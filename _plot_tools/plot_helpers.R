@@ -5,9 +5,9 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y){
     dplyr::summarize(mean = mean(!!enquo_y),
                      median = median(!!enquo_y),
                      sd = sd(!!enquo_y),
-                     lower.quartile = stats::quantile(!!enquo_y)[2],
-                     upper.quartile = stats::quantile(!!enquo_y)[4]) %>%
-    dplyr::mutate(lower.sd = mean - sd, upper.sd = mean + sd)
+                     lower_quartile = stats::quantile(!!enquo_y)[2],
+                     upper_quartile = stats::quantile(!!enquo_y)[4]) %>%
+    dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
   return(tufte_lines_df)
 }
 
@@ -34,6 +34,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
   x_axis_raw <- c(seq(1, raw_x_max,1))
   float.contrast <- float_contrast
   
+  effsize_type <- dabest_effectsize_obj$delta_y_labels
+  
   if (isTRUE(is_paired)) {
     raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_colour, 
                                      group = !!enquo_id_col)) +
@@ -47,24 +49,33 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       guides(colour="none", alpha="none", group="none")
     
     tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y)
-    
     row_num <- raw_x_max
     row_ref <- c(seq(1, row_num, 1)) + 0.1
-    
+    x_ref <- row_ref
+    y_top_t <-list(y = tufte_lines_df$mean + tufte_lines_df$mean/50,  
+                   yend = tufte_lines_df$upper_sd)
+    y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
+                   yend = tufte_lines_df$lower_sd) 
+    if (isTRUE(str_detect(effsize_type, "edian"))) {
+      y_top_t <-list(y = tufte_lines_df$median + tufte_lines_df$median/50,  
+                     yend = tufte_lines_df$upper_quartile)
+      y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
+                     yend = tufte_lines_df$lower_quartile) 
+    }
     # Adding tufte lines
     raw_plot <- raw_plot +
       geom_segment(data = tufte_lines_df, linewidth = 0.8,
                    aes(x = row_ref, 
                        xend = row_ref, 
-                       y = lower.sd, 
-                       yend = mean - mean/50),
+                       y = y_bot_t$y, 
+                       yend = y_bot_t$yend),
                    lineend = "square") +
       geom_segment(data = tufte_lines_df, linewidth = 0.8,
                    aes(x = row_ref, 
                        xend = row_ref, 
-                       y = mean + mean/50, 
-                       yend = upper.sd),
-                   lineend = "square") 
+                       y = y_top_t$y, 
+                       yend = y_top_t$yend),
+                   lineend = "square")
   }
   if (isTRUE(float.contrast)){
     # left-right graph
@@ -95,7 +106,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       non_float_contrast_theme +
       
       # Scale x-axis for alignment & add labels
-      scale_x_continuous(limits = c(0.8,2.3),
+      scale_x_continuous(limits = c(0.8,3),
                          expand = c(0,0),
                          breaks = c(1:raw_x_max),
                          labels = Ns$swarmticklabs) +
