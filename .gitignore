@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 
-# mac
+# Knitted html file
+dabestr-v1.html
+
+# Mac
 **/.DS_Store
 
 __pycache__/
