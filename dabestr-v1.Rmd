@@ -389,11 +389,11 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
                         yend = tufte_lines_df$upper_sd)
         y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
                         yend = tufte_lines_df$lower_sd) 
-        if ("edian" %in% effsize_type) {
+        if (isTRUE(str_detect(effsize_type, "edian"))) {
           y_top_t <-list(y = tufte_lines_df$median + tufte_lines_df$median/50,  
-                        yend = tufte_lines_df$upper_quantile)
+                        yend = tufte_lines_df$upper_quartile)
           y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
-                        yend = tufte_lines_df$lower_qunatile) 
+                        yend = tufte_lines_df$lower_quartile) 
         }
         # Adding tufte lines
         raw_plot <- raw_plot +
@@ -772,6 +772,7 @@ my.data <- wide.data %>%
 dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 dabest_obj.hedges_g <- hedges_g(dabest_obj)
+dabest_obj.median_diff <- median_diff(dabest_obj)
 
 # alternative way of plotting is
 # dabest_obj.mean_diff.plot <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1")) %>%
@@ -782,8 +783,8 @@ dabest_obj.hedges_g <- hedges_g(dabest_obj)
 ```
 
 ```{r}
-dabest_plot(dabest_obj.hedges_g, TRUE)
-dabest_plot(dabest_obj.hedges_g, FALSE)
+dabest_plot(dabest_obj.median_diff, TRUE)
+dabest_plot(dabest_obj.median_diff, FALSE)
 ```
 # Testing paired plots 
 ```{r}
