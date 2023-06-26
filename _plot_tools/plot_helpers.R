@@ -159,10 +159,16 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
   for(i in row_num){
     ci_coords <- density(bootstraps[[1]])
     x_coords_ci <- ci_coords$x
+    y_coords_ci <- ci_coords$y
+    
+    # Standardise y
+    y_coords_ci <- (y_coords_ci - min(y_coords_ci))/(max(y_coords_ci) - min(y_coords_ci))
+    y_coords_ci <- y_coords_ci/4
+    
     if(isTRUE(float_contrast)){
-      y_coords_ci <- ci_coords$y*3 + i
+      y_coords_ci <- y_coords_ci*2 + i
     }else{
-      y_coords_ci <- ci_coords$y + i
+      y_coords_ci <- y_coords_ci + i
     }
     
     min_x_coords <- min(x_coords_ci)
@@ -202,19 +208,19 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
       # Draw summary lines
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
-                   aes(x = 1.7, 
-                       xend = 2.3, 
+                   aes(x = 1.5, 
+                       xend = 3, 
                        y = difference, 
                        yend = difference)) +
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
-                   aes(x = 1.7, 
-                       xend = 2.3, 
+                   aes(x = 1.5, 
+                       xend = 3, 
                        y = 0, 
                        yend = 0)) +
       
       # Extend x-axis & add labels
-      scale_x_continuous(limits = c(1.7,2.3),
+      scale_x_continuous(limits = c(1.5,3),
                          expand = c(0,0),
                          breaks = c(2),
                          labels = delta_x_labels[2]) +
@@ -235,7 +241,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
     # Scale x-axis for alignment & add labels
     delta_plot <- delta_plot +
       theme_classic() +
-      scale_x_continuous(limits = c(0.8,2.3),
+      scale_x_continuous(limits = c(0.8,3),
                          expand = c(0,0),
                          breaks = c(1:delta_x_max),
                          labels = delta_x_labels) +
@@ -244,7 +250,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
                    aes(x = 0.8, 
-                       xend = 2.1, 
+                       xend = 3, 
                        y = 0, 
                        yend = 0)) +
       scale_y_continuous(limits = c(delta_y_min - delta_y_mean/10, 
