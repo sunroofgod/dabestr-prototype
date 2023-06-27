@@ -81,14 +81,16 @@ draw_panel_proportion_bar <- function(data, panel_scales, coord) {
                           width = coords$width,
                           height = 1 - coords$proportionsuccess,
                           gp = gpar(col = coords$colour,
-                                    fill = "white"))
+                                    fill = "white",
+                                    lwd = coords$size * .pt))
   
   success_bar <- rectGrob(x = coords$x,
                           y = coords$ysuccess,
                           width = coords$width,
                           height = coords$proportionsuccess,
                           gp = gpar(col = coords$colour,
-                                    fill = alpha(coords$fill, coords$alpha)))
+                                    fill = alpha(coords$fill, coords$alpha),
+                                    lwd = coords$size * .pt))
   
   gTree(children = gList(failure_bar, success_bar))
   
@@ -99,7 +101,9 @@ GeomProportionBar <- ggproto("GeomProportionBar", Geom,
                              default_aes = aes(colour = NA,
                                                width = 0.2,
                                                fill = "grey35",
-                                               alpha = NA),
+                                               alpha = NA,
+                                               lwd = 2,
+                                               size = 0.7),
                              draw_key = draw_key_polygon,
                              draw_panel = draw_panel_proportion_bar)
 

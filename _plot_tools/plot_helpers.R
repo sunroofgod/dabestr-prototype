@@ -1,13 +1,20 @@
 # Function for creation of df for tuftelines plot
-df_for_tufte <- function(raw_data, enquo_x, enquo_y){
+df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
                      median = median(!!enquo_y),
                      sd = sd(!!enquo_y),
                      lower_quartile = stats::quantile(!!enquo_y)[2],
-                     upper_quartile = stats::quantile(!!enquo_y)[4]) %>%
+                     upper_quartile = stats::quantile(!!enquo_y)[4])
+  
+  if(isTRUE(proportional)){
+    tufte_lines_df <- tufte_lines_df %>%
+      dplyr::mutate(sd = sd/10)
+  }
+  tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
+  
   return(tufte_lines_df)
 }
 
@@ -47,13 +54,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       guides(alpha="none", group="none")
   } else {
     if(isTRUE(proportional)){
+      bar_width <- ifelse(float_contrast, 0.15, 0.10)
       # Plot unpaired proportion rawplot
       raw_plot <- ggplot(proportional_data) +
         geom_proportionbar(aes(x = x_axis_raw, 
                                ysuccess = y_success, 
                                yfailure = y_failure, 
                                proportionsuccess = proportion_success,
-                               colour = !!enquo_x, fill = !!enquo_x))
+                               colour = !!enquo_x, 
+                               fill = !!enquo_x,
+                               width = bar_width)) +
+        guides(colour = "none", fill = "none")
     } else {
       raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
         geom_beeswarm(cex = 2) +
@@ -61,18 +72,24 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
         guides(colour="none", alpha="none", group="none")
     }
     
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y)
+    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
+    
+    # Aesthetics variables
+    tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.1)
+    
     row_num <- raw_x_max
-    row_ref <- c(seq(1, row_num, 1)) + 0.1
+    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
     x_ref <- row_ref
-    y_top_t <-list(y = tufte_lines_df$mean + tufte_lines_df$mean/50,  
+    
+    y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  
                    yend = tufte_lines_df$upper_sd)
-    y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
+    y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
                    yend = tufte_lines_df$lower_sd) 
     if (isTRUE(str_detect(effsize_type, "edian"))) {
-      y_top_t <-list(y = tufte_lines_df$median + tufte_lines_df$median/50,  
+      y_top_t <-list(y = tufte_lines_df$median + tufte_gap_value,  
                      yend = tufte_lines_df$upper_quartile)
-      y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
+      y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
                      yend = tufte_lines_df$lower_quartile) 
     }
     # Adding tufte lines

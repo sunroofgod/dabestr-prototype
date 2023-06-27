@@ -300,6 +300,23 @@ cliffs_delta <- function(dabest_obj) {
   return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Cliffs' delta"))
 }
 
+cohens_h <- function(dabest_obj){
+  
+  effect_size_func <- function(control, test, paired) {
+    #remove nas and nulls later on
+    prop_control <- mean(control)
+    prop_test <- mean(test)
+
+    # Arcsine transformation
+    phi_control <- 2 * asin(sqrt(prop_control))
+    phi_test <- 2 * asin(sqrt(prop_test))
+    result <- phi_test - phi_control
+    return(result)
+  }
+  
+  return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Cohen's h"))
+}
+
 hedges_correction <- function(x1, x2) {
 
   n1 <- length(x1)
@@ -350,15 +367,22 @@ non_float_contrast_theme <-
 
 ```{r}
 # Function for creation of df for tuftelines plot
-df_for_tufte <- function(raw_data, enquo_x, enquo_y){
+df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
                      median = median(!!enquo_y),
                      sd = sd(!!enquo_y),
                      lower_quartile = stats::quantile(!!enquo_y)[2],
-                     upper_quartile = stats::quantile(!!enquo_y)[4]) %>%
+                     upper_quartile = stats::quantile(!!enquo_y)[4])
+  
+  if(isTRUE(proportional)){
+    tufte_lines_df <- tufte_lines_df %>%
+      dplyr::mutate(sd = sd/10)
+  }
+  tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
+  
   return(tufte_lines_df)
 }
 
@@ -374,14 +398,16 @@ draw_panel_proportion_bar <- function(data, panel_scales, coord) {
                           width = coords$width,
                           height = 1 - coords$proportionsuccess,
                           gp = gpar(col = coords$colour,
-                                    fill = "white"))
+                                    fill = "white",
+                                    lwd = coords$size * .pt))
   
   success_bar <- rectGrob(x = coords$x,
                           y = coords$ysuccess,
                           width = coords$width,
                           height = coords$proportionsuccess,
                           gp = gpar(col = coords$colour,
-                                    fill = alpha(coords$fill, coords$alpha)))
+                                    fill = alpha(coords$fill, coords$alpha),
+                                    lwd = coords$size * .pt))
   
   gTree(children = gList(failure_bar, success_bar))
   
@@ -392,7 +418,9 @@ GeomProportionBar <- ggproto("GeomProportionBar", Geom,
                       default_aes = aes(colour = NA,
                                         width = 0.2,
                                         fill = "grey35",
-                                        alpha = NA),
+                                        alpha = NA,
+                                        lwd = 2,
+                                        size = 0.7),
                       draw_key = draw_key_polygon,
                       draw_panel = draw_panel_proportion_bar)
 
@@ -447,13 +475,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       guides(alpha="none", group="none")
   } else {
     if(isTRUE(proportional)){
+      bar_width <- ifelse(float_contrast, 0.15, 0.10)
       # Plot unpaired proportion rawplot
       raw_plot <- ggplot(proportional_data) +
         geom_proportionbar(aes(x = x_axis_raw, 
                                ysuccess = y_success, 
                                yfailure = y_failure, 
                                proportionsuccess = proportion_success,
-                               colour = !!enquo_x, fill = !!enquo_x))
+                               colour = !!enquo_x, 
+                               fill = !!enquo_x,
+                               width = bar_width)) +
+        guides(colour = "none", fill = "none")
     } else {
       raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
         geom_beeswarm(cex = 2) +
@@ -461,34 +493,40 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
         guides(colour="none", alpha="none", group="none")
     }
     
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y)
-        row_num <- raw_x_max
-        row_ref <- c(seq(1, row_num, 1)) + 0.1
-        x_ref <- row_ref
-        y_top_t <-list(y = tufte_lines_df$mean + tufte_lines_df$mean/50,  
-                        yend = tufte_lines_df$upper_sd)
-        y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
-                        yend = tufte_lines_df$lower_sd) 
-        if (isTRUE(str_detect(effsize_type, "edian"))) {
-          y_top_t <-list(y = tufte_lines_df$median + tufte_lines_df$median/50,  
-                        yend = tufte_lines_df$upper_quartile)
-          y_bot_t <-list(y = tufte_lines_df$mean - tufte_lines_df$mean/50, 
-                        yend = tufte_lines_df$lower_quartile) 
-        }
-        # Adding tufte lines
-        raw_plot <- raw_plot +
-          geom_segment(data = tufte_lines_df, linewidth = 0.8,
-                   aes(x = row_ref, 
-                       xend = row_ref, 
-                       y = y_bot_t$y, 
-                       yend = y_bot_t$yend),
-                   lineend = "square") +
-          geom_segment(data = tufte_lines_df, linewidth = 0.8,
-                   aes(x = row_ref, 
-                       xend = row_ref, 
-                       y = y_top_t$y, 
-                       yend = y_top_t$yend),
-                   lineend = "square")
+    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
+    
+    # Aesthetics variables
+    tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.1)
+    
+    row_num <- raw_x_max
+    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
+    x_ref <- row_ref
+    
+    y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  
+                    yend = tufte_lines_df$upper_sd)
+    y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
+                    yend = tufte_lines_df$lower_sd) 
+    if (isTRUE(str_detect(effsize_type, "edian"))) {
+      y_top_t <-list(y = tufte_lines_df$median + tufte_gap_value,  
+                    yend = tufte_lines_df$upper_quartile)
+      y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
+                    yend = tufte_lines_df$lower_quartile) 
+    }
+    # Adding tufte lines
+    raw_plot <- raw_plot +
+      geom_segment(data = tufte_lines_df, linewidth = 0.8,
+               aes(x = row_ref, 
+                   xend = row_ref, 
+                   y = y_bot_t$y, 
+                   yend = y_bot_t$yend),
+               lineend = "square") +
+      geom_segment(data = tufte_lines_df, linewidth = 0.8,
+               aes(x = row_ref, 
+                   xend = row_ref, 
+                   y = y_top_t$y, 
+                   yend = y_top_t$yend),
+               lineend = "square")
   }
   if (isTRUE(float.contrast)){
     # left-right graph
@@ -861,8 +899,8 @@ dabest_obj.median_diff <- median_diff(dabest_obj)
 ```
 
 ```{r}
-dabest_plot(dabest_obj.median_diff, TRUE)
-dabest_plot(dabest_obj.median_diff, FALSE)
+dabest_plot(dabest_obj.hedges_g, TRUE)
+dabest_plot(dabest_obj.hedges_g, FALSE)
 ```
 # Testing paired plots 
 ```{r}
@@ -882,18 +920,26 @@ set.seed(12345)
 
 N = 40
 
-my.data.proportional <- data.frame(
-  Group = sample(c("Control1", "Control2", "Group1", "Group2", "Group3"), 5000, TRUE)
+my.data.control_proportional <- data.frame(
+  Group = sample(c("Control1"), 40, TRUE)
 )
-my.data.proportional$Success <- numeric(nrow(my.data.proportional))
-my.data.proportional$Success[sample(nrow(my.data.proportional), 2500)] <- 1
+my.data.control_proportional$Success <- numeric(nrow(my.data.control_proportional))
+my.data.control_proportional$Success[sample(nrow(my.data.control_proportional), 8)] <- 1
+
+my.data.test_proportion <- data.frame(
+  Group = sample(c("Test1"), 40, TRUE)
+)
+my.data.test_proportion$Success <- numeric(nrow(my.data.test_proportion))
+my.data.test_proportion$Success[sample(nrow(my.data.test_proportion), 22)] <- 1
+
+my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion)
 ```
 
 ```{r}
 dabest_obj_proportional.mean_diff <- load(data = my.data.proportional, 
                                   x = Group, 
                                   y = Success, 
-                                  idx = c("Control1", "Group1"),
+                                  idx = c("Control1", "Test1"),
                                   proportional = TRUE) %>%
   mean_diff()
 ```
@@ -901,4 +947,19 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
 ```{r}
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE)
 dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+```
+
+```{r}
+dabest_obj_proportional.cohens_h <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = c("Control1", "Test1"),
+                                  proportional = TRUE) %>%
+  cohens_h()
+```
+
+```{r}
+
+dabest_plot(dabest_obj_proportional.cohens_h, TRUE)
+dabest_plot(dabest_obj_proportional.cohens_h, FALSE)
 ```
