@@ -17,6 +17,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
   enquo_y = dabest_effectsize_obj$enquo_y
   enquo_id_col = dabest_effectsize_obj$enquo_id_col
   enquo_colour = dabest_effectsize_obj$enquo_colour
+  proportional = dabest_effectsize_obj$proportional
+  proportional_data = dabest_effectsize_obj$proportional_data
+  
   raw_data <- dabest_effectsize_obj$raw_data
   Ns <- dabest_effectsize_obj$Ns
   raw_y_range_vector <- dabest_effectsize_obj$ylim
@@ -43,10 +46,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       scale_colour_manual(values=c("#4e6f85", "#b48459")) +
       guides(alpha="none", group="none")
   } else {
-    raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
-      geom_beeswarm(cex = 2) +
-      scale_colour_manual(values=c("#4e6f85", "#b48459")) +
-      guides(colour="none", alpha="none", group="none")
+    if(isTRUE(proportional)){
+      # Plot unpaired proportion rawplot
+      raw_plot <- ggplot(proportional_data) +
+        geom_proportionbar(aes(x = x_axis_raw, 
+                               ysuccess = y_success, 
+                               yfailure = y_failure, 
+                               proportionsuccess = proportion_success,
+                               colour = !!enquo_x, fill = !!enquo_x))
+    } else {
+      raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
+        geom_beeswarm(cex = 2) +
+        scale_colour_manual(values=c("#4e6f85", "#b48459")) +
+        guides(colour="none", alpha="none", group="none")
+    }
     
     tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y)
     row_num <- raw_x_max

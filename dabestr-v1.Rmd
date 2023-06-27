@@ -30,7 +30,8 @@ load <- function(
     is_paired = FALSE,
     id_col = NULL,
     ci = 95,
-    colour = NULL
+    colour = NULL,
+    proportional = FALSE
     ){
   
   # Storing plotting params as quosures
@@ -50,14 +51,10 @@ load <- function(
       mutate(x_axis_raw = case_when(
         Group == idx[1] ~ 1,
         Group == idx[2] ~ 2,
-      ))
+      )) 
     
     # Obtain raw_y_range_vector
     ylim <- range(raw_data[[name_y]])
-    
-    # Extending ylim for geom_beeswarm points being plotted
-    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/10
-    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/10
     
     # Creation of x-axis label
     Ns <- raw_data %>%
@@ -69,20 +66,42 @@ load <- function(
     buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
     Ns <- rbind(Ns)
     
-    # Calculation of summary lines
-    summaries <- raw_data %>%
-      group_by(!!enquo_x) %>%
-      summarise(summary_stats = mean(!!enquo_y))
-    
-    control_summary <- summaries$summary_stats[1]
-    test_summary <- summaries$summary_stats[2]
+    if(isTRUE(proportional)){
+      ## include checks here for data to see if it is proportional data
+      proportional_data <- raw_data %>%
+        select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
+        group_by(!!enquo_x) %>%
+        summarise(proportion_success = mean(!!enquo_y),
+                  y_success = proportion_success/2,
+                  y_failure = (1+proportion_success)/2)
+      
+      control_summary <- proportional_data$proportion_success[1]
+      test_summary <- proportional_data$proportion_success[2]
+        
+    } else {
+      # Extending ylim for geom_beeswarm points being plotted
+      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/10
+      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/10
+      
+      # Calculation of summary lines
+      summaries <- raw_data %>%
+        group_by(!!enquo_x) %>%
+        summarise(summary_stats = mean(!!enquo_y))
+      
+      control_summary <- summaries$summary_stats[1]
+      test_summary <- summaries$summary_stats[2]
+      
+      proportional_data <- NULL
+    }
     
     dabest_object <- list(
       raw_data = raw_data,
+      proportional_data = proportional_data,
       enquo_x = enquo_x,
       enquo_y = enquo_y,
       enquo_id_col = enquo_id_col,
       enquo_colour = enquo_colour,
+      proportional = proportional,
       idx = idx,
       is_paired = is_paired,
       ci = ci,
@@ -203,7 +222,9 @@ bootstrap <- function(
       enquo_x = dabest_obj$enquo_x,
       enquo_y = dabest_obj$enquo_y,
       enquo_id_col = dabest_obj$enquo_id_col,
-      enquo_colour = dabest_obj$enquo_colour
+      enquo_colour = dabest_obj$enquo_colour,
+      proportional = dabest_obj$proportional,
+      proportional_data = dabest_obj$proportional_data
     )
   }
   return(row)
@@ -343,6 +364,52 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y){
 
 ```
 
+# custom proportionbar geom
+```{r}
+draw_panel_proportion_bar <- function(data, panel_scales, coord) {
+  coords <- coord$transform(data, panel_scales) 
+  
+  failure_bar <- rectGrob(x = coords$x,
+                          y = coords$yfailure,
+                          width = coords$width,
+                          height = 1 - coords$proportionsuccess,
+                          gp = gpar(col = coords$colour,
+                                    fill = "white"))
+  
+  success_bar <- rectGrob(x = coords$x,
+                          y = coords$ysuccess,
+                          width = coords$width,
+                          height = coords$proportionsuccess,
+                          gp = gpar(col = coords$colour,
+                                    fill = alpha(coords$fill, coords$alpha)))
+  
+  gTree(children = gList(failure_bar, success_bar))
+  
+}
+
+GeomProportionBar <- ggproto("GeomProportionBar", Geom,
+                      required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
+                      default_aes = aes(colour = NA,
+                                        width = 0.2,
+                                        fill = "grey35",
+                                        alpha = NA),
+                      draw_key = draw_key_polygon,
+                      draw_panel = draw_panel_proportion_bar)
+
+geom_proportionbar <- function(mapping = NULL, data = NULL, stat = "identity", 
+                        position = "identity", show.legend = NA, 
+                        na.rm = FALSE, inherit.aes = TRUE, ...) {
+  layer(data = data, 
+        mapping = mapping,
+        stat = stat,
+        geom = GeomProportionBar,
+        position = position,
+        show.legend = show.legend,
+        inherit.aes = inherit.aes,
+        params = list(na.rm = na.rm, ...))
+}
+```
+
 # raw plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast) {
@@ -350,6 +417,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
   enquo_y = dabest_effectsize_obj$enquo_y
   enquo_id_col = dabest_effectsize_obj$enquo_id_col
   enquo_colour = dabest_effectsize_obj$enquo_colour
+  proportional = dabest_effectsize_obj$proportional
+  proportional_data = dabest_effectsize_obj$proportional_data
+  
   raw_data <- dabest_effectsize_obj$raw_data
   Ns <- dabest_effectsize_obj$Ns
   raw_y_range_vector <- dabest_effectsize_obj$ylim
@@ -376,10 +446,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       scale_colour_manual(values=c("#4e6f85", "#b48459")) +
       guides(alpha="none", group="none")
   } else {
-    raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
-      geom_beeswarm(cex = 2) +
-      scale_colour_manual(values=c("#4e6f85", "#b48459")) +
-      guides(colour="none", alpha="none", group="none")
+    if(isTRUE(proportional)){
+      # Plot unpaired proportion rawplot
+      raw_plot <- ggplot(proportional_data) +
+        geom_proportionbar(aes(x = x_axis_raw, 
+                               ysuccess = y_success, 
+                               yfailure = y_failure, 
+                               proportionsuccess = proportion_success,
+                               colour = !!enquo_x, fill = !!enquo_x))
+    } else {
+      raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
+        geom_beeswarm(cex = 2) +
+        scale_colour_manual(values=c("#4e6f85", "#b48459")) +
+        guides(colour="none", alpha="none", group="none")
+    }
     
     tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y)
         row_num <- raw_x_max
@@ -475,7 +555,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
 
   return(raw_plot)
 }
-
 ```
 
 # custom violin & boot_ci geoms
@@ -763,7 +842,6 @@ wide.data <- tibble::tibble(
 
 my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
-
 ```
 
 
@@ -796,4 +874,31 @@ dabest_obj.paired_median_diff <- median_diff(dabest_obj)
 ```{r}
 dabest_plot(dabest_obj.paired_median_diff, TRUE)
 dabest_plot(dabest_obj.paired_median_diff, FALSE)
+```
+
+# Testing proportional dataset
+```{r}
+set.seed(12345)
+
+N = 40
+
+my.data.proportional <- data.frame(
+  Group = sample(c("Control1", "Control2", "Group1", "Group2", "Group3"), 5000, TRUE)
+)
+my.data.proportional$Success <- numeric(nrow(my.data.proportional))
+my.data.proportional$Success[sample(nrow(my.data.proportional), 2500)] <- 1
+```
+
+```{r}
+dabest_obj_proportional.mean_diff <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = c("Control1", "Group1"),
+                                  proportional = TRUE) %>%
+  mean_diff()
+```
+
+```{r}
+dabest_plot(dabest_obj_proportional.mean_diff, TRUE)
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
 ```
