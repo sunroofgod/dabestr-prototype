@@ -42,40 +42,103 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
   idx <- dabest_effectsize_obj$idx
   raw_x_max = length(unlist(idx))
   x_axis_raw <- c(seq(1, raw_x_max,1))
-  float.contrast <- float_contrast
   
   effsize_type <- dabest_effectsize_obj$delta_y_labels
   
-  if (isTRUE(is_paired)) {
-    raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_colour, 
-                                     group = !!enquo_id_col)) +
-      geom_line(aes(alpha = 0.8)) +
-      scale_colour_manual(values=c("#4e6f85", "#b48459")) +
-      guides(alpha="none", group="none")
-  } else {
-    if(isTRUE(proportional)){
-      bar_width <- ifelse(float_contrast, 0.15, 0.10)
-      # Plot unpaired proportion rawplot
-      raw_plot <- ggplot(proportional_data) +
-        geom_proportionbar(aes(x = x_axis_raw, 
-                               ysuccess = y_success, 
-                               yfailure = y_failure, 
-                               proportionsuccess = proportion_success,
-                               colour = !!enquo_x, 
-                               fill = !!enquo_x,
-                               width = bar_width)) +
-        guides(colour = "none", fill = "none")
-    } else {
-      raw_plot <- ggplot(raw_data, aes(x = x_axis_raw, y = !!enquo_y, colour = !!enquo_x)) +
-        geom_beeswarm(cex = 2) +
-        scale_colour_manual(values=c("#4e6f85", "#b48459")) +
-        guides(colour="none", alpha="none", group="none")
-    }
+  # to add: check if multiplot, float_contrast = FALSE automatically
+  
+  plot_components <- create_plot_components(proportional, is_paired, float_contrast)
+  main_plot_type <- plot_components$main_plot_type
+  is_summary_lines <- plot_components$summary_lines
+  is_tufte_lines <- plot_components$tufte_lines
+  
+  sankey_bar_gap <- 0.02
+  
+  # Initialise raw_plot and add main_plot_type component
+  raw_plot <- switch(
+    main_plot_type,
     
+    "swarmplot" =
+      ggplot() +
+      # to add: need to handle colour for swarm & slope graphs
+      geom_beeswarm(data = raw_data, 
+                    aes(x = x_axis_raw, 
+                        y = !!enquo_y, 
+                        colour = !!enquo_colour)) +
+      guides(colour = "none", alpha = "none", group = "none"),
+    
+    "slope" = 
+      ggplot() +
+      geom_line(data = raw_data,
+                aes(x = x_axis_raw, 
+                    y = !!enquo_y,
+                    colour = !!enquo_colour,
+                    group = !!enquo_id_col,
+                    alpha = 0.8)) +
+      guides(alpha = "none", group = "none"),
+    
+    "unpaired proportions" = 
+      ggplot() +
+      geom_proportionbar(data = proportional_data,
+                         aes(x = x_axis_raw,
+                             y = proportion_success,
+                             colour = !!enquo_x, 
+                             fill = !!enquo_x,
+                             width = bar_width)) +
+      guides(colour = "none", fill ="none"),
+    
+    "sankey" =
+      ggplot() +
+      geom_sankeyflow(data = data_for_flow1, 
+                      aes(x = x, y = y, fillcol = "#db6159")) +
+      geom_sankeyflow(data = data_for_flow2, 
+                      aes(x = x, y = y, fillcol = "#818181")) +
+      geom_sankeyflow(data = data_for_rect_top, 
+                      aes(x = x, y = y, fillcol = "#818181")) +
+      geom_sankeyflow(data = data_for_rect_bot, 
+                      aes(x = x, y = y, fillcol = "#db6159")) +
+      geom_sankeybar(data = data_for_bars, 
+                     aes(x = x_axis_raw,
+                         ysuccess = y_success, 
+                         yfailure = y_failure, 
+                         proportionsuccess = proportion_success, 
+                         width = bar_width,
+                         gap = sankey_bar_gap))
+  )
+  
+  # Add scaling to axis & theme
+  raw_plot <- raw_plot +
+    theme_classic() +
+    scale_x_continuous(limits = c(0.6,1:raw_x_max+1),
+                       expand = c(0,0),
+                       breaks = c(1:raw_x_max),
+                       labels = Ns$swarmticklabs) +
+    scale_y_continuous(limits = c(raw_y_min, raw_y_max), expand = c(0,0))
+  
+  # Add summary_lines component
+  if(isTRUE(is_summary_lines)) {
+    raw_plot <- raw_plot +
+      geom_segment(colour = "black",linewidth = 0.3,
+                   aes(x = 1, 
+                       xend = 3,
+                       y = control_summary, 
+                       yend = control_summary)) +
+      geom_segment(colour = "black", linewidth = 0.3,
+                   aes(x = 2, 
+                       xend = 3, 
+                       y = test_summary, 
+                       yend = test_summary))
+  }
+  
+  # Add tufte_lines component
+  if(isTRUE(is_tufte_lines)) {
     tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
-    
-    # Aesthetics variables
-    tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
+    if(main_plot_type == "sankey"){
+      tufte_gap_value <- sankey_bar_gap
+    } else {
+      tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
+      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
+    }
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.1)
     
     row_num <- raw_x_max
@@ -92,7 +155,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
                      yend = tufte_lines_df$lower_quartile) 
     }
-    # Adding tufte lines
     raw_plot <- raw_plot +
       geom_segment(data = tufte_lines_df, linewidth = 0.8,
                    aes(x = row_ref, 
@@ -107,40 +169,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
                        yend = y_top_t$yend),
                    lineend = "square")
   }
-  if (isTRUE(float.contrast)){
-    # left-right graph
-    raw_plot <- raw_plot + 
-      theme_classic() +
+  
+  # Remove x-axis and redraw depending on float_contrast
+  if(isTRUE(float_contrast)) {
+    raw_plot <- raw_plot +
       float_contrast_theme +
-      
-      # Scale x-axis for alignment & add labels
-      scale_x_continuous(limits = c(0.6,3),
-                         expand = c(0,0),
-                         breaks = c(1:raw_x_max),
-                         labels = Ns$swarmticklabs) +
-      
-      # Redraw x-axis
-      geom_segment(linewidth = 0.8, color = "black", x = 0, xend = 2.5, y = raw_y_min, yend = raw_y_min) +
-      
-      # Draw summary lines
-      geom_segment(colour = "black",
-                   linewidth = 0.3,
-                   aes(x = 1, xend = 3, y = control_summary, yend = control_summary)) +
-      geom_segment(colour = "black",
-                   linewidth = 0.3,
-                   aes(x = 2, xend = 3, y = test_summary, yend = test_summary))
+      geom_segment(linewidth = 0.8, color = "black", x = 0, xend = 2.5, y = raw_y_min, yend = raw_y_min)
   } else {
-    # top-down graph
-    raw_plot <- raw_plot + 
-      theme_classic() +
+    raw_plot <- raw_plot +
       non_float_contrast_theme +
       
-      # Scale x-axis for alignment & add labels
-      scale_x_continuous(limits = c(0.8,3),
-                         expand = c(0,0),
-                         breaks = c(1:raw_x_max),
-                         labels = Ns$swarmticklabs) +
-      
+      # to add: redrawing of axis for multiplot false float_contrast
       # Redraw x-axis line
       geom_segment(linewidth = 0.5, 
                    x = 1, 
@@ -166,9 +205,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
                    color = "black",
                    lineend = "square")
   }
-  raw_plot <- raw_plot +
-    scale_y_continuous(limits = c(raw_y_min, raw_y_max), expand = c(0,0)) +
-    labs(y = "value")
+  
+  # Add y_labels component
+  if(isTRUE(proportional)){
+    raw_plot <- raw_plot +
+      labs(y = "proportion of success")
+  } else {
+    raw_plot <- raw_plot +
+      labs(y = "value")
+  }
   
   return(raw_plot)
 }
