@@ -45,12 +45,28 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
   
   effsize_type <- dabest_effectsize_obj$delta_y_labels
   
-  # to add: check if multiplot, float_contrast = FALSE automatically
+  # check if multiplot
+  if(length(idx) >= 2) {
+    float_contrast = FALSE
+  }
   
   plot_components <- create_plot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$summary_lines
   is_tufte_lines <- plot_components$tufte_lines
+  
+  if(main_plot_type == "sankey"){
+    sankey_df <- create_dfs_for_sankey(float_contrast, 
+                                       raw_data,
+                                       proportional_data,
+                                       enquo_id_col,
+                                       x_axis_raw)
+    flow1 <- sankey_df$flow1
+    flow2 <- sankey_df$flow2
+    rect_top <- sankey_df$rect_top
+    rect_bot <- sankey_df$rect_bot
+    bars <- sankey_df$bars
+  }
   
   sankey_bar_gap <- 0.02
   
@@ -89,15 +105,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = data_for_flow1, 
+      geom_sankeyflow(data = flow1, 
                       aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeyflow(data = data_for_flow2, 
+      geom_sankeyflow(data = flow2, 
                       aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = data_for_rect_top, 
+      geom_sankeyflow(data = rect_top, 
                       aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = data_for_rect_bot, 
+      geom_sankeyflow(data = rect_bot, 
                       aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeybar(data = data_for_bars, 
+      geom_sankeybar(data = bars, 
                      aes(x = x_axis_raw,
                          ysuccess = y_success, 
                          yfailure = y_failure, 
@@ -177,33 +193,32 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       geom_segment(linewidth = 0.8, color = "black", x = 0, xend = 2.5, y = raw_y_min, yend = raw_y_min)
   } else {
     raw_plot <- raw_plot +
-      non_float_contrast_theme +
-      
-      # to add: redrawing of axis for multiplot false float_contrast
-      # Redraw x-axis line
-      geom_segment(linewidth = 0.5, 
-                   x = 1, 
-                   xend = 2, 
-                   y = raw_y_min + raw_y_mean/30, 
-                   yend = raw_y_min + raw_y_mean/30,
-                   color = "black",
-                   lineend = "square") +
-      
-      # Redraw ticks
-      geom_segment(linewidth = 0.5,
-                   x = 1, 
-                   xend = 1, 
-                   y = raw_y_min + raw_y_mean/30, 
-                   yend = raw_y_min,
-                   color = "black",
-                   lineend = "square") +
-      geom_segment(linewidth = 0.5,
-                   x = 2, 
-                   xend = 2, 
-                   y = raw_y_min + raw_y_mean/30, 
-                   yend = raw_y_min,
-                   color = "black",
-                   lineend = "square")
+      non_float_contrast_theme
+
+      x_axis_pointer <- 0
+      for (j in idx) {
+        # Redraw x-axis line
+        raw_plot <- raw_plot +
+          geom_segment(linewidth = 0.5, 
+                       x = x_axis_pointer + 1, 
+                       xend = x_axis_pointer + length(idx[[j]]), 
+                       y = raw_y_min + raw_y_mean/30, 
+                       yend = raw_y_min + raw_y_mean/30,
+                       color = "black",
+                       lineend = "square")
+        # Redraw ticks
+        for (k in idx[[j]]) {
+          raw_plot <- raw_plot +
+            geom_segment(linewidth = 0.5,
+                         x = x_axis_pointer + k, 
+                         xend = x_axis_pointer + k, 
+                         y = raw_y_min + raw_y_mean/30, 
+                         yend = raw_y_min,
+                         color = "black",
+                         lineend = "square")
+        }
+        x_axis_pointer <- length(idx[[j]])
+      }
   }
   
   # Add y_labels component
@@ -343,34 +358,30 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
                                     delta_y_max + delta_y_mean/10),
                          expand = c(0,0))
     
-    # settle aesthetics of the x-axis, try to make it look like the python ver
-    # should be a for loop but its not going to be for now
-    # for loop is for j in length(idx)
-    #               for k in length(idx[[i]])
-    
-    delta_plot <- delta_plot +
-      
+    x_axis_pointer <- 0
+    for (j in idx) {
       # Redraw x-axis line
-      geom_segment(linewidth = 0.5, 
-                   aes(x = 1, 
-                       xend = 2, 
-                       y = delta_y_min - delta_y_mean/15, 
-                       yend = delta_y_min - delta_y_mean/15),
-                   lineend = "square") +
-      
+      delta_plot <- delta_plot +
+        geom_segment(linewidth = 0.5, 
+                     x = x_axis_pointer + 1, 
+                     xend = x_axis_pointer + length(idx[[j]]), 
+                     y = delta_y_min - delta_y_mean/15, 
+                     yend = delta_y_min - delta_y_mean/15,
+                     color = "black",
+                     lineend = "square")
       # Redraw ticks
-      geom_segment(linewidth = 0.5,
-                   aes(x = 1, 
-                       xend = 1, 
+      for (k in idx[[j]]) {
+        delta_plot <- delta_plot +
+          geom_segment(linewidth = 0.5,
+                       x = x_axis_pointer + k, 
+                       xend = x_axis_pointer + k, 
                        y = delta_y_min - delta_y_mean/15, 
-                       yend = delta_y_min - delta_y_mean/10),
-                   lineend = "square") +
-      geom_segment(linewidth = 0.5,
-                   aes(x = 2, 
-                       xend = 2, 
-                       y = delta_y_min - delta_y_mean/15, 
-                       yend = delta_y_min - delta_y_mean/10),
-                   lineend = "square")
+                       yend = delta_y_min - delta_y_mean/10,
+                       color = "black",
+                       lineend = "square")
+      }
+      x_axis_pointer <- length(idx[[j]])
+    }
   }
   
   delta_plot <- delta_plot +
