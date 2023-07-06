@@ -42,6 +42,7 @@ bootstrap <- function(
   enquo_y <- dabest_obj$enquo_y
   ci <- dabest_obj$ci
   is_paired <- dabest_obj$is_paired
+  is_colour <- dabest_obj$is_colour
   
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
@@ -92,6 +93,7 @@ bootstrap <- function(
       difference = boot_result$t0,
       raw_data = raw_data,
       is_paired = is_paired,
+      is_colour = is_colour,
       Ns = dabest_obj$Ns,
       control_summary = dabest_obj$control_summary,
       test_summary = dabest_obj$test_summary,
