@@ -24,6 +24,7 @@ library(grid)
 library(scales)
 library(ggsci)
 library(colorspace)
+library(roxygen2)
 ```
 
 # load function
@@ -581,6 +582,54 @@ create_plot_components <- function(proportional,
 }
 ```
 
+```{r}
+assign_plot_kwargs <- function(plot_kwargs) {
+  colour_col <- NULL
+  swarm_label <- NULL
+  contrast_label <- NULL
+  custom_palette <- "d3"
+  swarm_ylim <- NULL
+  contrast_ylim <- NULL
+  delta2_ylim <- NULL
+  delta2_label <- NULL
+  
+  if(isFALSE(is.null(plot_kwargs$colour_col))) {
+    colour_col <- plot_kwargs$colour_col
+  }
+  if(isFALSE(is.null(plot_kwargs$swarm_label))) {
+    swarm_label <- plot_kwargs$swarm_label
+  }
+  if(isFALSE(is.null(plot_kwargs$contrast_label))) {
+    contrast_label <- plot_kwargs$contrast_label
+  }
+  if(isFALSE(is.null(plot_kwargs$custom_palette))) {
+    custom_palette <- plot_kwargs$custom_palette
+  }
+  if(isFALSE(is.null(plot_kwargs$swarm_ylim))) {
+    swarm_ylim <- plot_kwargs$swarm_ylim
+  }
+  if(isFALSE(is.null(plot_kwargs$contrast_ylim))) {
+    contrast_ylim <- plot_kwargs$contrast_ylim
+  }
+  if(isFALSE(is.null(plot_kwargs$delta2_ylim))) {
+    delta2_ylim <- plot_kwargs$delta2_ylim
+  }
+  if(isFALSE(is.null(plot_kwargs$delta2_label))) {
+    delta2_label <- plot_kwargs$delta2_label
+  }
+  return(list(
+    colour_col = colour_col,
+    swarm_label = swarm_label,
+    contrast_label = contrast_label,
+    custom_palette = custom_palette,
+    swarm_ylim = swarm_ylim,
+    contrast_ylim = contrast_ylim,
+    delta2_ylim = delta2_ylim,
+    delta2_label = delta2_label
+  ))
+}
+```
+
 # custom proportionbar geom
 ```{r}
 "%||%" <- function(a, b) {
@@ -744,7 +793,7 @@ geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity",
 
 # raw plot function
 ```{r}
-plot_raw <- function(dabest_effectsize_obj, float_contrast) {
+plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x = dabest_effectsize_obj$enquo_x
   enquo_y = dabest_effectsize_obj$enquo_y
   enquo_id_col = dabest_effectsize_obj$enquo_id_col
@@ -889,7 +938,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast) {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
       tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.15)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.10)
     
     row_num <- raw_x_max
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -1012,7 +1061,7 @@ draw_group_halfviolin <- function(data, panel_scales, coord) {
 GeomHalfViolin <- ggproto("GeomHalfViolin", Geom,
                           required_aes = c("x", "y"),
                           default_aes = aes(colour = NA, 
-                                            fill = "grey35",
+                                            fill = "grey50",
                                             alpha = 0.8),
                           draw_key = draw_key_point,
                           draw_group = draw_group_halfviolin)
@@ -1073,7 +1122,7 @@ geom_bootci <- function(mapping = NULL, data = NULL, stat = "identity",
 
 # delta_plot function 
 ```{r}
-plot_delta <- function(dabest_effectsize_obj, float_contrast) {
+plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx = dabest_effectsize_obj$idx
   bootstraps = dabest_effectsize_obj$bootstraps
   delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
@@ -1084,6 +1133,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
   raw_y_range_vector <- dabest_effectsize_obj$ylim
   control_summary <- dabest_effectsize_obj$control_summary
   test_summary <- dabest_effectsize_obj$test_summary
+  
+  is_colour <- dabest_effectsize_obj$is_colour
+  is_paired <- dabest_effectsize_obj$is_paired
   
   # Extracting geom_bootci params
   ci_low = dabest_effectsize_obj$bca_ci_low
@@ -1129,10 +1181,17 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
                                 tag = c("tag1", rep("tag2", 512))) %>%
       arrange(tag, x, y)
     
-    delta_plot <- delta_plot +
-      geom_halfviolin(na.rm = TRUE, 
-                      data = df_for_violin,
-                      aes(x = y, y = x, fill = tag))
+    if (isTRUE(is_paired) || isTRUE(is_colour)) {
+      delta_plot <- delta_plot +
+        geom_halfviolin(na.rm = TRUE, 
+                        data = df_for_violin,
+                        aes(x = y, y = x))
+    } else {
+      delta_plot <- delta_plot +
+        geom_halfviolin(na.rm = TRUE, 
+                        data = df_for_violin,
+                        aes(x = y, y = x, fill = tag))
+    }
     
   }
   delta_plot <- delta_plot +
@@ -1238,16 +1297,71 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast) {
 }
 ```
 
+# palette applier
+```{r}
+apply_palette <- function(ggplot_object, palette_name) {
+  ggplot_object <- switch(
+    palette_name,
+    
+    "npg" =
+      ggplot_object + scale_color_npg() + scale_fill_npg(),
+    
+    "aaas" = 
+      ggplot_object + scale_color_aaas() + scale_fill_aaas(),
+    
+    "nejm" = 
+      ggplot_object + scale_color_nejm() + scale_fill_nejm(),
+    
+    "lancet" = 
+      ggplot_object + scale_color_lancet() + scale_fill_lancet(),
+    
+    "jama" = 
+      ggplot_object + scale_color_jama() + scale_fill_jama(),
+    
+    "jco" = 
+      ggplot_object + scale_color_jco() + scale_fill_jco(),
+    
+    "ucscgb" = 
+      ggplot_object + scale_color_ucscgb() + scale_fill_ucscgb(),
+    
+    "d3" = 
+      ggplot_object + scale_color_d3() + scale_fill_d3(),
+    
+    "locuszoom" = 
+      ggplot_object + scale_color_locuszoom() + scale_fill_locuszoom(),
+    
+    "igv" = 
+      ggplot_object + scale_color_igv() + scale_fill_igv(),
+    
+    "cosmic" = 
+      ggplot_object + scale_color_cosmic() + scale_fill_cosmic(),
+    
+    "uchicago" = 
+      ggplot_object + scale_color_uchicago() + scale_fill_uchicago(),
+    
+    "brewer" = 
+      ggplot_object + scale_color_brewer() + scale_fill_brewer()
+  )
+  
+  return(ggplot_object)
+}
+```
+
 # dabest_plot functin
 ```{r}
-dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE) {
+dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
+  plot_kwargs <- list(...)
+  plot_kwargs <- assign_plot_kwargs(plot_kwargs)
+  
+  custom_palette <- plot_kwargs$custom_palette
+  
   is_colour <- dabest_obj.mean_diff$is_colour
   raw_legend <- NULL
   
   if (isFALSE(float_contrast)) {
     
-    raw_plot <- plot_raw(dabest_obj.mean_diff, float_contrast=FALSE) + scale_color_nejm() + scale_fill_nejm()
-    delta_plot <- plot_delta(dabest_obj.mean_diff, float_contrast=FALSE) + scale_color_nejm() + scale_fill_nejm()
+    raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
@@ -1270,8 +1384,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE) {
     
   } else {
     
-    raw_plot <- plot_raw(dabest_obj.mean_diff, float_contrast=TRUE) + scale_color_nejm() + scale_fill_nejm()
-    delta_plot <- plot_delta(dabest_obj.mean_diff, float_contrast=TRUE) + scale_color_nejm() + scale_fill_nejm()
+    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
@@ -1300,7 +1414,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE) {
 
 # Testing dataset
 ```{r}
-set.seed(333)
+set.seed(12345)
 
 N = 40
 c1 <- rnorm(N, mean = 100, sd = 25)
@@ -1340,15 +1454,15 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 
 ```{r}
 dabest_plot(dabest_obj.mean_diff, TRUE)
-dabest_plot(dabest_obj.mean_diff, FALSE)
+dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
 ```
 
 ```{r}
 dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
   mean_diff()
 
-dabest_plot(dabest_obj.colour_mean_diff, TRUE)
-dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
 # Testing paired plots 
 ```{r}
@@ -1366,8 +1480,8 @@ dabest_plot(dabest_obj.paired_median_diff, FALSE)
 dabest_obj.colour_paired_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), is_paired = TRUE, id_col = ID, colour = Gender) %>%
   mean_diff()
 
-dabest_plot(dabest_obj.colour_paired_mean_diff, TRUE)
-dabest_plot(dabest_obj.colour_paired_mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_paired_mean_diff, TRUE, custom_palette = "ucscgb")
+dabest_plot(dabest_obj.colour_paired_mean_diff, FALSE, custom_palette = "igv")
 ```
 
 # Testing proportional dataset
@@ -1403,8 +1517,8 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
 ```
 
 ```{r}
-dabest_plot(dabest_obj_proportional.mean_diff, TRUE) 
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "d3") 
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
 ```
 
 ```{r}
@@ -1418,7 +1532,7 @@ dabest_obj_proportional.cohens_h <- load(data = my.data.proportional,
 
 ```{r}
 
-dabest_plot(dabest_obj_proportional.cohens_h, TRUE)
+dabest_plot(dabest_obj_proportional.cohens_h, TRUE, custom_palette = "brewer")
 dabest_plot(dabest_obj_proportional.cohens_h, FALSE)
 ```
 
