@@ -18,374 +18,173 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   return(tufte_lines_df)
 }
 
-# Raw plot function
-plot_raw <- function(dabest_effectsize_obj, float_contrast) {
-  enquo_x = dabest_effectsize_obj$enquo_x
-  enquo_y = dabest_effectsize_obj$enquo_y
-  enquo_id_col = dabest_effectsize_obj$enquo_id_col
-  enquo_colour = dabest_effectsize_obj$enquo_colour
-  proportional = dabest_effectsize_obj$proportional
-  proportional_data = dabest_effectsize_obj$proportional_data
+# Function for creation of df for sankey plot
+create_dfs_for_sankey <- function(float_contrast = FALSE, 
+                                  raw_data, 
+                                  proportional_data, 
+                                  enquo_id_col, 
+                                  x_axis_raw, 
+                                  ind = 1,
+                                  scale_factor_sig = 0.8,
+                                  gap
+) {
+  ind <- 1
+  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+  means_c_t <- proportional_data$proportion_success
+  #for() will use for loops for multiple plot groups
+  success_success <- raw_data %>%
+    group_by(!!enquo_id_col) %>%
+    summarise(success_change = 
+                any(Success == 1 & Group == "Control1") & 
+                any(Success == 1 & Group == "Test1")) %>%
+    filter(success_change) %>%
+    summarise(C1T1 = n()/N)
+  failure_failire <- raw_data %>%
+    group_by(!!enquo_id_col) %>%
+    summarise(success_change = 
+                any(Success == 0 & Group == "Control1") & 
+                any(Success == 0 & Group == "Test1")) %>%
+    filter(success_change) %>%
+    summarise(C1T1F = n()/N)
   
-  raw_data <- dabest_effectsize_obj$raw_data
-  Ns <- dabest_effectsize_obj$Ns
-  raw_y_range_vector <- dabest_effectsize_obj$ylim
+  # find values for lower flow success to failure flow
+  ss <- success_success$C1T1[1]
+  value_start1 <- success_success$C1T1[1] - gap/8
+  value_start2 <- means_c_t[1]- gap/2 - gap/8
+  value_end1 <- means_c_t[2] + gap/2 +gap/8
+  value_end2 <- 1- failure_failire$C1T1F[1] + gap/8
   
-  raw_y_max <- raw_y_range_vector[2]
-  raw_y_min <- raw_y_range_vector[1]
-  raw_y_mean <- raw_y_max - raw_y_min
   
-  test_summary <- dabest_effectsize_obj$test_summary
-  control_summary <- dabest_effectsize_obj$control_summary
-  is_paired <- dabest_effectsize_obj$is_paired
+  # find values for upper flppied flow success to failure flow
+  flow_start1 <- 1- failure_failire$C1T1F[1]
+  flow_end1 <- means_c_t[2] - gap/2
+  flow_start2 <- means_c_t[1] + gap/2
+  flow_end2 <- success_success$C1T1[1]
   
-  idx <- dabest_effectsize_obj$idx
-  raw_x_max = length(unlist(idx))
-  x_axis_raw <- c(seq(1, raw_x_max,1))
+  # form dataframes from sigmoid/ flippedSig functions and the rectangles, later fit into sankeyflow
+  sig1 <- sigmoid(ind + bar_width, scale_factor_sig, value_start1, value_end1)
+  sig2 <- sigmoid(ind + bar_width, scale_factor_sig, value_start2, value_end2)
+  sig1 <- arrange(sig1, desc(x))
+  sig3 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start1, flow_end1)
+  sig4 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start2, flow_end2)
+  sig4 <- arrange(sig4, desc(x))
+  data_for_flow1 <- rbind(sig2, sig1)
+  data_for_flow2 <- rbind(sig3, sig4)
+  data_for_rect_top <- data.frame(
+    x = c(x_axis_raw, rev(x_axis_raw)), 
+    y = c(1, 1, rep(flow_start1, 2)))
+  data_for_rect_bot <- data.frame(
+    x = c(x_axis_raw, rev(x_axis_raw)), 
+    y = c(rep(ss,2), 0, 0))
   
-  effsize_type <- dabest_effectsize_obj$delta_y_labels
+  #prepare data for bargraphs of paired proportional data
+  data_for_bars <- proportional_data
   
-  # check if multiplot
-  if(length(idx) >= 2) {
-    float_contrast = FALSE
-  }
   
-  plot_components <- create_plot_components(proportional, is_paired, float_contrast)
-  main_plot_type <- plot_components$main_plot_type
-  is_summary_lines <- plot_components$summary_lines
-  is_tufte_lines <- plot_components$tufte_lines
-  
-  if(main_plot_type == "sankey"){
-    sankey_df <- create_dfs_for_sankey(float_contrast, 
-                                       raw_data,
-                                       proportional_data,
-                                       enquo_id_col,
-                                       x_axis_raw)
-    flow1 <- sankey_df$flow1
-    flow2 <- sankey_df$flow2
-    rect_top <- sankey_df$rect_top
-    rect_bot <- sankey_df$rect_bot
-    bars <- sankey_df$bars
-  }
-  
-  sankey_bar_gap <- 0.02
-  
-  # Initialise raw_plot and add main_plot_type component
-  raw_plot <- switch(
-    main_plot_type,
-    
-    "swarmplot" =
-      ggplot() +
-      # to add: need to handle colour for swarm & slope graphs
-      geom_beeswarm(data = raw_data, 
-                    aes(x = x_axis_raw, 
-                        y = !!enquo_y, 
-                        colour = !!enquo_colour)) +
-      guides(colour = "none", alpha = "none", group = "none"),
-    
-    "slope" = 
-      ggplot() +
-      geom_line(data = raw_data,
-                aes(x = x_axis_raw, 
-                    y = !!enquo_y,
-                    colour = !!enquo_colour,
-                    group = !!enquo_id_col,
-                    alpha = 0.8)) +
-      guides(alpha = "none", group = "none"),
-    
-    "unpaired proportions" = 
-      ggplot() +
-      geom_proportionbar(data = proportional_data,
-                         aes(x = x_axis_raw,
-                             y = proportion_success,
-                             colour = !!enquo_x, 
-                             fill = !!enquo_x,
-                             width = bar_width)) +
-      guides(colour = "none", fill ="none"),
-    
-    "sankey" =
-      ggplot() +
-      geom_sankeyflow(data = flow1, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeyflow(data = flow2, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_top, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_bot, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeybar(data = bars, 
-                     aes(x = x_axis_raw,
-                         ysuccess = y_success, 
-                         yfailure = y_failure, 
-                         proportionsuccess = proportion_success, 
-                         width = bar_width,
-                         gap = sankey_bar_gap))
+  list_of_dfs <- list(
+    flow1 = data_for_flow1,
+    flow2 = data_for_flow2, 
+    rect_top = data_for_rect_top, 
+    rect_bot = data_for_rect_bot,
+    bars = proportional_data
   )
-  
-  # Add scaling to axis & theme
-  raw_plot <- raw_plot +
-    theme_classic() +
-    scale_x_continuous(limits = c(0.6,1:raw_x_max+1),
-                       expand = c(0,0),
-                       breaks = c(1:raw_x_max),
-                       labels = Ns$swarmticklabs) +
-    scale_y_continuous(limits = c(raw_y_min, raw_y_max), expand = c(0,0))
-  
-  # Add summary_lines component
-  if(isTRUE(is_summary_lines)) {
-    raw_plot <- raw_plot +
-      geom_segment(colour = "black",linewidth = 0.3,
-                   aes(x = 1, 
-                       xend = 3,
-                       y = control_summary, 
-                       yend = control_summary)) +
-      geom_segment(colour = "black", linewidth = 0.3,
-                   aes(x = 2, 
-                       xend = 3, 
-                       y = test_summary, 
-                       yend = test_summary))
-  }
-  
-  # Add tufte_lines component
-  if(isTRUE(is_tufte_lines)) {
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
-    if(main_plot_type == "sankey"){
-      tufte_gap_value <- sankey_bar_gap
-    } else {
-      tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
-      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
-    }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.1)
-    
-    row_num <- raw_x_max
-    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
-    x_ref <- row_ref
-    
-    y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  
-                   yend = tufte_lines_df$upper_sd)
-    y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
-                   yend = tufte_lines_df$lower_sd) 
-    if (isTRUE(str_detect(effsize_type, "edian"))) {
-      y_top_t <-list(y = tufte_lines_df$median + tufte_gap_value,  
-                     yend = tufte_lines_df$upper_quartile)
-      y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
-                     yend = tufte_lines_df$lower_quartile) 
-    }
-    raw_plot <- raw_plot +
-      geom_segment(data = tufte_lines_df, linewidth = 0.8,
-                   aes(x = row_ref, 
-                       xend = row_ref, 
-                       y = y_bot_t$y, 
-                       yend = y_bot_t$yend),
-                   lineend = "square") +
-      geom_segment(data = tufte_lines_df, linewidth = 0.8,
-                   aes(x = row_ref, 
-                       xend = row_ref, 
-                       y = y_top_t$y, 
-                       yend = y_top_t$yend),
-                   lineend = "square")
-  }
-  
-  # Remove x-axis and redraw depending on float_contrast
-  if(isTRUE(float_contrast)) {
-    raw_plot <- raw_plot +
-      float_contrast_theme +
-      geom_segment(linewidth = 0.8, color = "black", x = 0, xend = 2.5, y = raw_y_min, yend = raw_y_min)
-  } else {
-    raw_plot <- raw_plot +
-      non_float_contrast_theme
-
-      x_axis_pointer <- 0
-      for (j in idx) {
-        # Redraw x-axis line
-        raw_plot <- raw_plot +
-          geom_segment(linewidth = 0.5, 
-                       x = x_axis_pointer + 1, 
-                       xend = x_axis_pointer + length(idx[[j]]), 
-                       y = raw_y_min + raw_y_mean/30, 
-                       yend = raw_y_min + raw_y_mean/30,
-                       color = "black",
-                       lineend = "square")
-        # Redraw ticks
-        for (k in idx[[j]]) {
-          raw_plot <- raw_plot +
-            geom_segment(linewidth = 0.5,
-                         x = x_axis_pointer + k, 
-                         xend = x_axis_pointer + k, 
-                         y = raw_y_min + raw_y_mean/30, 
-                         yend = raw_y_min,
-                         color = "black",
-                         lineend = "square")
-        }
-        x_axis_pointer <- length(idx[[j]])
-      }
-  }
-  
-  # Add y_labels component
-  if(isTRUE(proportional)){
-    raw_plot <- raw_plot +
-      labs(y = "proportion of success")
-  } else {
-    raw_plot <- raw_plot +
-      labs(y = "value")
-  }
-  
-  return(raw_plot)
+  list_of_dfs
 }
 
-# Delta plot function
-plot_delta <- function(dabest_effectsize_obj, float_contrast) {
-  idx = dabest_effectsize_obj$idx
-  bootstraps = dabest_effectsize_obj$bootstraps
-  delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
-  delta_y_labels = dabest_effectsize_obj$delta_y_labels
-  delta_x_max = length(unlist(idx))
-  float_contrast = float_contrast
-  row_num = dabest_effectsize_obj$row_num
-  raw_y_range_vector <- dabest_effectsize_obj$ylim
-  control_summary <- dabest_effectsize_obj$control_summary
-  test_summary <- dabest_effectsize_obj$test_summary
+# Function for creation of df for xaxis redraw for float_contrast FALSE plot
+create_dfs_for_xaxis_redraw <- function(idx) {
+  x_axis_pointer <- 0
+  xaxis_line_x_vector <- c()
+  xaxis_line_xend_vector <- c()
+  xaxis_ticks_x_vector <- c()
   
-  # Extracting geom_bootci params
-  ci_low = dabest_effectsize_obj$bca_ci_low
-  ci_high = dabest_effectsize_obj$bca_ci_high
-  difference = dabest_effectsize_obj$difference
-  
-  # Initialising ylim limits
-  delta_y_max = .Machine$double.xmin
-  delta_y_min = .Machine$double.xmax
-  
-  delta_plot <- ggplot()
-  
-  for(i in row_num){
-    ci_coords <- density(bootstraps[[1]])
-    x_coords_ci <- ci_coords$x
-    y_coords_ci <- ci_coords$y
+  for (j in 1:length(idx)) {
+    # calculate xaxis line x coords
+    x_coord <- x_axis_pointer + 1
+    xaxis_line_x_vector <- append(xaxis_line_x_vector, x_coord)
+    xend_coord <- x_axis_pointer + length(idx[[j]])
+    xaxis_line_xend_vector <- append(xaxis_line_xend_vector, xend_coord)
     
-    # Standardise y
-    y_coords_ci <- (y_coords_ci - min(y_coords_ci))/(max(y_coords_ci) - min(y_coords_ci))
-    y_coords_ci <- y_coords_ci/4
-    
-    if(isTRUE(float_contrast)){
-      y_coords_ci <- y_coords_ci*2 + i
-    }else{
-      y_coords_ci <- y_coords_ci + i
+    # calculate xaxis ticks x coords
+    for (k in 1:length(idx[[j]])) {
+      x_coord <- x_axis_pointer + k
+      xaxis_ticks_x_vector <- append(xaxis_ticks_x_vector, x_coord)
+      
     }
-    
-    min_x_coords <- min(x_coords_ci)
-    max_x_coords <- max(x_coords_ci)
-    
-    # Keeping track of ylim limits
-    if(min_x_coords < delta_y_min){
-      delta_y_min <- min_x_coords
-    }
-    if(max_x_coords > delta_y_max){
-      delta_y_max <- max_x_coords
-    }
-    
-    delta_plot <- delta_plot +
-      geom_halfviolin(aes(x = y_coords_ci, y = x_coords_ci))
-    
+    x_axis_pointer <- length(idx[[j]])
   }
-  delta_plot <- delta_plot +
-    geom_bootci(aes(x = row_num,
-                    ymin = ci_low,
-                    ymax = ci_high,
-                    middle = difference))
   
-  delta_y_mean <- (delta_y_max - delta_y_min)/2
+  dfs_for_xaxis_redraw <- list(
+    df_for_line = data.frame(x = xaxis_line_x_vector,
+                             xend = xaxis_line_xend_vector),
+    df_for_ticks = data.frame(x = xaxis_ticks_x_vector)
+  )
   
-  if(isTRUE(float_contrast)){
-    # left-right graph
-    # Calculate new ylims to align summary lines
-    min_raw_y <- raw_y_range_vector[1]
-    raw_y_range <- raw_y_range_vector[2] - raw_y_range_vector[1]
-    min_y_coords <- difference/(1 - (test_summary - min_raw_y)/(control_summary - min_raw_y))
-    delta_y_range <- raw_y_range * -min_y_coords/(control_summary - min_raw_y)
-    
-    delta_plot <- delta_plot +
-      theme_classic() +
+  return(dfs_for_xaxis_redraw)
+}
+
+# Function for creation of list of TRUE/FALSE for plot components that will be built
+create_plot_components <- function(proportional, 
+                                   is_paired, 
+                                   float_contrast) {
+  main_plot_type <- ""
+  is_summary_lines <- TRUE
+  is_tufte_lines <- TRUE
+  
+  if (isTRUE(proportional)) {
+    if (isFALSE(is_paired)) {
       
-      # Draw summary lines
-      geom_segment(colour = "black", 
-                   linewidth = 0.3, 
-                   aes(x = 1.5, 
-                       xend = 3, 
-                       y = difference, 
-                       yend = difference)) +
-      geom_segment(colour = "black", 
-                   linewidth = 0.3, 
-                   aes(x = 1.5, 
-                       xend = 3, 
-                       y = 0, 
-                       yend = 0)) +
+      main_plot_type <- "unpaired proportions"
       
-      # Extend x-axis & add labels
-      scale_x_continuous(limits = c(1.5,3),
-                         expand = c(0,0),
-                         breaks = c(2),
-                         labels = delta_x_labels[2]) +
-      
-      # Scale y-axis for alignment of summary lines & change position of y-axis to right
-      scale_y_continuous(limits = c(min_y_coords, 
-                                    min_y_coords + delta_y_range),
-                         expand = c(0, 0),
-                         position = "right") +
-      float_contrast_theme +
-      
-      # Redraw x-axis line
-      geom_hline(linewidth = 0.8,
-                 yintercept = min_y_coords)
-    
-  } else {
-    # top-down graph
-    # Scale x-axis for alignment & add labels
-    delta_plot <- delta_plot +
-      theme_classic() +
-      scale_x_continuous(limits = c(0.8,3),
-                         expand = c(0,0),
-                         breaks = c(1:delta_x_max),
-                         labels = delta_x_labels) +
-      non_float_contrast_theme +
-      
-      geom_segment(colour = "black", 
-                   linewidth = 0.3, 
-                   aes(x = 0.8, 
-                       xend = 3, 
-                       y = 0, 
-                       yend = 0)) +
-      scale_y_continuous(limits = c(delta_y_min - delta_y_mean/10, 
-                                    delta_y_max + delta_y_mean/10),
-                         expand = c(0,0))
-    
-    x_axis_pointer <- 0
-    for (j in idx) {
-      # Redraw x-axis line
-      delta_plot <- delta_plot +
-        geom_segment(linewidth = 0.5, 
-                     x = x_axis_pointer + 1, 
-                     xend = x_axis_pointer + length(idx[[j]]), 
-                     y = delta_y_min - delta_y_mean/15, 
-                     yend = delta_y_min - delta_y_mean/15,
-                     color = "black",
-                     lineend = "square")
-      # Redraw ticks
-      for (k in idx[[j]]) {
-        delta_plot <- delta_plot +
-          geom_segment(linewidth = 0.5,
-                       x = x_axis_pointer + k, 
-                       xend = x_axis_pointer + k, 
-                       y = delta_y_min - delta_y_mean/15, 
-                       yend = delta_y_min - delta_y_mean/10,
-                       color = "black",
-                       lineend = "square")
+      if(isTRUE(float_contrast)){
+        
+        is_summary_lines <- TRUE
+        
+      } else {
+        
+        is_summary_lines <- FALSE
       }
-      x_axis_pointer <- length(idx[[j]])
+      
+    } else {
+      
+      main_plot_type <- "sankey"
+      is_summary_lines <- FALSE
+      
+    }
+  } else {
+    if (isFALSE(is_paired)) {
+      
+      main_plot_type <- "swarmplot"
+      
+      if(isTRUE(float_contrast)){
+        
+        is_summary_lines <- TRUE
+        
+      } else {
+        
+        is_summary_lines <- FALSE
+        
+      }
+    } else {
+      
+      main_plot_type <- "slope"
+      is_tufte_lines <- FALSE
+      
+      if(isTRUE(float_contrast)){
+        
+        is_summary_lines <- TRUE
+        
+      } else {
+        
+        is_summary_lines <- FALSE
+      }
     }
   }
   
-  delta_plot <- delta_plot +
-    labs(y = delta_y_labels)
-  
-  return(delta_plot)
+  plot_component <- list(
+    main_plot_type = main_plot_type,
+    is_summary_lines = is_summary_lines,
+    is_tufte_lines = is_tufte_lines
+  )
+  return(plot_component)
 }

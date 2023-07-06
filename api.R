@@ -16,6 +16,8 @@ load <- function(
   enquo_id_col <- enquo(id_col)
   enquo_colour <- enquo(colour)
   
+  is_colour <- isTRUE(as_label(enquo_colour) != "NULL")
+  
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
   
@@ -55,9 +57,10 @@ load <- function(
       test_summary <- proportional_data$proportion_success[2]
       
     } else {
-      # Extending ylim for geom_beeswarm points being plotted
-      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/10
-      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/10
+      
+      # Extending ylim for plotting
+      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
       
       # Calculation of summary lines
       summaries <- raw_data %>%
@@ -80,6 +83,7 @@ load <- function(
       proportional = proportional,
       idx = idx,
       is_paired = is_paired,
+      is_colour = is_colour,
       ci = ci,
       Ns = Ns,
       control_summary = control_summary,
