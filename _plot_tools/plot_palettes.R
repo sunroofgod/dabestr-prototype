@@ -40,7 +40,13 @@ apply_palette <- function(ggplot_object, palette_name) {
       ggplot_object + scale_color_uchicago() + scale_fill_uchicago(),
     
     "brewer" = 
-      ggplot_object + scale_color_brewer() + scale_fill_brewer()
+      ggplot_object + scale_color_brewer() + scale_fill_brewer(),
+    
+    "ordinal" = 
+      ggplot_object + scale_color_ordinal() + scale_fill_ordinal(),
+
+    "viridis_d" = 
+      ggplot_object + scale_color_viridis_d() + scale_fill_viridis_d()
   )
   
   return(ggplot_object)

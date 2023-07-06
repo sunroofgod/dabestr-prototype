@@ -1340,7 +1340,13 @@ apply_palette <- function(ggplot_object, palette_name) {
       ggplot_object + scale_color_uchicago() + scale_fill_uchicago(),
     
     "brewer" = 
-      ggplot_object + scale_color_brewer() + scale_fill_brewer()
+      ggplot_object + scale_color_brewer() + scale_fill_brewer(),
+    
+    "ordinal" = 
+      ggplot_object + scale_color_ordinal() + scale_fill_ordinal(),
+    
+    "viridis_d" = 
+      ggplot_object + scale_color_viridis_d() + scale_fill_viridis_d()
   )
   
   return(ggplot_object)
@@ -1481,7 +1487,7 @@ dabest_obj.colour_paired_mean_diff <- load(data = my.data, x = Group, y = Measur
   mean_diff()
 
 dabest_plot(dabest_obj.colour_paired_mean_diff, TRUE, custom_palette = "ucscgb")
-dabest_plot(dabest_obj.colour_paired_mean_diff, FALSE, custom_palette = "igv")
+dabest_plot(dabest_obj.colour_paired_mean_diff, FALSE, custom_palette = "ordinal")
 ```
 
 # Testing proportional dataset
@@ -1517,7 +1523,7 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
 ```
 
 ```{r}
-dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "d3") 
+dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "viridis_d") 
 dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
 ```
 

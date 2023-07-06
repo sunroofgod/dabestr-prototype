@@ -1,11 +1,16 @@
-dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE) {
+dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
+  plot_kwargs <- list(...)
+  plot_kwargs <- assign_plot_kwargs(plot_kwargs)
+  
+  custom_palette <- plot_kwargs$custom_palette
+  
   is_colour <- dabest_obj.mean_diff$is_colour
   raw_legend <- NULL
   
   if (isFALSE(float_contrast)) {
     
-    raw_plot <- plot_raw(dabest_obj.mean_diff, float_contrast=FALSE) + scale_color_nejm() + scale_fill_nejm()
-    delta_plot <- plot_delta(dabest_obj.mean_diff, float_contrast=FALSE) + scale_color_nejm() + scale_fill_nejm()
+    raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
@@ -28,8 +33,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE) {
     
   } else {
     
-    raw_plot <- plot_raw(dabest_obj.mean_diff, float_contrast=TRUE) + scale_color_nejm() + scale_fill_nejm()
-    delta_plot <- plot_delta(dabest_obj.mean_diff, float_contrast=TRUE) + scale_color_nejm() + scale_fill_nejm()
+    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
