@@ -4,6 +4,7 @@ effsize_boot <- function(
     reps = 5000, 
     paired = FALSE
 ){
+  
   s <- c(rep(1, length(data$control)),
          rep(2, length(data$test)))
   
@@ -41,6 +42,7 @@ bootstrap <- function(
   enquo_y <- dabest_obj$enquo_y
   ci <- dabest_obj$ci
   is_paired <- dabest_obj$is_paired
+  is_colour <- dabest_obj$is_colour
   
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
@@ -60,7 +62,7 @@ bootstrap <- function(
     to_add_xlabels <- c("", xlabels)
     delta_x_labels <- append(delta_x_labels,to_add_xlabels)
     
-    control_test_measurement <- list(control =ctrl_measurement,
+    control_test_measurement <- list(control = ctrl_measurement,
                                      test = test_measurement)
     set.seed(seed)
     
@@ -91,6 +93,7 @@ bootstrap <- function(
       difference = boot_result$t0,
       raw_data = raw_data,
       is_paired = is_paired,
+      is_colour = is_colour,
       Ns = dabest_obj$Ns,
       control_summary = dabest_obj$control_summary,
       test_summary = dabest_obj$test_summary,
@@ -98,7 +101,9 @@ bootstrap <- function(
       enquo_x = dabest_obj$enquo_x,
       enquo_y = dabest_obj$enquo_y,
       enquo_id_col = dabest_obj$enquo_id_col,
-      enquo_colour = dabest_obj$enquo_colour
+      enquo_colour = dabest_obj$enquo_colour,
+      proportional = dabest_obj$proportional,
+      proportional_data = dabest_obj$proportional_data
     )
   }
   return(row)

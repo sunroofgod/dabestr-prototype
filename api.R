@@ -6,7 +6,8 @@ load <- function(
     is_paired = FALSE,
     id_col = NULL,
     ci = 95,
-    colour = NULL
+    colour = NULL,
+    proportional = FALSE
 ){
   
   # Storing plotting params as quosures
@@ -14,6 +15,8 @@ load <- function(
   enquo_y <- enquo(y)
   enquo_id_col <- enquo(id_col)
   enquo_colour <- enquo(colour)
+  
+  is_colour <- isTRUE(as_label(enquo_colour) != "NULL")
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
@@ -26,14 +29,10 @@ load <- function(
       mutate(x_axis_raw = case_when(
         Group == idx[1] ~ 1,
         Group == idx[2] ~ 2,
-      ))
+      )) 
     
     # Obtain raw_y_range_vector
     ylim <- range(raw_data[[name_y]])
-    
-    # Extending ylim for geom_beeswarm points being plotted
-    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/10
-    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/10
     
     # Creation of x-axis label
     Ns <- raw_data %>%
@@ -45,22 +44,46 @@ load <- function(
     buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
     Ns <- rbind(Ns)
     
-    # Calculation of summary lines
-    summaries <- raw_data %>%
-      group_by(!!enquo_x) %>%
-      summarise(summary_stats = mean(!!enquo_y))
-    
-    control_summary <- summaries$summary_stats[1]
-    test_summary <- summaries$summary_stats[2]
+    if(isTRUE(proportional)){
+      ## include checks here for data to see if it is proportional data
+      proportional_data <- raw_data %>%
+        select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
+        group_by(!!enquo_x) %>%
+        summarise(proportion_success = mean(!!enquo_y),
+                  y_success = proportion_success/2,
+                  y_failure = (1+proportion_success)/2)
+      
+      control_summary <- proportional_data$proportion_success[1]
+      test_summary <- proportional_data$proportion_success[2]
+      
+    } else {
+      
+      # Extending ylim for plotting
+      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
+      
+      # Calculation of summary lines
+      summaries <- raw_data %>%
+        group_by(!!enquo_x) %>%
+        summarise(summary_stats = mean(!!enquo_y))
+      
+      control_summary <- summaries$summary_stats[1]
+      test_summary <- summaries$summary_stats[2]
+      
+      proportional_data <- NULL
+    }
     
     dabest_object <- list(
       raw_data = raw_data,
+      proportional_data = proportional_data,
       enquo_x = enquo_x,
       enquo_y = enquo_y,
       enquo_id_col = enquo_id_col,
       enquo_colour = enquo_colour,
+      proportional = proportional,
       idx = idx,
       is_paired = is_paired,
+      is_colour = is_colour,
       ci = ci,
       Ns = Ns,
       control_summary = control_summary,

@@ -5,8 +5,6 @@ float_contrast_theme <-
         axis.title.x = ggplot2::element_blank(), 
         axis.ticks.x = ggplot2::element_blank(),
         axis.title.x.bottom = ggplot2::element_blank(),
-        legend.position = "left",
-        legend.justification = "top",
         legend.title=element_blank())
 
 # Theme for top-down graph
@@ -16,6 +14,4 @@ non_float_contrast_theme <-
         axis.ticks.x = ggplot2::element_blank(),
         axis.title.x.bottom = ggplot2::element_blank(),
         axis.title.y = element_text(size = 10),
-        legend.position = "left",
-        legend.justification = "top",
         legend.title=element_blank())
