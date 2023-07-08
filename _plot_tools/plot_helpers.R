@@ -194,7 +194,7 @@ assign_plot_kwargs <- function(plot_kwargs) {
   colour_col <- NULL
   swarm_label <- NULL
   contrast_label <- NULL
-  custom_palette <- "nejm"
+  custom_palette <- "d3"
   swarm_ylim <- NULL
   contrast_ylim <- NULL
   delta2_ylim <- NULL

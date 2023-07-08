@@ -3,7 +3,7 @@ load <- function(
     x = NULL,
     y = NULL,
     idx = NULL,
-    is_paired = FALSE,
+    paired = NULL,
     id_col = NULL,
     ci = 95,
     colour = NULL,
@@ -17,19 +17,29 @@ load <- function(
   enquo_colour <- enquo(colour)
   
   is_colour <- isTRUE(as_label(enquo_colour) != "NULL")
+  is_paired <- isFALSE(is.null(paired))
+  
+  # to add: if is_paired is TRUE --> id_col cannot be NULl
+  # to add: paired must be either "baseline" or "sequential"
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
   
+  unlist_idx <- unlist(idx)
+  
   if (!is.null(idx)){
     raw_data <- data %>%
-      filter(!!enquo_x %in% idx) %>%
-      
-      # (to be changed later for multi-group)
-      mutate(x_axis_raw = case_when(
-        Group == idx[1] ~ 1,
-        Group == idx[2] ~ 2,
-      )) 
+      filter(!!enquo_x %in% unlist_idx) %>%
+      mutate(x_axis_raw = 0)
+    
+    raw_data[[name_x]] = factor(x = raw_data[[name_x]], levels = unlist_idx)
+    
+    for (i in 1:length(unlist_idx)) {
+      raw_data <- raw_data %>%
+        mutate(x_axis_raw = ifelse(
+          !!enquo_x == unlist_idx[i], i, x_axis_raw 
+        ))
+    }
     
     # Obtain raw_y_range_vector
     ylim <- range(raw_data[[name_y]])
@@ -40,9 +50,9 @@ load <- function(
       dplyr::count()
     Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
     
-    # (to be changed later for multi-group)
-    buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
-    Ns <- rbind(Ns)
+    # (Don't need the below code anymore due to change in implementation)
+    # buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
+    # Ns <- rbind(Ns)
     
     if(isTRUE(proportional)){
       ## include checks here for data to see if it is proportional data
@@ -67,6 +77,7 @@ load <- function(
         group_by(!!enquo_x) %>%
         summarise(summary_stats = mean(!!enquo_y))
       
+      # Only currently works for two-groups, if needed for extended features in future, to be changed
       control_summary <- summaries$summary_stats[1]
       test_summary <- summaries$summary_stats[2]
       
@@ -84,6 +95,7 @@ load <- function(
       idx = idx,
       is_paired = is_paired,
       is_colour = is_colour,
+      paired = paired,
       ci = ci,
       Ns = Ns,
       control_summary = control_summary,
