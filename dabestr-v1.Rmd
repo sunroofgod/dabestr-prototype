@@ -326,10 +326,6 @@ bootstrap <- function(
 }
 ```
 
-```{r}
-mean_diff(test)
-```
-
 # Main effect_size functions
 ```{r}
 mean_diff <- function(dabest_obj) {
@@ -344,7 +340,7 @@ mean_diff <- function(dabest_obj) {
   is_paired <- dabest_obj$is_paired
   
   if(is_paired){
-    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired mean difference"))
+    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference"))
   }
   return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference"))
 }
@@ -361,7 +357,7 @@ median_diff <- function(dabest_obj) {
   is_paired <- dabest_obj$is_paired
   
   if(is_paired){
-    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired median difference"))
+    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference"))
   }
   return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference"))
 }
@@ -1305,7 +1301,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_plot <- delta_plot +
       geom_halfviolin(na.rm = TRUE, 
                       data = df_for_violin,
-                      aes(x = y, y = x))
+                      aes(x = y, y = x, group = tag))
     } else {
     delta_plot <- delta_plot +
       geom_halfviolin(na.rm = TRUE, 
@@ -1419,11 +1415,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 }
 ```
 
-```{r}
-
-plot_delta(test.mean_diff, FALSE, NULL)
-```
-
 # palette applier
 ```{r}
 apply_palette <- function(ggplot_object, palette_name) {
@@ -1489,7 +1480,12 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   custom_palette <- plot_kwargs$custom_palette
   
   is_colour <- dabest_obj.mean_diff$is_colour
+  idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
+  
+  if(length(unlist(idx)) >= 2) {
+    float_contrast <- FALSE
+  }
   
   if (isFALSE(float_contrast)) {
     
@@ -1589,8 +1585,17 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
 ```
+## unpaired colour
+```{r}
+dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
+  mean_diff()
+
+dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
+```
 
 # multigroup
+## multigroup unpaired
 ```{r}
 dabest_obj_multigroup <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
 dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
@@ -1600,32 +1605,40 @@ dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "nejm")
 ```
-
+## unpaired multiplot colour
 ```{r}
-dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
+dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
   mean_diff()
 
-dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
+
+
 # Testing paired plots 
 ```{r}
-dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), is_paired = TRUE, id_col = ID)
-dabest_obj.paired_mean_diff <- mean_diff(dabest_obj)
-dabest_obj.paired_median_diff <- median_diff(dabest_obj)
+dabest_obj_multigroup_sequential <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
+dabest_obj_multigroup_sequential.mean_diff <- mean_diff(dabest_obj_multigroup_sequential)
+
+dabest_obj_multigroup_baseline <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID)
+dabest_obj_multigroup_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_baseline)
 ```
 
 ```{r}
-dabest_plot(dabest_obj.paired_median_diff, TRUE)
-dabest_plot(dabest_obj.paired_median_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE)
 ```
 
 ```{r}
-dabest_obj.colour_paired_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), is_paired = TRUE, id_col = ID, colour = Gender) %>%
+dabest_obj.colour_baseline_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
   mean_diff()
 
-dabest_plot(dabest_obj.colour_paired_mean_diff, TRUE, custom_palette = "ucscgb")
-dabest_plot(dabest_obj.colour_paired_mean_diff, FALSE, custom_palette = "ordinal")
+dabest_obj.colour_sequential_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID, colour = Gender) %>%
+  mean_diff()
+```
+
+```{r}
+dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
+dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
 ```
 
 # Testing proportional dataset
@@ -1640,14 +1653,20 @@ my.data.control_proportional <- data.frame(
 my.data.control_proportional$Success <- numeric(nrow(my.data.control_proportional))
 my.data.control_proportional$Success[sample(nrow(my.data.control_proportional), 8)] <- 1
 
-my.data.test_proportion <- data.frame(
+my.data.test_proportion1 <- data.frame(
   Group = sample(c("Test1"), 40, TRUE)
 )
-my.data.test_proportion$Success <- numeric(nrow(my.data.test_proportion))
-my.data.test_proportion$Success[sample(nrow(my.data.test_proportion), 22)] <- 1
+my.data.test_proportion1$Success <- numeric(nrow(my.data.test_proportion1))
+my.data.test_proportion1$Success[sample(nrow(my.data.test_proportion1), 22)] <- 1
 
-my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion)
-id <- data.frame(ID = rep(c(1:40), 2))
+my.data.test_proportion2 <- data.frame(
+  Group = sample(c("Test2"), 40, TRUE)
+)
+my.data.test_proportion2$Success <- numeric(nrow(my.data.test_proportion2))
+my.data.test_proportion2$Success[sample(nrow(my.data.test_proportion2), 15)] <- 1
+
+my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2)
+id <- data.frame(ID = rep(c(1:40), 3))
 my.data.proportional <- cbind(my.data.proportional, id)
 ```
 
@@ -1666,18 +1685,18 @@ dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago
 ```
 
 ```{r}
-dabest_obj_proportional.cohens_h <- load(data = my.data.proportional, 
+dabest_obj_proportional_multigroup.cohens_h <- load(data = my.data.proportional, 
                                   x = Group, 
                                   y = Success, 
-                                  idx = c("Control1", "Test1"),
+                                  idx = c("Control1", "Test1", "Test2"),
                                   proportional = TRUE) %>%
   cohens_h()
 ```
 
 ```{r}
 
-dabest_plot(dabest_obj_proportional.cohens_h, TRUE, custom_palette = "brewer")
-dabest_plot(dabest_obj_proportional.cohens_h, FALSE)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, TRUE, custom_palette = "brewer")
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
 ```
 
 ```{r}
@@ -1686,12 +1705,15 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
                                   y = Success, 
                                   idx = c("Control1", "Test1"),
                                   proportional = TRUE,
-                                  is_paired = TRUE,
+                                  paired = "baseline",
                                   id_col = ID) %>%
   mean_diff()
 ```
 
 ```{r}
-dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
+```
+
+```{r}
+
 ```

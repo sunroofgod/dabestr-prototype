@@ -5,7 +5,12 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   custom_palette <- plot_kwargs$custom_palette
   
   is_colour <- dabest_obj.mean_diff$is_colour
+  idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
+  
+  if(length(unlist(idx)) >= 2) {
+    float_contrast <- FALSE
+  }
   
   if (isFALSE(float_contrast)) {
     
