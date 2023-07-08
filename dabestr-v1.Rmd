@@ -38,7 +38,9 @@ load <- function(
     id_col = NULL,
     ci = 95,
     colour = NULL,
-    proportional = FALSE
+    proportional = FALSE,
+    minimeta = FALSE,
+    delta2 = FALSE
     ){
   
   # Storing plotting params as quosures
@@ -123,6 +125,8 @@ load <- function(
       enquo_id_col = enquo_id_col,
       enquo_colour = enquo_colour,
       proportional = proportional,
+      minimeta = minimeta,
+      delta2 = delta2,
       idx = idx,
       is_paired = is_paired,
       is_colour = is_colour,
@@ -190,8 +194,8 @@ bootstrap <- function(
   enquo_x <- dabest_obj$enquo_x
   enquo_y <- dabest_obj$enquo_y
   ci <- dabest_obj$ci
-  is_paired <- dabest_obj$is_paired
   paired <- dabest_obj$paired
+  is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
   
   quoname_x <- as_name(enquo_x)
@@ -319,6 +323,8 @@ bootstrap <- function(
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
               proportional = dabest_obj$proportional,
+              minimeta = dabest_obj$minimeta,
+              delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
   
@@ -573,32 +579,31 @@ create_dfs_for_xaxis_redraw <- function(idx) {
   xaxis_line_xend_vector <- c()
   xaxis_ticks_x_vector <- c()
   
-    for (j in 1:length(idx)) {
-      # calculate xaxis line x coords
-      x_coord <- x_axis_pointer + 1
-      xaxis_line_x_vector <- append(xaxis_line_x_vector, x_coord)
-      xend_coord <- x_axis_pointer + length(idx[[j]])
-      xaxis_line_xend_vector <- append(xaxis_line_xend_vector, xend_coord)
-
-      # calculate xaxis ticks x coords
-      for (k in 1:length(idx[[j]])) {
-        x_coord <- x_axis_pointer + k
-        xaxis_ticks_x_vector <- append(xaxis_ticks_x_vector, x_coord)
-
-      }
-      x_axis_pointer <- length(idx[[j]])
+  for (j in 1:length(idx)) {
+    # calculate xaxis line x coords
+    x_coord <- x_axis_pointer + 1
+    xaxis_line_x_vector <- append(xaxis_line_x_vector, x_coord)
+    xend_coord <- x_axis_pointer + length(idx[[j]])
+    xaxis_line_xend_vector <- append(xaxis_line_xend_vector, xend_coord)
+    
+    # calculate xaxis ticks x coords
+    for (k in 1:length(idx[[j]])) {
+      x_coord <- x_axis_pointer + k
+      xaxis_ticks_x_vector <- append(xaxis_ticks_x_vector, x_coord)
     }
+    x_axis_pointer <- x_axis_pointer + length(idx[[j]])
+  }
   
   dfs_for_xaxis_redraw <- list(
     df_for_line = data.frame(x = xaxis_line_x_vector,
-                              xend = xaxis_line_xend_vector),
+                             xend = xaxis_line_xend_vector),
     df_for_ticks = data.frame(x = xaxis_ticks_x_vector)
   )
   
   return(dfs_for_xaxis_redraw)
 }
 
-create_plot_components <- function(proportional, 
+create_rawplot_components <- function(proportional, 
                                    is_paired, 
                                    float_contrast) {
   main_plot_type <- ""
@@ -607,49 +612,30 @@ create_plot_components <- function(proportional,
   
   if (isTRUE(proportional)) {
     if (isFALSE(is_paired)) {
-      
       main_plot_type <- "unpaired proportions"
-      
       if(isTRUE(float_contrast)){
-        
           is_summary_lines <- TRUE
-          
       } else {
-        
           is_summary_lines <- FALSE
       }
-      
     } else {
-      
       main_plot_type <- "sankey"
       is_summary_lines <- FALSE
-      
     }
   } else {
     if (isFALSE(is_paired)) {
-      
       main_plot_type <- "swarmplot"
-      
       if(isTRUE(float_contrast)){
-        
           is_summary_lines <- TRUE
-          
       } else {
-        
           is_summary_lines <- FALSE
-          
       }
     } else {
-      
       main_plot_type <- "slope"
       is_tufte_lines <- FALSE
-      
       if(isTRUE(float_contrast)){
-        
         is_summary_lines <- TRUE
-        
       } else {
-        
         is_summary_lines <- FALSE
       }
     }
@@ -873,6 +859,56 @@ geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 ```
 
+## plot slopegraph
+```{r}
+plot_slopegraph <- function(dabest_effectsize_obj) {
+  raw_data <- dabest_effectsize_obj$raw_data
+  
+  enquo_x = dabest_effectsize_obj$enquo_x
+  enquo_y = dabest_effectsize_obj$enquo_y
+  enquo_id_col = dabest_effectsize_obj$enquo_id_col
+  enquo_colour = dabest_effectsize_obj$enquo_colour
+  
+  name_x <- as_name(enquo_x)
+  name_y <- as_name(enquo_y)
+  
+  idx = dabest_effectsize_obj$idx
+  
+  raw_plot <- ggplot()
+  slopegraph_params <- list(linewidth = 0.3, alpha = 0.5)
+  
+  for(subplot_groups in idx) {
+    # Assign subplot.
+    subplot <- dplyr::filter(raw_data, !!enquo_x %in% subplot_groups)
+
+    subplot[[name_x]] <-
+      subplot[[name_x]] %>%
+      factor(subplot_groups, ordered = TRUE)
+
+    slopegraph_params[["data"]] <- subplot
+
+    # Assign aesthetic mappings.
+    if(rlang::quo_is_null(enquo_colour)) {
+      slopegraph_aes <- ggplot2::aes(x_axis_raw, !!enquo_y,
+                            group = !!enquo_id_col)
+    } else {
+      slopegraph_aes <- ggplot2::aes(x_axis_raw, !!enquo_y,
+                            group = !!enquo_id_col,
+                            col = !!enquo_colour)
+    }
+
+    slopegraph_params[["mapping"]] <- slopegraph_aes
+
+    # Create slopegraph
+    raw_plot <-
+      raw_plot +
+      do.call(ggplot2::geom_line, slopegraph_params)
+  }
+  
+  return(raw_plot)
+}
+```
+
 # raw plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
@@ -881,6 +917,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_id_col = dabest_effectsize_obj$enquo_id_col
   enquo_colour = dabest_effectsize_obj$enquo_colour
   proportional = dabest_effectsize_obj$proportional
+  minimeta = dabest_effectsize_obj$minimeta
+  delta2 = dabest_effectsize_obj$delta2
   proportional_data = dabest_effectsize_obj$proportional_data
   
   raw_data <- dabest_effectsize_obj$raw_data
@@ -903,14 +941,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   raw_x_max = length(unlist(idx))
   x_axis_raw <- c(seq(1, raw_x_max,1))
   
+  # Extend x_axis if minimeta/deltadelta is being plotted.
+  if(isTRUE(minimeta) || isTRUE(delta2)) {
+    raw_x_max <- raw_x_max + 2
+  }
+  
   effsize_type <- dabest_effectsize_obj$delta_y_labels
   
-  # check if multiplot
-  if(length(idx) >= 2) {
+  # Check if multiplot.
+  if(length(unlist(idx)) >= 3) {
     float_contrast = FALSE
   }
   
-  plot_components <- create_plot_components(proportional, is_paired, float_contrast)
+  #### Rawplot Building ####
+  plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
@@ -936,13 +980,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   bar_width <- ifelse(float_contrast, 0.15, 0.10)
   
-  # Initialise raw_plot and add main_plot_type component
+  #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
     main_plot_type,
     
     "swarmplot" =
       ggplot() +
-      # to add: need to handle colour for swarm & slope graphs
       geom_beeswarm(data = raw_data, 
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
@@ -950,13 +993,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     cex = 2),
     
     "slope" = 
-      ggplot() +
-      geom_line(data = raw_data,
-                aes(x = x_axis_raw, 
-                    y = !!enquo_y,
-                    colour = !!enquo_colour,
-                    group = !!enquo_id_col,
-                    alpha = 0.8)),
+      plot_slopegraph(dabest_effectsize_obj),
     
     "unpaired proportions" = 
       ggplot() +
@@ -986,17 +1023,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                          gap = sankey_bar_gap))
   )
   
-  # Add scaling to axis & theme
+  #### Add scaling Component ####
   raw_plot <- raw_plot +
     theme_classic() +
     coord_cartesian(ylim = c(raw_y_min, raw_y_max),
                     xlim = c(0.6,raw_x_max+0.5),
                     expand = FALSE,
                     clip = "off") +
-    scale_x_continuous(breaks = c(1:raw_x_max),
+    scale_x_continuous(breaks = c(x_axis_raw),
                        labels = Ns$swarmticklabs)
   
-  # Add summary_lines component
+  #### Add summary_lines component ####
   if(isTRUE(is_summary_lines)) {
     raw_plot <- raw_plot +
       geom_segment(colour = "black",linewidth = 0.3,
@@ -1011,7 +1048,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                        yend = test_summary))
   }
   
-  # Add tufte_lines component
+  #### Add tufte_lines component ####
   if(isTRUE(is_tufte_lines)) {
     tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
@@ -1022,7 +1059,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     }
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.10)
     
-    row_num <- raw_x_max
+    row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
     x_ref <- row_ref
     
@@ -1077,7 +1114,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     }
   }
   
-  # Remove x-axis and redraw depending on float_contrast
+  #### Remove x-axis and redraw x_axis component ####
   if(isTRUE(float_contrast)) {
     raw_plot <- raw_plot +
       float_contrast_theme +
@@ -1113,7 +1150,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                        yend = raw_y_min))
   }
   
-  # Add y_labels component
+  #### Add y_labels component ####
   if(isTRUE(proportional)){
     raw_plot <- raw_plot +
       labs(y = "proportion of success")
@@ -1202,57 +1239,58 @@ geom_bootci <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 ```
 
-# delta_plot function 
+## delta_plot helper functions
 ```{r}
-plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
-  idx = dabest_effectsize_obj$idx
-  bootstraps = dabest_effectsize_obj$bootstraps
-  delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
-  delta_y_labels = dabest_effectsize_obj$delta_y_labels
-  delta_x_max = length(unlist(idx))
-  float_contrast = float_contrast
-  raw_y_range_vector <- dabest_effectsize_obj$ylim
-  control_summary <- dabest_effectsize_obj$control_summary
-  test_summary <- dabest_effectsize_obj$test_summary
+create_deltaplot_components <- function(proportional, 
+                                        is_paired, 
+                                        float_contrast,
+                                        is_colour,
+                                        delta2) {
+  main_violin_type <- "multicolour"
+  is_summary_lines <- TRUE
+  is_bootci <- TRUE
+  is_deltadelta <- FALSE
   
-  is_colour <- dabest_effectsize_obj$is_colour
-  is_paired <- dabest_effectsize_obj$is_paired
+  if(isTRUE(is_paired) || isTRUE(is_colour)) {
+    main_violin_type <- "singlecolour"
+  }
+  if(isTRUE(delta2)) {
+    is_deltadelta <- TRUE
+  }
+  if(isFALSE(float_contrast)) {
+    is_summary_lines <- FALSE
+  }
+  
+  plot_component <- list(
+    main_violin_type = main_violin_type,
+    is_summary_lines = is_summary_lines,
+    is_bootci = is_bootci,
+    is_deltadelta = is_deltadelta
+  )
+  return(plot_component)
+}
 
-  # Initialising ylim limits
-  delta_y_max = .Machine$double.xmin
-  delta_y_min = .Machine$double.xmax
-  
-  # Obtain boot
-  boot_result <- dabest_effectsize_obj$boot_result
-  boots <- boot_result$bootstraps
-  
-  # Extracting geom_bootci params
-  ci_low = boot_result$bca_ci_low
-  ci_high = boot_result$bca_ci_high
-  difference = boot_result$difference
-  
-  # obtain x_axis breaks for bootci and scale_x_continuous
-  x_axis_breaks <- c()
-  
-  delta_plot <- ggplot()
+create_violinplot_components <- function(boots, 
+                                         idx, 
+                                         float_contrast, 
+                                         delta_y_max,
+                                         delta_y_min) {
   df_for_violin <- data.frame(
     x = NA,
     y = NA,
     tag = NA
   )
   
-  # check if multiplot
-  if(length(unlist(idx)) >= 2) {
-    float_contrast <- FALSE
-  }
-  
+  x_axis_breaks <- c()
   curr_boot_idx = 1
   curr_x_idx = 0
+  
   for (group in idx) {
     curr_x_idx <- curr_x_idx + 1
     temp_df_violin <- data.frame(x = NA,
                                  y = NA,
                                  tag = toString(curr_x_idx))
+    
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
     
     for (i in 2:length(group)) {
@@ -1269,9 +1307,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       y_coords_ci <- y_coords_ci/6
       
       if (isFALSE(float_contrast)) {
-      y_coords_ci <- y_coords_ci/1.5
+        y_coords_ci <- y_coords_ci/1.5
       }
-  
+      
       y_coords_ci <- y_coords_ci + curr_x_idx
       
       min_x_coords <- min(x_coords_ci)
@@ -1297,41 +1335,152 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   df_for_violin <- df_for_violin %>%
     arrange(tag, x , y)
   
-  if (isTRUE(is_paired) || isTRUE(is_colour)) {
-    delta_plot <- delta_plot +
+  plot_component <- list(
+    df_for_violin = df_for_violin,
+    delta_y_min = delta_y_min,
+    delta_y_max = delta_y_max,
+    x_axis_breaks = x_axis_breaks
+  )
+  
+  return(plot_component)
+}
+```
+
+# delta_plot function 
+```{r}
+plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
+  idx = dabest_effectsize_obj$idx
+  bootstraps = dabest_effectsize_obj$bootstraps
+  
+  delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
+  delta_y_labels = dabest_effectsize_obj$delta_y_labels
+  
+  minimeta = dabest_effectsize_obj$minimeta
+  delta2 = dabest_effectsize_obj$delta2
+  is_colour <- dabest_effectsize_obj$is_colour
+  is_paired <- dabest_effectsize_obj$is_paired
+  
+  raw_y_range_vector <- dabest_effectsize_obj$ylim
+  control_summary <- dabest_effectsize_obj$control_summary
+  test_summary <- dabest_effectsize_obj$test_summary
+  
+  # Initialising x & y limits
+  delta_x_max = length(unlist(idx))
+  delta_y_min = .Machine$double.xmax
+  delta_y_max = .Machine$double.xmin
+  
+  # Obtain boot
+  boot_result <- dabest_effectsize_obj$boot_result
+  boots <- boot_result$bootstraps
+  
+  # Extracting geom_bootci params
+  ci_low = boot_result$bca_ci_low
+  ci_high = boot_result$bca_ci_high
+  difference = boot_result$difference
+  
+  # Check if multiplot
+  if(length(unlist(idx)) >= 3) {
+    float_contrast <- FALSE
+  }
+  
+  #### Deltaplot Building ####
+  delta_plot_components <- create_deltaplot_components(proportional, 
+                                                       is_paired, 
+                                                       float_contrast,
+                                                       is_colour,
+                                                       delta2)
+  main_violin_type <- delta_plot_components$main_violin_type
+  is_summary_lines <- delta_plot_components$is_summary_lines
+  is_bootci <- delta_plot_components$is_bootci
+  is_deltadelta <- delta_plot_components$is_deltadelta
+  
+  #### initialise delta_plot & Add main_violin_type component ####
+  # Extend idx if minimeta or deltadelta
+  if (isTRUE(minimeta) || isTRUE(delta2)) {
+    idx <- c(idx, list(c("minimeta", "deltadelta")))
+  }
+  
+  violin_plot_components <- create_violinplot_components(boots, 
+                                                         idx, 
+                                                         float_contrast, 
+                                                         delta_y_max,
+                                                         delta_y_min)
+  
+  df_for_violin <- violin_plot_components$df_for_violin
+  delta_y_min <- violin_plot_components$delta_y_min
+  delta_y_max <- violin_plot_components$delta_y_max
+  delta_y_mean <- (delta_y_max - delta_y_min)/2
+  x_axis_breaks <- violin_plot_components$x_axis_breaks
+  
+  delta_plot <- switch(
+    main_violin_type,
+    
+    "multicolour" = 
+      ggplot() +
+      geom_halfviolin(na.rm = TRUE, 
+                      data = df_for_violin,
+                      aes(x = y, y = x, fill = tag)),
+    
+    "singlecolour" = 
+      ggplot() +
       geom_halfviolin(na.rm = TRUE, 
                       data = df_for_violin,
                       aes(x = y, y = x, group = tag))
-    } else {
-    delta_plot <- delta_plot +
-      geom_halfviolin(na.rm = TRUE, 
-                      data = df_for_violin,
-                      aes(x = y, y = x, fill = tag))
-    }
+  )
   
-  # return(delta_plot)
-
-  delta_plot <- delta_plot +
-    geom_bootci(
-                aes(x = x_axis_breaks,
-                    ymin = ci_low,
-                    ymax = ci_high,
-                    middle = difference))
-
-  delta_y_mean <- (delta_y_max - delta_y_min)/2
-  
+  #### Add scaling Component ####
   if (isTRUE(float_contrast)) {
-    # left-right graph
     # Calculate new ylims to align summary lines
     min_raw_y <- raw_y_range_vector[1]
-    raw_y_range <- raw_y_range_vector[2] - raw_y_range_vector[1]
+    max_raw_y <- raw_y_range_vector[2]
+    raw_y_range <- max_raw_y - min_raw_y
     min_y_coords <- difference/(1 - (test_summary - min_raw_y)/(control_summary - min_raw_y))
     delta_y_range <- raw_y_range * -min_y_coords/(control_summary - min_raw_y)
     
     delta_plot <- delta_plot +
       theme_classic() +
+      coord_cartesian(ylim = c(min_y_coords, min_y_coords + delta_y_range),
+                      xlim = c(1.8,delta_x_max+0.25),
+                      expand = FALSE) +
+      scale_x_continuous(breaks = c(2),
+                         labels = delta_x_labels) +
+      scale_y_continuous(position = "right") 
+    
+  } else {
+    # Extend xaxis for minimeta/deltadelta.
+    if (isTRUE(minimeta) || isTRUE(delta2)) {
+      delta_x_max <- delta_x_max + 2
       
-      # Draw summary lines
+      if (isTRUE(minimeta)) {
+        delta_x_labels <- append(delta_x_labels, "Weighted delta")
+      } else {
+        delta_x_labels <- append(delta_x_labels, "delta-delta")
+      }
+    }
+    
+    delta_plot <- delta_plot +
+      theme_classic() +
+      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/2, 
+                               delta_y_max + delta_y_mean/2),
+                      xlim = c(0.6, delta_x_max+0.5),
+                      expand = FALSE) +
+      scale_x_continuous(breaks = x_axis_breaks,
+                         labels = delta_x_labels)
+  }
+  
+  #### Add bootci Component ####
+  if (isTRUE(is_bootci)) {
+    delta_plot <- delta_plot +
+      geom_bootci(
+        aes(x = x_axis_breaks,
+            ymin = ci_low,
+            ymax = ci_high,
+            middle = difference))
+  }
+  
+  #### Add summary lines Component ####
+  if (isTRUE(is_summary_lines)) {
+    delta_plot <- delta_plot +
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
                    aes(x = 1.8, 
@@ -1343,50 +1492,23 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    aes(x = 1.8, 
                        xend = delta_x_max+0.25, 
                        y = 0, 
-                       yend = 0)) +
-      
-      # Extend x-axis & add labels
-      scale_x_continuous(limits = c(1.8,delta_x_max+0.25),
-                         expand = c(0,0),
-                         breaks = c(2),
-                         labels = delta_x_labels[2]) +
-      
-      # Scale y-axis for alignment of summary lines & change position of y-axis to right
-      scale_y_continuous(limits = c(min_y_coords, 
-                                    min_y_coords + delta_y_range),
-                         expand = c(0, 0),
-                         position = "right") +
+                       yend = 0))
+  }
+  
+  #### Remove xaxis and redraw xaxis component ####
+  if (isTRUE(float_contrast)) {
+    delta_plot <- delta_plot +
       float_contrast_theme +
-      
-      # Redraw x-axis line
       geom_hline(linewidth = 0.8,
                  yintercept = min_y_coords)
-    
   } else {
-    # top-down graph
-    # Scale x-axis for alignment & add labels
+    # Obtain xaxis line and ticks elements for xaxis redraw
     dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
     df_for_line <- dfs_for_xaxis_redraw$df_for_line
     df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
     
-    delta_plot <- delta_plot +
-      theme_classic() +
-      scale_x_continuous(limits = c(0.6,delta_x_max+0.5),
-                         expand = c(0,0),
-                         breaks = x_axis_breaks,
-                         labels = delta_x_labels) +
+    delta_plot <- delta_plot + 
       non_float_contrast_theme +
-      
-      # Drawing of the 0 line
-      geom_segment(colour = "black", 
-                   linewidth = 0.3, 
-                   aes(x = 0.6, 
-                       xend = delta_x_max+0.5, 
-                       y = 0, 
-                       yend = 0)) +
-      scale_y_continuous(limits = c(delta_y_min - delta_y_mean/2, 
-                                    delta_y_max + delta_y_mean/2),
-                         expand = c(0,0)) +
       
       # Redraw xaxis line
       geom_segment(data = df_for_line,
@@ -1396,7 +1518,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    aes(x = x, 
                        xend = xend, 
                        y = delta_y_min - delta_y_mean/3.5, 
-                       yend = delta_y_min - delta_y_mean/3.5))  +
+                       yend = delta_y_min - delta_y_mean/3.5)) +
+      
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
@@ -1408,8 +1531,52 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                        yend = delta_y_min - delta_y_mean/2))
   }
   
+  #### Add y = 0 line Component ####
+  if (isFALSE(float_contrast)) {
+    delta_plot <- delta_plot +
+      geom_segment(colour = "black", 
+                   linewidth = 0.3, 
+                   aes(x = 0.6, 
+                       xend = delta_x_max+0.5, 
+                       y = 0, 
+                       yend = 0))
+  }
+  
+  #### Add y_labels Component ####
   delta_plot <- delta_plot +
     labs(y = delta_y_labels)
+  
+  #### Add deltadelta yaxis Component
+  if (isTRUE(is_deltadelta)) {
+    delta_delta_plot <- ggplot() +
+      theme_classic() +
+      non_float_contrast_theme +
+      
+      # Setting scaling and limits
+      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/2, 
+                               delta_y_max + delta_y_mean/2),
+                      xlim = c(0, 1),
+                      expand = FALSE) +
+      scale_x_continuous(breaks = c(0.5),
+                         labels = "") +
+      labs(y = "delta-delta") +
+      scale_y_continuous(position = "right") +
+      
+      # Drawing y = 0 line
+      geom_hline(linewidth = 0.3,
+                 yintercept = 0)
+    
+    delta_plot <- cowplot::plot_grid(
+      plotlist = list(delta_plot + theme(legend.position="none",
+                                         plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt")), 
+                      delta_delta_plot + theme(legend.position="none",
+                                               plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt"))),
+      nrow = 1, 
+      rel_widths = c(1, 0.1),
+      axis = "lr",
+      align = "h"
+      )
+  }
   
   return(delta_plot)
 }
@@ -1483,7 +1650,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
   
-  if(length(unlist(idx)) >= 2) {
+  if(length(unlist(idx)) >= 3) {
     float_contrast <- FALSE
   }
   
@@ -1585,6 +1752,7 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
 ```
+
 ## unpaired colour
 ```{r}
 dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
@@ -1605,6 +1773,7 @@ dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "nejm")
 ```
+
 ## unpaired multiplot colour
 ```{r}
 dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
@@ -1714,6 +1883,21 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
 
+# Testing minimeta & deltadelta w/0 actual minimeta and deltadelta functionalities
 ```{r}
+dabest_obj_multigroup_minimeta <- load(data = my.data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
+dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_minimeta)
+dabest_obj_multigroup_minimeta.mean_diff$boot_result <- 
+  rbind(dabest_obj_multigroup_minimeta.mean_diff$boot_result, dabest_obj_multigroup_minimeta.mean_diff$boot_result[3,])
+
+dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Group, y = Measurement, delta2 = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
+dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
+dabest_obj_multigroup_deltadelta.mean_diff$boot_result <- 
+  rbind(dabest_obj_multigroup_deltadelta.mean_diff$boot_result, dabest_obj_multigroup_deltadelta.mean_diff$boot_result[3,])
+```
+
+```{r}
+dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 
 ```

@@ -44,8 +44,8 @@ bootstrap <- function(
   enquo_x <- dabest_obj$enquo_x
   enquo_y <- dabest_obj$enquo_y
   ci <- dabest_obj$ci
-  is_paired <- dabest_obj$is_paired
   paired <- dabest_obj$paired
+  is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
   
   quoname_x <- as_name(enquo_x)
@@ -173,6 +173,8 @@ bootstrap <- function(
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
               proportional = dabest_obj$proportional,
+              minimeta = dabest_obj$minimeta,
+              delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
   
