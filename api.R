@@ -7,7 +7,9 @@ load <- function(
     id_col = NULL,
     ci = 95,
     colour = NULL,
-    proportional = FALSE
+    proportional = FALSE,
+    minimeta = FALSE,
+    delta2 = FALSE
 ){
   
   # Storing plotting params as quosures
@@ -92,6 +94,8 @@ load <- function(
       enquo_id_col = enquo_id_col,
       enquo_colour = enquo_colour,
       proportional = proportional,
+      minimeta = minimeta,
+      delta2 = delta2,
       idx = idx,
       is_paired = is_paired,
       is_colour = is_colour,

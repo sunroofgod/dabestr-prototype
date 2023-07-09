@@ -8,7 +8,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
   
-  if(length(unlist(idx)) >= 2) {
+  if(length(unlist(idx)) >= 3) {
     float_contrast <- FALSE
   }
   

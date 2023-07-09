@@ -109,9 +109,8 @@ create_dfs_for_xaxis_redraw <- function(idx) {
     for (k in 1:length(idx[[j]])) {
       x_coord <- x_axis_pointer + k
       xaxis_ticks_x_vector <- append(xaxis_ticks_x_vector, x_coord)
-      
     }
-    x_axis_pointer <- length(idx[[j]])
+    x_axis_pointer <- x_axis_pointer + length(idx[[j]])
   }
   
   dfs_for_xaxis_redraw <- list(
@@ -123,59 +122,40 @@ create_dfs_for_xaxis_redraw <- function(idx) {
   return(dfs_for_xaxis_redraw)
 }
 
-# Function for creation of list of TRUE/FALSE for plot components that will be built
-create_plot_components <- function(proportional, 
-                                   is_paired, 
-                                   float_contrast) {
+# Function for creation of list of TRUE/FALSE for raw plot components that will be built
+create_rawplot_components <- function(proportional, 
+                                      is_paired, 
+                                      float_contrast) {
   main_plot_type <- ""
   is_summary_lines <- TRUE
   is_tufte_lines <- TRUE
   
   if (isTRUE(proportional)) {
     if (isFALSE(is_paired)) {
-      
       main_plot_type <- "unpaired proportions"
-      
       if(isTRUE(float_contrast)){
-        
         is_summary_lines <- TRUE
-        
       } else {
-        
         is_summary_lines <- FALSE
       }
-      
     } else {
-      
       main_plot_type <- "sankey"
       is_summary_lines <- FALSE
-      
     }
   } else {
     if (isFALSE(is_paired)) {
-      
       main_plot_type <- "swarmplot"
-      
       if(isTRUE(float_contrast)){
-        
         is_summary_lines <- TRUE
-        
       } else {
-        
         is_summary_lines <- FALSE
-        
       }
     } else {
-      
       main_plot_type <- "slope"
       is_tufte_lines <- FALSE
-      
       if(isTRUE(float_contrast)){
-        
         is_summary_lines <- TRUE
-        
       } else {
-        
         is_summary_lines <- FALSE
       }
     }
@@ -234,4 +214,158 @@ assign_plot_kwargs <- function(plot_kwargs) {
     delta2_ylim = delta2_ylim,
     delta2_label = delta2_label
   ))
+}
+
+# Function for creation of list of TRUE/FALSE for delta plot components that will be built
+create_deltaplot_components <- function(proportional, 
+                                        is_paired, 
+                                        float_contrast,
+                                        is_colour,
+                                        delta2) {
+  main_violin_type <- "multicolour"
+  is_summary_lines <- TRUE
+  is_bootci <- TRUE
+  is_deltadelta <- FALSE
+  
+  if(isTRUE(is_paired) || isTRUE(is_colour)) {
+    main_violin_type <- "singlecolour"
+  }
+  if(isTRUE(delta2)) {
+    is_deltadelta <- TRUE
+  }
+  if(isFALSE(float_contrast)) {
+    is_summary_lines <- FALSE
+  }
+  
+  plot_component <- list(
+    main_violin_type = main_violin_type,
+    is_summary_lines = is_summary_lines,
+    is_bootci = is_bootci,
+    is_deltadelta = is_deltadelta
+  )
+  return(plot_component)
+}
+
+# violinplot helper
+create_violinplot_components <- function(boots, 
+                                         idx, 
+                                         float_contrast, 
+                                         delta_y_max,
+                                         delta_y_min) {
+  df_for_violin <- data.frame(
+    x = NA,
+    y = NA,
+    tag = NA
+  )
+  
+  x_axis_breaks <- c()
+  curr_boot_idx = 1
+  curr_x_idx = 0
+  
+  for (group in idx) {
+    curr_x_idx <- curr_x_idx + 1
+    temp_df_violin <- data.frame(x = NA,
+                                 y = NA,
+                                 tag = toString(curr_x_idx))
+    
+    df_for_violin <- rbind(df_for_violin, temp_df_violin)
+    
+    for (i in 2:length(group)) {
+      curr_x_idx <- curr_x_idx + 1
+      x_axis_breaks <- append(x_axis_breaks, curr_x_idx)
+      
+      ci_coords <- density(boots[[curr_boot_idx]])
+      
+      x_coords_ci <- ci_coords$x
+      y_coords_ci <- ci_coords$y
+      
+      # Standardise y
+      y_coords_ci <- (y_coords_ci - min(y_coords_ci))/(max(y_coords_ci) - min(y_coords_ci))
+      y_coords_ci <- y_coords_ci/6
+      
+      if (isFALSE(float_contrast)) {
+        y_coords_ci <- y_coords_ci/1.5
+      }
+      
+      y_coords_ci <- y_coords_ci + curr_x_idx
+      
+      min_x_coords <- min(x_coords_ci)
+      max_x_coords <- max(x_coords_ci)
+      
+      # Keeping track of ylim limits
+      if (min_x_coords < delta_y_min) {
+        delta_y_min <- min_x_coords
+      }
+      if (max_x_coords > delta_y_max) {
+        delta_y_max <- max_x_coords
+      }
+      
+      temp_df_violin <- data.frame(x = x_coords_ci,
+                                   y = y_coords_ci,
+                                   tag = rep(toString(curr_x_idx),512))
+      
+      df_for_violin <- rbind(df_for_violin, temp_df_violin)
+      
+      curr_boot_idx <- curr_boot_idx + 1
+    }
+  }
+  df_for_violin <- df_for_violin %>%
+    arrange(tag, x , y)
+  
+  plot_component <- list(
+    df_for_violin = df_for_violin,
+    delta_y_min = delta_y_min,
+    delta_y_max = delta_y_max,
+    x_axis_breaks = x_axis_breaks
+  )
+  
+  return(plot_component)
+}
+
+# Function that plots slopegraph
+plot_slopegraph <- function(dabest_effectsize_obj) {
+  raw_data <- dabest_effectsize_obj$raw_data
+  
+  enquo_x = dabest_effectsize_obj$enquo_x
+  enquo_y = dabest_effectsize_obj$enquo_y
+  enquo_id_col = dabest_effectsize_obj$enquo_id_col
+  enquo_colour = dabest_effectsize_obj$enquo_colour
+  
+  name_x <- as_name(enquo_x)
+  name_y <- as_name(enquo_y)
+  
+  idx = dabest_effectsize_obj$idx
+  
+  raw_plot <- ggplot()
+  slopegraph_params <- list(linewidth = 0.3, alpha = 0.5)
+  
+  for(subplot_groups in idx) {
+    # Assign subplot.
+    subplot <- dplyr::filter(raw_data, !!enquo_x %in% subplot_groups)
+    
+    subplot[[name_x]] <-
+      subplot[[name_x]] %>%
+      factor(subplot_groups, ordered = TRUE)
+    
+    slopegraph_params[["data"]] <- subplot
+    
+    # Assign aesthetic mappings.
+    if(rlang::quo_is_null(enquo_colour)) {
+      slopegraph_aes <- ggplot2::aes(x_axis_raw, !!enquo_y,
+                                     group = !!enquo_id_col)
+    } else {
+      slopegraph_aes <- ggplot2::aes(x_axis_raw, !!enquo_y,
+                                     group = !!enquo_id_col,
+                                     col = !!enquo_colour)
+    }
+    
+    slopegraph_params[["mapping"]] <- slopegraph_aes
+    
+    # Create slopegraph
+    raw_plot <-
+      raw_plot +
+      do.call(ggplot2::geom_line, slopegraph_params)
+  }
+  
+  return(raw_plot)
 }
