@@ -1,3 +1,10 @@
+#' Main plotting api
+#' 
+#' @description
+#' Contains function `dabest_plot`.
+#' 
+#' To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
+
 dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   plot_kwargs <- list(...)
   plot_kwargs <- assign_plot_kwargs(plot_kwargs)

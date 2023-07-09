@@ -1,3 +1,8 @@
+#' Helper functions that deal with assignment of colour palettes for the overall plots
+#' 
+#' @description
+#' Contains function `apply_palette`.
+
 # Applies palettes to <ggplot> objects
 apply_palette <- function(ggplot_object, palette_name) {
   ggplot_object <- switch(
@@ -51,4 +56,3 @@ apply_palette <- function(ggplot_object, palette_name) {
   
   return(ggplot_object)
 }
-

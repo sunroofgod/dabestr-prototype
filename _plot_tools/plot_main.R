@@ -1,3 +1,8 @@
+#' Contains functions responsible for generation of raw_plot and delta_plot.
+#' 
+#' @description
+#' Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
+
 # Raw plot function
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x = dabest_effectsize_obj$enquo_x
@@ -355,7 +360,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       delta_x_max <- delta_x_max + 2
       
       if (isTRUE(minimeta)) {
-        delta_x_labels <- append(delta_x_labels, "Weighted delta")
       } else {
         delta_x_labels <- append(delta_x_labels, "delta-delta")
       }
