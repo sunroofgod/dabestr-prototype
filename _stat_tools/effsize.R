@@ -1,3 +1,11 @@
+#' Main effectsize api
+#' 
+#' @description
+#' Contains functions `mean_diff`, `median_diff`, `cohens_d`, `hedges_g`,
+#' `cliffs_delta`, `cohens_h` and `hedges_correction`.
+#' 
+#' To be used after loading in data with `load()` function.
+
 mean_diff <- function(dabest_obj) {
   
   effect_size_func <- function(control, test, paired) {

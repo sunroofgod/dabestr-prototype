@@ -1,3 +1,9 @@
+#' Main api
+#' 
+#' @description
+#' Contains unified `load()` function that checks the data for errors and configures it to 
+#' the proper format for effect size calculations.
+
 load <- function(
     data,
     x = NULL,

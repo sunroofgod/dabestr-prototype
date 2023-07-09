@@ -1,3 +1,8 @@
+#' Contains custom <ggproto> geom_objects for plotting.
+#' 
+#' @description
+#' Contains main geoms `geom_halfviolin`, `geom_bootci`, `geom_proportionbar`, `geom_sankeybar` and `geom_sankeyflow`.
+
 # Halfviolin Geom
 draw_group_halfviolin <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
@@ -40,12 +45,13 @@ draw_panel_boot_ci <- function(data, panel_scales, coord) {
                           x1 = coords$x,
                           y0 = coords$ymin,
                           y1 = coords$ymax,
-                          gp = gpar(lwd = coords$size * .pt,
+                          gp = gpar(lwd = coords$linesize * .pt,
                                     lineend = coords$lineend))
   
   ci_dot <- pointsGrob(x = coords$x,
                        y = coords$middle,
-                       pch = coords$shape)
+                       pch = coords$shape,
+                       size = unit(coords$dotsize, "char"))
   
   gTree(children = gList(ci_line, ci_dot))
   
@@ -53,7 +59,8 @@ draw_panel_boot_ci <- function(data, panel_scales, coord) {
 
 GeomBootCI <- ggproto("GeomBootCI", Geom,
                       required_aes = c("x", "ymin", "ymax", "middle"),
-                      default_aes = aes(size = 1.2,
+                      default_aes = aes(linesize = 0.8,
+                                        dotsize = 0.5,
                                         shape = 19, 
                                         lwd = 2,
                                         lineend = "square"),
