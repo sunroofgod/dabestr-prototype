@@ -199,6 +199,8 @@ boot_weighted_row <- function(boot_result, ci){
   weighted_result <- Map(function(x, w) x * w,
                          boot_result$bootstraps, boot_result$weight)
   weighted_bootstrap <- Reduce("+", weighted_result)
+  weighted_bootstrap <- weighted_bootstrap/sum(weights)
+
   
   weighted_difference <- calculate_weighted_delta(weight = boot_result$weight,
                                                   differences = boot_result$difference)
@@ -642,14 +644,14 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
 }
 
 create_dfs_for_sankey <- function(float_contrast = FALSE, 
-                                 raw_data, 
-                                 proportional_data, 
-                                 enquo_id_col, 
-                                 x_axis_raw, 
-                                 ind = 1,
-                                 scale_factor_sig = 0.8,
-                                 gap
-                                 ) {
+                                  raw_data, 
+                                  proportional_data, 
+                                  enquo_id_col, 
+                                  x_axis_raw, 
+                                  ind = 1,
+                                  scale_factor_sig = 0.8,
+                                  gap
+                                  ) {
   ind <- 1
   bar_width <- ifelse(float_contrast, 0.15, 0.10)
   means_c_t <- proportional_data$proportion_success
@@ -912,7 +914,8 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 }
 ```
 
-# create sankey diagrams
+
+# custom sankey geoms
 ```{r}
 # sankey bars
 draw_panel_sankey_bar <- function(data, panel_scales, coord) {
@@ -967,35 +970,36 @@ geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 
 # sankey flows
-draw_panel_sankey_flow <- function(data, panel_scales, coord) {
+
+draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
+  first_row <- coords[1, , drop = FALSE]
   
   flow <- polygonGrob(x = coords$x,
                       y = coords$y,
-                      gp = gpar(col = coords$fillcol,
-                                fill = coords$fillcol,
-                                alpha = coords$alpha))
-
+                      gp = gpar(col = first_row$colour,
+                                fill = alpha(first_row$fill, first_row$alpha)))
 }
 
 GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
                           required_aes = c("x", "y"),
-                          default_aes = aes(fillcol = "gray50",
+                          default_aes = aes(colour = NA,
+                                            fill = "gray50",
                                             alpha = 0.8),
                           draw_key = draw_key_polygon,
-                          draw_panel = draw_panel_sankey_flow)
+                          draw_group = draw_group_sankey_flow)
 
 geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity", 
-                           position = "identity", show.legend = NA, 
-                           na.rm = FALSE, inherit.aes = TRUE, ...) {
-        layer(data = data, 
-              mapping = mapping,
-              stat = stat,
-              geom = GeomSankeyFlow,
-              position = position,
-              show.legend = show.legend,
-              inherit.aes = inherit.aes,
-              params = list(na.rm = na.rm, ...))
+                            position = "identity", show.legend = NA, 
+                            na.rm = FALSE, inherit.aes = TRUE, ...) {
+  layer(data = data, 
+        mapping = mapping,
+        stat = stat,
+        geom = GeomSankeyFlow,
+        position = position,
+        show.legend = show.legend,
+        inherit.aes = inherit.aes,
+        params = list(na.rm = na.rm, ...))
 }
 ```
 
@@ -1147,13 +1151,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "sankey" =
       ggplot() +
       geom_sankeyflow(data = flow1, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
+
+                      aes(x = x, y = y, fill = "#db6159")) +
       geom_sankeyflow(data = flow2, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
+                      aes(x = x, y = y, fill = "#818181")) +
       geom_sankeyflow(data = rect_top, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
+                      aes(x = x, y = y, fill = "#818181")) +
       geom_sankeyflow(data = rect_bot, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
+                      aes(x = x, y = y, fill = "#db6159")) +
       geom_sankeybar(data = bars, 
                      aes(x = x_axis_raw,
                          ysuccess = y_success, 
@@ -1804,9 +1809,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       raw_legend <- get_legend(raw_plot + 
                                  guides(alpha = "none") +
                                  theme(legend.box.margin = margin(0, 0, 0, 0)))
-    }
-    
-    final_plot <- cowplot::plot_grid(
+
+      final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
                         raw_legend, 
                         delta_plot + theme(legend.position="none"),
@@ -1817,31 +1821,40 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       axis       = "lr",
       align      = "b")
     
-    return(final_plot)
+      return(final_plot)
+    } else {
+      final_plot <- cowplot::plot_grid(
+      plotlist   = list(raw_plot + theme(legend.position="none"), 
+                        delta_plot + theme(legend.position="none")),
+      nrow       = 2,
+      ncol       = 1,
+      axis       = "lr",
+      align      = "b")
     
+      return(final_plot)
+    }
   } else {
     
     raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     
+    final_plot <- cowplot::plot_grid(
+    plotlist   = list(raw_plot + theme(legend.position="none"), 
+                      delta_plot + theme(legend.position="none")),
+    nrow       = 1,
+    ncol       = 2,
+    rel_widths = c(0.8, 0.2),
+    axis       = "lr",
+    align      = "h")
+
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
                                  guides(color = guide_legend(nrow = 1),
                                         alpha = "none") + 
                                  theme(legend.position = "bottom"))
+      
+      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(1, 0.1))
     }
-    
-    final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        delta_plot + theme(legend.position="none")),
-      nrow       = 1,
-      ncol       = 2,
-      rel_widths = c(0.8, 0.2),
-      axis       = "lr",
-      align      = "h")
-    
-    final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(1, 0.1))
-    
     return(final_plot)
   }
   
@@ -1892,6 +1905,7 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 ```{r}
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
+
 ```
 
 ## unpaired colour
@@ -2021,6 +2035,7 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
 ```
 
 ```{r}
+dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
 # Testing minimeta dataset
@@ -2062,4 +2077,8 @@ dabest_obj_multigroup_deltadelta.mean_diff$boot_result <-
 ```{r}
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+```
+
+```{r}
+dabest_obj_multigroup_minimeta.mean_diff$boot_result
 ```
