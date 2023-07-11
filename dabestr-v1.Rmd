@@ -200,7 +200,7 @@ boot_weighted_row <- function(boot_result, ci){
                          boot_result$bootstraps, boot_result$weight)
   weighted_bootstrap <- Reduce("+", weighted_result)
   weighted_bootstrap <- weighted_bootstrap/sum(weights)
-  
+
   
   weighted_difference <- calculate_weighted_delta(weight = boot_result$weight,
                                                   differences = boot_result$difference)
@@ -914,6 +914,7 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 }
 ```
 
+
 # custom sankey geoms
 ```{r}
 # sankey bars
@@ -969,6 +970,7 @@ geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 
 # sankey flows
+
 draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   first_row <- coords[1, , drop = FALSE]
@@ -977,7 +979,6 @@ draw_group_sankey_flow <- function(data, panel_scales, coord) {
                       y = coords$y,
                       gp = gpar(col = first_row$colour,
                                 fill = alpha(first_row$fill, first_row$alpha)))
-  
 }
 
 GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
@@ -1150,6 +1151,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "sankey" =
       ggplot() +
       geom_sankeyflow(data = flow1, 
+
                       aes(x = x, y = y, fill = "#db6159")) +
       geom_sankeyflow(data = flow2, 
                       aes(x = x, y = y, fill = "#818181")) +
@@ -1807,6 +1809,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       raw_legend <- get_legend(raw_plot + 
                                  guides(alpha = "none") +
                                  theme(legend.box.margin = margin(0, 0, 0, 0)))
+
       final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
                         raw_legend, 
@@ -1843,7 +1846,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     rel_widths = c(0.8, 0.2),
     axis       = "lr",
     align      = "h")
-    
+
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
                                  guides(color = guide_legend(nrow = 1),
@@ -1852,7 +1855,6 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       
       final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(1, 0.1))
     }
-    
     return(final_plot)
   }
   
@@ -1903,6 +1905,7 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 ```{r}
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
+
 ```
 
 ## unpaired colour
@@ -2037,7 +2040,7 @@ dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
 # Testing minimeta dataset
 ```{r}
-set.seed(1445)
+set.seed(12345)
 
 N = 20
 c1 <- rnorm(N, mean = 3, sd = 0.4)
