@@ -11,6 +11,7 @@ date: '2023-06-24'
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
+library(tidyr)
 library(dplyr)
 library(stringr)
 library(lubridate)
@@ -33,6 +34,7 @@ load <- function(
     data,
     x = NULL,
     y = NULL,
+    experiment = NULL,
     idx = NULL,
     paired = NULL,
     id_col = NULL,
@@ -57,6 +59,13 @@ load <- function(
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
+  
+  if (isTRUE(delta2)) {
+    enquo_experiment <- enquo(experiment)
+    name_experiment <- as_name(enquo_experiment)
+    data <- data %>%
+      unite(!!enquo_x,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+  }
   
   unlist_idx <- unlist(idx)
   
@@ -248,6 +257,35 @@ var_w_df <- function(measurement, size){
   var <- (sum((measurement - mean(measurement))^2) / df)
   
   return(var)
+}
+```
+
+## calculate the last row of boot_result to append the bootstrap delta-delta 
+```{r}
+boot_delta_delta <- function(boot_result,ci) {
+  bootstrap_delta_delta_neg <- Reduce("-",boot_result$bootstraps)
+  bootstrap_delta_delta <- bootstrap_delta_delta_neg *-1
+  difference_delta_delta <- calculate_delta_difference(boot_result$difference)
+  bca_delta_delta <- bca(bootstrap_delta_delta)
+  pct_interval <- confinterval(bootstrap_delta_delta,ci/100)
+  boot_last_row <- list(
+    control_group = 'Delta2 Overall Test',
+    test_group = 'Delta2 Overall Test',
+    bootstraps = list(as.vector(bootstrap_delta_delta)),
+    nboots = length(bootstrap_delta_delta),
+    bca_ci_low = bca_delta_delta[1],
+    bca_ci_high = bca_delta_delta[2],
+    pct_ci_low = pct_interval[1],
+    pct_ci_high = pct_interval[2],
+    ci = ci,
+    difference = difference_delta_delta,
+    weight = 1
+    )
+  }
+
+calculate_delta_difference <- function(differences) {
+  delta_difference <- differences[2]-differences[1]
+  return(delta_difference)
 }
 ```
 
@@ -446,13 +484,17 @@ bootstrap <- function(
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
     delta_x_labels <- append(delta_x_labels, "Weighted Delta")
-    }
+  }
+  if (isTRUE(delta2)) {
+    boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
+    boot_result <- bind_rows(boot_result,boot_last_row)
+    delta_x_labels <- append(delta_x_labels, "delta-delta")
+  }
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
-              raw_data = raw_data,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -2063,22 +2105,49 @@ my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
-# Testing minimeta & deltadelta w/0 actual minimeta and deltadelta functionalities
+# Testing minimeta
 ```{r}
 dabest_obj_multigroup_minimeta <- load(data = my.data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2"), c("Control3", "Group3")))
 dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_minimeta)
-
-dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Group, y = Measurement, delta2 = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
-dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
-dabest_obj_multigroup_deltadelta.mean_diff$boot_result <- 
-  rbind(dabest_obj_multigroup_deltadelta.mean_diff$boot_result, dabest_obj_multigroup_deltadelta.mean_diff$boot_result[3,])
 ```
 
+# Testing deltadelta dataset
+```{r}
+set.seed(12345)
+
+N = 40
+placebo <- rnorm(N, mean = 3, sd = 0.4)
+drug <- rnorm(N, mean = 3.5, sd = 0.75)
+genotype <- c(rep('M', N/2), rep('W', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+
+wide.data <- tibble::tibble(
+  Placebo = placebo,
+  Drug = drug,
+  Dummy = dummy,
+  Genotype = genotype, ID = id)
+
+my.data <- wide.data %>%
+  tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy)
+```
+
+# Testing deltadelta 
+```{r}
+dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE,experiment =Treatment,idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")))
+dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
+##dabest_obj_multigroup_deltadelta.mean_diff$boot_result <- 
+  ##rbind(dabest_obj_multigroup_deltadelta.mean_diff$boot_result, dabest_obj_multigroup_deltadelta.mean_diff$boot_result[3,])
+```
+
+# Plotting of minimeta and delta-delta
 ```{r}
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 ```
 
+
 ```{r}
 dabest_obj_multigroup_minimeta.mean_diff$boot_result
+dabest_obj_multigroup_deltadelta.mean_diff$boot_result
 ```
