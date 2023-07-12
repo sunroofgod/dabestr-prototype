@@ -1639,11 +1639,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     # Extend xaxis for minimeta/deltadelta.
     if (isTRUE(minimeta) || isTRUE(delta2)) {
       delta_x_max <- delta_x_max + 2
-      
-      if (isTRUE(minimeta)) {
-      } else {
-        delta_x_labels <- append(delta_x_labels, "delta-delta")
-      }
     }
     
     delta_plot <- delta_plot +
