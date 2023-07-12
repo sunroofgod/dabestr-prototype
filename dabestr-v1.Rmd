@@ -792,6 +792,7 @@ create_rawplot_components <- function(proportional,
 }
 ```
 
+## assign plot kwargs
 ```{r}
 assign_plot_kwargs <- function(plot_kwargs) {
   colour_col <- NULL
@@ -1053,7 +1054,7 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
 }
 ```
 
-# raw plot function
+# raw_plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x = dabest_effectsize_obj$enquo_x
@@ -1134,7 +1135,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2),
+                    cex = 2,
+                    method = "swarm",
+                    corral = "wrap",
+                    corral.width = 0.3),
     
     "slope" = 
       plot_slopegraph(dabest_effectsize_obj),
@@ -1200,9 +1204,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       tufte_gap_value <- sankey_bar_gap
     } else {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
-      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
+      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.10)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.20)
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -1263,7 +1267,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if(isTRUE(float_contrast)) {
     raw_plot <- raw_plot +
       float_contrast_theme +
-      geom_segment(linewidth = 0.45, 
+      geom_segment(linewidth = 0.4, 
                    color = "black",
                    aes(x = 0.6, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
     
@@ -1282,8 +1286,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = raw_y_min + raw_y_mean/20, 
-                       yend = raw_y_min + raw_y_mean/20))  +
+                       y = raw_y_min + raw_y_mean/40, 
+                       yend = raw_y_min + raw_y_mean/40))  +
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
@@ -1291,7 +1295,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = raw_y_min + raw_y_mean/20, 
+                       y = raw_y_min + raw_y_mean/40, 
                        yend = raw_y_min))
   }
   
@@ -1663,8 +1667,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = delta_y_min - delta_y_mean/3.5, 
-                       yend = delta_y_min - delta_y_mean/3.5)) +
+                       y = delta_y_min - delta_y_mean/2.5, 
+                       yend = delta_y_min - delta_y_mean/2.5)) +
       
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
@@ -1673,17 +1677,21 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = delta_y_min - delta_y_mean/3.5, 
+                       y = delta_y_min - delta_y_mean/2.5, 
                        yend = delta_y_min - delta_y_mean/2))
   }
   
   #### Add y = 0 line Component ####
   if (isFALSE(float_contrast)) {
+    zero_line_xend <- delta_x_max + 0.3
+    if (isTRUE(is_deltadelta)) {
+      zero_line_xend <- zero_line_xend + 0.2
+    }
     delta_plot <- delta_plot +
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
                    aes(x = 0.6, 
-                       xend = delta_x_max+0.5, 
+                       xend = zero_line_xend, 
                        y = 0, 
                        yend = 0))
   }
@@ -1714,11 +1722,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     delta_plot <- cowplot::plot_grid(
       plotlist = list(delta_plot + theme(legend.position="none",
-                                         plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt")), 
+                                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")), 
                       delta_delta_plot + theme(legend.position="none",
-                                               plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt"))),
+                                               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
       nrow = 1, 
-      rel_widths = c(1, 0.1),
+      rel_widths = c(0.9, 0.1),
       axis = "lr",
       align = "h"
       )
@@ -1793,6 +1801,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   custom_palette <- plot_kwargs$custom_palette
   
   is_colour <- dabest_obj.mean_diff$is_colour
+  is_deltadelta <- dabest_obj.mean_diff$delta2
   idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
   
@@ -1800,52 +1809,59 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     float_contrast <- FALSE
   }
   
-  if (isFALSE(float_contrast)) {
-    
+  if(isFALSE(float_contrast)) {
     raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     
-    if(isTRUE(is_colour)) {
-      raw_legend <- get_legend(raw_plot + 
-                                 guides(alpha = "none") +
-                                 theme(legend.box.margin = margin(0, 0, 0, 0)))
-
-      final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        raw_legend, 
-                        delta_plot + theme(legend.position="none"),
-                        NULL),
-      nrow       = 2,
-      ncol       = 2,
-      rel_widths = c(0.9, 0.1),
-      axis       = "lr",
-      align      = "b")
+    if(isTRUE(is_deltadelta)) {
+      raw_plot <- cowplot::plot_grid(
+        plotlist = list(raw_plot + theme(legend.position="none"), NULL), 
+        nrow = 1, 
+        ncol = 2, 
+        rel_widths = c(0.9, 0.1)
+        )
+    }
     
-      return(final_plot)
-    } else {
-      final_plot <- cowplot::plot_grid(
+    final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        delta_plot + theme(legend.position="none")),
+                      delta_plot + theme(legend.position="none")),
       nrow       = 2,
       ncol       = 1,
-      axis       = "lr",
-      align      = "b")
+      axis       = "tblr",
+      align      = "vh"
+      )
     
-      return(final_plot)
+    if(isTRUE(is_colour)) {
+      raw_legend <- get_legend(raw_plot + 
+                               guides(alpha = "none") +
+                               theme(legend.box.margin = margin(0, 0, 0, 0)))
+      
+      legend_plot <- cowplot::plot_grid(
+        plotlist = list(raw_legend, NULL),
+        nrow = 2,
+        ncol = 1,
+        rel_heights = c(0.1, 0.9)
+        )
+      
+      final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
     }
+  
+    return(final_plot)
+
   } else {
-    
+    #isTRUE(float_contrast)
     raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     
     final_plot <- cowplot::plot_grid(
-    plotlist   = list(raw_plot + theme(legend.position="none"), 
-                      delta_plot + theme(legend.position="none")),
-    nrow       = 1,
-    ncol       = 2,
-    rel_widths = c(0.8, 0.2),
-    axis       = "lr",
-    align      = "h")
+      plotlist   = list(raw_plot + theme(legend.position="none"), 
+                        delta_plot + theme(legend.position="none")),
+      nrow       = 1,
+      ncol       = 2,
+      rel_widths = c(0.8, 0.2),
+      axis       = "lr",
+      align      = "h"
+      )
 
     if(isTRUE(is_colour)) {
       raw_legend <- get_legend(raw_plot + 
@@ -1853,7 +1869,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
                                         alpha = "none") + 
                                  theme(legend.position = "bottom"))
       
-      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(1, 0.1))
+      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
     }
     return(final_plot)
   }
@@ -1862,7 +1878,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
 }
 ```
 
-# Testing dataset
+# 2group dataset
 ```{r}
 set.seed(12345)
 
@@ -1887,8 +1903,6 @@ my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
-
-# Testing unpaired plots
 ```{r}
 dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
@@ -1902,10 +1916,10 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 # dabest_obj.mean_diff.plot
 ```
 
+## unpaired
 ```{r}
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
-
 ```
 
 ## unpaired colour
@@ -1917,8 +1931,79 @@ dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
 
+
+## testing export as pdf/png/jepg
+```{r}
+pdf(file = "Images/2group_float_true.pdf",
+    width = 6,
+    height = 8,
+    pointsize = 12)
+dabest_plot(dabest_obj.mean_diff, TRUE)
+dabest_plot(dabest_obj.colour_mean_diff, TRUE)
+dev.off()
+
+pdf(file = "Images/2group_float_false.pdf",
+    width = 8,
+    height = 6,
+    pointsize = 12)
+dabest_plot(dabest_obj.mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
+
+```{r}
+png(file = "Images/2group_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj.mean_diff, TRUE)
+dev.off()
+
+jpeg(file = "Images/2group_float_false.jpeg",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.mean_diff, FALSE)
+dev.off()
+```
+
+# multiplot dataset
+```{r}
+set.seed(12345)
+
+N = 40
+c1 <- rnorm(N, mean = 3, sd = 0.4)
+c2 <- rnorm(N, mean = 3.5, sd = 0.75)
+c3 <- rnorm(N, mean = 3.25, sd = 0.4)
+
+g1 <- rnorm(N, mean = 3.5, sd = 0.5)
+g2 <- rnorm(N, mean = 2.5, sd = 0.6)
+g3 <- rnorm(N, mean = 3, sd = 0.75)
+
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+
+wide.data <- tibble::tibble(
+  Control1 = c1, Control2 = c2, Control3 = c3,
+  Group1 = g1, Group2 = g2, Group3 = g3, 
+  Dummy = dummy,
+  Gender = gender, ID = id)
+
+my.data <- wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 # multigroup
 ## multigroup unpaired
+```
+
+## unpaired
 ```{r}
 dabest_obj_multigroup <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
 dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
@@ -1929,7 +2014,7 @@ dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama")
 ```
 
-## unpaired multiplot colour
+## unpaired colour
 ```{r}
 dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
   mean_diff()
@@ -1937,8 +2022,41 @@ dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, 
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
 
+## testing export as pdf/png/jepg
+```{r}
+pdf(file = "Images/multigroup_unpaired.pdf",
+    width = 8,
+    height = 6,
+    pointsize = 12)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
 
-# Testing paired plots 
+```{r}
+png(file = "Images/multigroup_unpaired.png",
+    width = 6,
+    height = 6,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "Images/multigroup_unpaired.jpeg",
+    width = 6,
+    height = 6,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
+
+## paired
 ```{r}
 dabest_obj_multigroup_sequential <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
 dabest_obj_multigroup_sequential.mean_diff <- mean_diff(dabest_obj_multigroup_sequential)
@@ -1952,6 +2070,7 @@ dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
 dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE)
 ```
 
+## paired colour
 ```{r}
 dabest_obj.colour_baseline_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
   mean_diff()
@@ -2078,7 +2197,11 @@ dabest_obj_multigroup_deltadelta.mean_diff$boot_result <-
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 ```
+# Testing png/pdf/jpeg/svg
+```{r}
+
+```
 
 ```{r}
-dabest_obj_multigroup_minimeta.mean_diff$boot_result
+
 ```
