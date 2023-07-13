@@ -1853,6 +1853,10 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     
+    raw_legend <- get_legend(raw_plot + 
+                         guides(alpha = "none") +
+                         theme(legend.box.margin = margin(0, 0, 0, 0)))
+    
     if(isTRUE(is_deltadelta)) {
       raw_plot <- cowplot::plot_grid(
         plotlist = list(raw_plot + theme(legend.position="none"), NULL), 
@@ -1872,10 +1876,6 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       )
     
     if(isTRUE(is_colour)) {
-      raw_legend <- get_legend(raw_plot + 
-                               guides(alpha = "none") +
-                               theme(legend.box.margin = margin(0, 0, 0, 0)))
-      
       legend_plot <- cowplot::plot_grid(
         plotlist = list(raw_legend, NULL),
         nrow = 2,
@@ -2124,7 +2124,7 @@ dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
 dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
 ```
 
-# Testing proportional dataset
+# proportional dataset
 ```{r}
 set.seed(54321)
 
@@ -2162,6 +2162,7 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
   mean_diff()
 ```
 
+## unpaired
 ```{r}
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "igv") 
 dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
@@ -2176,6 +2177,7 @@ dabest_obj_proportional_multigroup.cohens_h <- load(data = my.data.proportional,
   cohens_h()
 ```
 
+## multi unpaired
 ```{r}
 
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, TRUE, custom_palette = "brewer")
@@ -2193,11 +2195,12 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
   mean_diff()
 ```
 
+## sankey
 ```{r}
 dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
-# Testing minimeta dataset
+# minimeta dataset
 ```{r}
 set.seed(12345)
 
@@ -2222,13 +2225,14 @@ my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
-# Testing minimeta
+## unpaired
 ```{r}
 dabest_obj_multigroup_minimeta <- load(data = my.data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2"), c("Control3", "Group3")))
 dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_minimeta)
+dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 ```
 
-# Testing deltadelta dataset
+# deltadelta dataset
 ```{r}
 set.seed(12345)
 
@@ -2249,22 +2253,20 @@ my.data <- wide.data %>%
   tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy)
 ```
 
-# Testing deltadelta 
+## unpaired
 ```{r}
 dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE,experiment =Treatment,idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")))
 dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
-##dabest_obj_multigroup_deltadelta.mean_diff$boot_result <- 
-  ##rbind(dabest_obj_multigroup_deltadelta.mean_diff$boot_result, dabest_obj_multigroup_deltadelta.mean_diff$boot_result[3,])
-```
 
-# Plotting of minimeta and delta-delta
-```{r}
-dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 ```
-# Testing png/pdf/jpeg/svg
-```{r}
 
+## paired
+```{r}
+dabest_obj_multigroup_deltadelta_baseline <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE,experiment =Treatment,idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), paired = "baseline", id = ID, colour = NA)
+dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_baseline)
+
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
 ```
 
 
