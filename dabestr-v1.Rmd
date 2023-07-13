@@ -64,7 +64,10 @@ load <- function(
     enquo_experiment <- enquo(experiment)
     name_experiment <- as_name(enquo_experiment)
     data <- data %>%
+      mutate(grouping = !!enquo_x) %>%
       unite(!!enquo_x,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    enquo_colour <- data$grouping
+    is_colour <- TRUE
   }
   
   unlist_idx <- unlist(idx)
