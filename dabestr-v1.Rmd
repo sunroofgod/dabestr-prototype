@@ -65,8 +65,12 @@ load <- function(
     name_experiment <- as_name(enquo_experiment)
     data <- data %>%
       mutate(grouping = !!enquo_x) %>%
-      unite(!!enquo_x,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
-    enquo_colour <- data$grouping
+      unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    if (as_label(enquo_colour) == "NULL") {
+      enquo_colour <- enquo_x
+    }
+    enquo_x <- enquo_experiment
+    name_x <- as_name(enquo_x)
     is_colour <- TRUE
   }
   
