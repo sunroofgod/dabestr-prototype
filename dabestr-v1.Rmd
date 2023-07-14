@@ -2246,15 +2246,18 @@ drug <- rnorm(N, mean = 3.5, sd = 0.75)
 genotype <- c(rep('M', N/2), rep('W', N/2))
 dummy <- rep("Dummy", N)
 id <- 1: N
+Rep <- rep(c("Rep1", "Rep2"), N/2)
 
 wide.data <- tibble::tibble(
   Placebo = placebo,
   Drug = drug,
   Dummy = dummy,
-  Genotype = genotype, ID = id)
+  Genotype = genotype, 
+  ID = id,
+  Rep = Rep)
 
 my.data <- wide.data %>%
-  tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy)
+  tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy, -Rep)
 ```
 
 ## unpaired
@@ -2267,7 +2270,8 @@ dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 
 ## paired
 ```{r}
-dabest_obj_multigroup_deltadelta_baseline <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE,experiment =Treatment,idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), paired = "baseline", id = ID, colour = NA)
+dabest_obj_multigroup_deltadelta_baseline <- load(data = my.data, x = Treatment, y = Measurement, delta2 = TRUE, experiment = Genotype,idx = list(c("Placebo W","Drug W"),c("Placebo M","Drug M")), paired = "baseline", id = ID, colour = Rep)
+
 dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_baseline)
 
 dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
