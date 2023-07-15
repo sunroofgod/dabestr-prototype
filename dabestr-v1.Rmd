@@ -684,7 +684,7 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   
   if(isTRUE(proportional)){
     tufte_lines_df <- tufte_lines_df %>%
-      dplyr::mutate(sd = sd/10)
+      dplyr::mutate(sd = sd/7)
   }
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
@@ -1073,8 +1073,8 @@ GeomSankeyBar <- ggproto("GeomSankeyBar", Geom,
                       required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
                       default_aes = aes(col = NA,
                                         width = 0.2,
-                                        col_failure = "#818181",
-                                        col_success = "#db6159",
+                                        col_failure = NA,
+                                        col_success = NA,
                                         fill_failure = "#818181",
                                         fill_success = "#db6159",
                                         alpha = 1,
@@ -1232,7 +1232,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_tufte_lines <- plot_components$is_tufte_lines
   
   if(main_plot_type == "sankey"){
-    sankey_bar_gap <- 0.02
+    sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
@@ -1251,7 +1251,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     enquo_colour <- enquo_x
   }
   
-  bar_width <- ifelse(float_contrast, 0.15, 0.04)
+  bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
