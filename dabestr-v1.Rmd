@@ -63,6 +63,16 @@ load <- function(
   if (isTRUE(delta2)) {
     enquo_experiment <- enquo(experiment)
     name_experiment <- as_name(enquo_experiment)
+
+    # Make sure that data is a 2x2 ANOVA case
+    if (length(unique(data[[name_experiment]]))!=2) {
+      stop("`experiment` does not have a length of 2")
+    } 
+    
+    if (length(unique(data[[name_x]]))!=2) {
+      stop("`x` does not have a length of 2")
+    }
+    
     data <- data %>%
       mutate(grouping = !!enquo_x) %>%
       unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
