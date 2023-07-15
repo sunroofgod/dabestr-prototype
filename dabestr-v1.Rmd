@@ -711,7 +711,9 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    scale_factor_sig = 0.8,
                                    gap) {
   
-  type <- ifelse(length(idx) == 1, "single sankey", "multiple sankeys")
+  type <- ifelse(length(unlist(idx)) <= 2, 
+                 "single sankey", 
+                 "multiple sankeys")
   
   flow_success_to_failure = tibble()
   flow_success_to_success = tibble()
