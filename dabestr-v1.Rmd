@@ -692,76 +692,154 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   return(tufte_lines_df)
 }
 
-create_dfs_for_sankey <- function(float_contrast = FALSE, 
-                                  raw_data, 
-                                  proportional_data, 
-                                  enquo_id_col, 
-                                  x_axis_raw, 
-                                  ind = 1,
-                                  scale_factor_sig = 0.8,
-                                  gap
-                                  ) {
-  ind <- 1
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+create_dfs_for_sankey <-  function(float_contrast = FALSE,
+                                   raw_data,
+                                   proportional_data,
+                                   enquo_id_col,
+                                   x_axis_raw,
+                                   idx,
+                                   scale_factor_sig = 0.8,
+                                   gap) {
+  
+  flow_success_to_failure = tibble()
+  flow_success_to_success = tibble()
+  flow_failure_to_success = tibble()
+  flow_failure_to_failure = tibble()
+  bar_width <- ifelse(float_contrast, 0.15, 0.3)
+  scale_factor_sig <- ifelse(float_contrast, 0.7, 0.425)
   means_c_t <- proportional_data$proportion_success
-  #for() will use for loops for multiple plot groups
-  success_success <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 1 & Group == "Control1") & 
-                any(Success == 1 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1 = n()/N)
-  failure_failire <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 0 & Group == "Control1") & 
-                any(Success == 0 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1F = n()/N)
+  x_padding <- 0.02
   
-  # find values for lower flow success to failure flow
-  ss <- success_success$C1T1[1]
-  value_start1 <- success_success$C1T1[1] - gap/8
-  value_start2 <- means_c_t[1]- gap/2 - gap/8
-  value_end1 <- means_c_t[2] + gap/2 +gap/8
-  value_end2 <- 1- failure_failire$C1T1F[1] + gap/8
+  #redraw_x_axis <- list()
+  prop <- proportional_data
+  ind <- 1
+  x_start <- 1
+  group_being_processed <- 1
+  for (group in idx) {
+    group_length <- length(group)
+    
+    for (i in 1: (group_length - 1)) {
+      #redraw_x_axis <- append(redraw_x_axis, x_start)
+      success_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(success_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(success_change) %>%
+        summarise(SS = n() / N)
+      
+      success_failure <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(sf_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(sf_change) %>%
+        summarise(SF = n() / N)
+      
+      failure_failire <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FF = n() / N)
+      
+      failure_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FS = n() / N)
+      # find values for lower flow success to failure flow
+      ss <- success_success$SS[1]
+      ff <- failure_failire$FF[1]
+      sf <- success_failure$SF[1]
+      fs <- failure_success$FS[1]
+      sf_start1 <- ss #- gap / 2  #success_success$SS[1]
+      sf_start2 <- means_c_t[ind] - gap/2 # / 2 - gap / 4
+      sf_end1 <- means_c_t[ind + 1] + gap/2 # / 2 + gap / 4
+      sf_end2 <- 1 - ff #+ gap / 2 #failure_failire$FF[1]
+      
+      
+      # find values for upper flppied flow success to failure flow
+      fs_start1 <- 1 - ff
+      fs_start2 <- means_c_t[ind] + gap/2  #/ 2 + gap / 4
+      fs_end1 <- means_c_t[ind + 1] - gap/2 #/ 2 - gap / 4
+      fs_end2 <- ss
+      
+      # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
+      sig_success_failure_bot <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start1,
+                                         sf_end1)
+      sig_success_failure_top <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start2,
+                                         sf_end2)
+      sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
+      sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start1,
+                                             fs_end1)
+      sig_failure_success_bot <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start2,
+                                             fs_end2)
+      sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
+      
+      #number of points of data points
+      N_points <- length(sig_success_failure_bot)
+      # generate the tag column for all of these
+      tag <- rep(ind, N_points)
+      sankey_success_failure <- rbind(sig_success_failure_top,
+                                      sig_success_failure_bot)
+      sankey_success_failure <- cbind(sankey_success_failure, tag)
+      
+      sankey_failure_success <- rbind(sig_failure_success_top,
+                                      sig_failure_success_bot)
+      sankey_failure_success <- cbind(sankey_failure_success, tag)
+      
+      rect_flow_x <- c(x_start, x_start + 1)
+      
+      sankey_failure_failure <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(1, 1, rep(fs_start1, 2)),
+                                           tag = c(rep(ind, 4)))
+      sankey_success_success <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(rep(ss, 2), 0, 0),
+                                           tag = c(rep(ind, 4)))
+      
+      x_start <- x_start + 1
+      
+      ind <- ind + 1
+      #` update the 4 sankey flow dfs for plotting
+      flow_success_to_failure <- bind_rows(flow_success_to_failure,
+                                           sankey_success_failure)
+      flow_success_to_success <- bind_rows(flow_success_to_success,
+                                           sankey_success_success)
+      flow_failure_to_success <- bind_rows(flow_failure_to_success,
+                                           sankey_failure_success)
+      flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
+                                           sankey_failure_failure)
+    }
+    group_being_processed <- group_being_processed + 1
+    x_start <- x_start + 1
+    ind <- ind + 1
+  }
+  redraw_x_axis <- c(1 : length(unlist(idx)))
+  sankey_bars <- proportional_data
+  dfs_for_sankeys <- list(flow_success_to_failure = flow_success_to_failure,
+                          flow_failure_to_success = flow_failure_to_success,
+                          flow_success_to_success = flow_success_to_success,
+                          flow_failure_to_failure = flow_failure_to_failure,
+                          sankey_bars = sankey_bars,
+                          redraw_x_axis = redraw_x_axis)
   
-  
-  # find values for upper flppied flow success to failure flow
-  flow_start1 <- 1- failure_failire$C1T1F[1]
-  flow_end1 <- means_c_t[2] - gap/2
-  flow_start2 <- means_c_t[1] + gap/2
-  flow_end2 <- success_success$C1T1[1]
-  
-  # form dataframes from sigmoid/ flippedSig functions and the rectangles, later fit into sankeyflow
-  sig1 <- sigmoid(ind + bar_width, scale_factor_sig, value_start1, value_end1)
-  sig2 <- sigmoid(ind + bar_width, scale_factor_sig, value_start2, value_end2)
-  sig1 <- arrange(sig1, desc(x))
-  sig3 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start1, flow_end1)
-  sig4 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start2, flow_end2)
-  sig4 <- arrange(sig4, desc(x))
-  data_for_flow1 <- rbind(sig2, sig1)
-  data_for_flow2 <- rbind(sig3, sig4)
-  data_for_rect_top <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(1, 1, rep(flow_start1, 2)))
-  data_for_rect_bot <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(rep(ss,2), 0, 0))
-  
-  #prepare data for bargraphs of paired proportional data
-  data_for_bars <- proportional_data
-  
-  
-  list_of_dfs <- list(
-    flow1 = data_for_flow1,
-    flow2 = data_for_flow2, 
-    rect_top = data_for_rect_top, 
-    rect_bot = data_for_rect_bot,
-    bars = proportional_data
-  )
-  list_of_dfs
+  return(dfs_for_sankeys)
 }
 
 create_dfs_for_xaxis_redraw <- function(idx) {
@@ -1028,13 +1106,13 @@ draw_group_sankey_flow <- function(data, panel_scales, coord) {
   flow <- polygonGrob(x = coords$x,
                       y = coords$y,
                       gp = gpar(col = first_row$colour,
-                                fill = alpha(first_row$fill, first_row$alpha)))
+                                fill = alpha(first_row$fillcol, first_row$alpha)))
 }
 
 GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
                           required_aes = c("x", "y"),
                           default_aes = aes(colour = NA,
-                                            fill = "gray50",
+                                            fillcol = "gray50",
                                             alpha = 0.8),
                           draw_key = draw_key_polygon,
                           draw_group = draw_group_sankey_flow)
@@ -1160,19 +1238,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        proportional_data = proportional_data,
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
-                                       gap = sankey_bar_gap)
-    flow1 <- sankey_df$flow1
-    flow2 <- sankey_df$flow2
-    rect_top <- sankey_df$rect_top
-    rect_bot <- sankey_df$rect_bot
-    bars <- sankey_df$bars
+                                       gap = sankey_bar_gap,
+                                       idx = idx)
+    flow_success_to_failure <- sankey_df$flow_success_to_failure
+    flow_failure_to_success <- sankey_df$flow_failure_to_success
+    flow_success_to_success <- sankey_df$flow_success_to_success
+    flow_failure_to_failure <- sankey_df$flow_failure_to_failure
+    sankey_bars <- sankey_df$sankey_bars
   }
   
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
   
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+  bar_width <- ifelse(float_contrast, 0.15, 0.04)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
@@ -1203,16 +1282,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow1, 
-
-                      aes(x = x, y = y, fill = "#db6159")) +
-      geom_sankeyflow(data = flow2, 
-                      aes(x = x, y = y, fill = "#818181")) +
-      geom_sankeyflow(data = rect_top, 
-                      aes(x = x, y = y, fill = "#818181")) +
-      geom_sankeyflow(data = rect_bot, 
-                      aes(x = x, y = y, fill = "#db6159")) +
-      geom_sankeybar(data = bars, 
+      geom_sankeyflow(data = flow_success_to_failure, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_success, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeyflow(data = flow_success_to_success, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_failure, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeybar(data = sankey_bars, 
                      aes(x = x_axis_raw,
                          ysuccess = y_success, 
                          yfailure = y_failure, 
@@ -2152,8 +2230,26 @@ my.data.test_proportion2 <- data.frame(
 my.data.test_proportion2$Success <- numeric(nrow(my.data.test_proportion2))
 my.data.test_proportion2$Success[sample(nrow(my.data.test_proportion2), 15)] <- 1
 
-my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2)
-id <- data.frame(ID = rep(c(1:40), 3))
+my.data.test_proportion3 <- data.frame(
+  Group = sample(c("Test3"), 40, TRUE)
+)
+my.data.test_proportion3$Success <- numeric(nrow(my.data.test_proportion3))
+my.data.test_proportion3$Success[sample(nrow(my.data.test_proportion3), 18)] <- 1
+
+my.data.test_proportion4 <- data.frame(
+  Group = sample(c("Test4"), 40, TRUE)
+)
+my.data.test_proportion4$Success <- numeric(nrow(my.data.test_proportion4))
+my.data.test_proportion4$Success[sample(nrow(my.data.test_proportion4), 20)] <- 1
+
+my.data.test_proportion5 <- data.frame(
+  Group = sample(c("Control2"), 40, TRUE)
+)
+my.data.test_proportion5$Success <- numeric(nrow(my.data.test_proportion5))
+my.data.test_proportion5$Success[sample(nrow(my.data.test_proportion5), 4)] <- 1
+
+my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2, my.data.test_proportion3, my.data.test_proportion4, my.data.test_proportion5)
+id <- data.frame(ID = rep(c(1:40), 6))
 my.data.proportional <- cbind(my.data.proportional, id)
 ```
 
@@ -2204,6 +2300,33 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
 dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
+
+```{r}
+dabest_obj_baseline_sankey.mean_diff <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = list(c("Control1", "Test1", "Test2", "Test3"),c("Control2", "Test4")),
+                                  proportional = TRUE,
+                                  paired = "baseline",
+                                  id_col = ID) %>%
+  mean_diff()
+
+dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = list(c("Control1", "Test1", "Test2", "Test3"),c("Control2", "Test4")),
+                                  proportional = TRUE,
+                                  paired = "sequential",
+                                  id_col = ID) %>%
+  mean_diff()
+```
+
+## multi sankey
+```{r}
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+```
+
 # minimeta dataset
 ```{r}
 set.seed(12345)
@@ -2262,7 +2385,7 @@ my.data <- wide.data %>%
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE,experiment =Treatment,idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")))
+dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment =Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")))
 dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
 
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
