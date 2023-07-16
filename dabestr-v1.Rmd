@@ -174,7 +174,6 @@ load <- function(
 
 ## grp_var and bca function for final weighted bca cis
 ```{r}
-#grp variance 
 calculate_group_variance <- function(ctrl_var, 
                                      ctrl_N,
                                      test_var, 
@@ -185,9 +184,8 @@ calculate_group_variance <- function(ctrl_var,
   # return(ctrl_var/ctrl_N + test_var/test_N)
 }
 
-#bca function inverse variance method
 bca <- function(bootstraps, conf.level = .95){
-
+  # Inverse Variance Method
   if(var(bootstraps)==0){
     lower <- mean(bootstraps)
     upper <- mean(bootstraps)
@@ -306,7 +304,7 @@ calculate_delta_difference <- function(differences) {
 }
 ```
 
-# Bootstrap helper functions
+# bootstrap helper functions
 ```{r}
 effsize_boot <- function(
     data, 
@@ -533,7 +531,7 @@ bootstrap <- function(
 }
 ```
 
-# Main effect_size functions
+# effect_size functions
 ```{r}
 mean_diff <- function(dabest_obj) {
   
@@ -641,7 +639,7 @@ hedges_correction <- function(x1, x2) {
 }
 ```
 
-# float_contrast/non_float_contrast themes
+## float_contrast/non_float_contrast themes
 ```{r}
 # Theme for left-right graph
 float_contrast_theme <- 
@@ -663,7 +661,7 @@ non_float_contrast_theme <-
 
 ```
 
-# helper math stats tool functions
+## math stats tool functions
 ```{r}
 sigmoid <- function(x_from, factor, y_from, y_to, smooth = 5.5, n = 300) {
   x <- seq(-smooth, smooth, length = n)
@@ -683,7 +681,7 @@ flipped_sig <- function(x_from, factor, y_from, y_to, smooth = 5.5, n = 300) {
 # df creation functions
 ```{r}
 # Function for creation of df for tuftelines plot
-df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
+create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
@@ -991,7 +989,7 @@ assign_plot_kwargs <- function(plot_kwargs) {
 }
 ```
 
-# custom proportionbar geom
+# proportionbar geom
 ```{r}
 "%||%" <- function(a, b) {
   if (!is.null(a)) a else b
@@ -1066,7 +1064,7 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 ```
 
 
-# custom sankey geoms
+# sankey geoms
 ```{r}
 # sankey bars
 draw_panel_sankey_bar <- function(data, panel_scales, coord) {
@@ -1121,7 +1119,6 @@ geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 
 # sankey flows
-
 draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   first_row <- coords[1, , drop = FALSE]
@@ -1136,7 +1133,7 @@ GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
                           required_aes = c("x", "y"),
                           default_aes = aes(colour = NA,
                                             fillcol = "gray50",
-                                            alpha = 0.8),
+                                            alpha = 0.5),
                           draw_key = draw_key_polygon,
                           draw_group = draw_group_sankey_flow)
 
@@ -1349,7 +1346,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   #### Add tufte_lines component ####
   if(isTRUE(is_tufte_lines)) {
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
+    tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
       tufte_gap_value <- sankey_bar_gap
     } else {
@@ -1462,7 +1459,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 }
 ```
 
-# custom violin & boot_ci geoms
+# halfviolin geom
 ```{r}
 draw_group_halfviolin <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
@@ -1496,7 +1493,10 @@ geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity",
               inherit.aes = inherit.aes,
               params = list(na.rm = na.rm, ...))
 }
+```
 
+# bootci geom
+```{r}
 draw_panel_boot_ci <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
         
@@ -1881,7 +1881,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 }
 ```
 
-# palette applier
+## palette applier
 ```{r}
 apply_palette <- function(ggplot_object, palette_name) {
   ggplot_object <- switch(
@@ -1964,7 +1964,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     
     if(isTRUE(is_deltadelta)) {
       raw_plot <- cowplot::plot_grid(
-        plotlist = list(raw_plot + theme(legend.position="none"), NULL), 
+        plotlist = list(raw_plot + theme(legend.position="none"), 
+                        NULL), 
         nrow = 1, 
         ncol = 2, 
         rel_widths = c(0.9, 0.1)
@@ -2018,8 +2019,6 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     }
     return(final_plot)
   }
-  
-  final_plot
 }
 ```
 
@@ -2079,17 +2078,17 @@ dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 
 ## testing export as pdf/png/jepg
 ```{r}
-pdf(file = "Images/2group_float_true.pdf",
-    width = 6,
-    height = 8,
+pdf(file = "assets/2group/2group_float_true.pdf",
+    width = 5.5,
+    height = 5.5,
     pointsize = 12)
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.colour_mean_diff, TRUE)
 dev.off()
 
-pdf(file = "Images/2group_float_false.pdf",
-    width = 8,
-    height = 6,
+pdf(file = "assets/2group/2group_float_false.pdf",
+    width = 5.5,
+    height = 7,
     pointsize = 12)
 dabest_plot(dabest_obj.mean_diff, FALSE)
 dabest_plot(dabest_obj.colour_mean_diff, FALSE)
@@ -2097,7 +2096,7 @@ dev.off()
 ```
 
 ```{r}
-png(file = "Images/2group_float_true.png",
+png(file = "assets/2group/2group_float_true.png",
     width = 5.5,
     height = 5.5,
     units = "in",
@@ -2107,9 +2106,9 @@ png(file = "Images/2group_float_true.png",
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dev.off()
 
-jpeg(file = "Images/2group_float_false.jpeg",
+jpeg(file = "assets/2group/2group_float_false.jpeg",
     width = 5.5,
-    height = 5.5,
+    height = 7,
     units = "in",
     pointsize = 12,
     res = 1200,
@@ -2169,9 +2168,9 @@ dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 
 ## testing export as pdf/png/jepg
 ```{r}
-pdf(file = "Images/multigroup_unpaired.pdf",
-    width = 8,
-    height = 6,
+pdf(file = "assets/multigroup/multigroup_unpaired.pdf",
+    width = 5.5,
+    height = 7,
     pointsize = 12)
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
 dabest_plot(dabest_obj.colour_mean_diff, FALSE)
@@ -2179,9 +2178,9 @@ dev.off()
 ```
 
 ```{r}
-png(file = "Images/multigroup_unpaired.png",
-    width = 6,
-    height = 6,
+png(file = "assets/multigroup/multigroup_unpaired.png",
+    width = 5.5,
+    height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
@@ -2189,9 +2188,9 @@ png(file = "Images/multigroup_unpaired.png",
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
 dev.off()
 
-jpeg(file = "Images/multigroup_unpaired.jpeg",
-    width = 6,
-    height = 6,
+jpeg(file = "assets/multigroup/multigroup_unpaired_colour.jpeg",
+    width = 7,
+    height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
@@ -2227,6 +2226,29 @@ dabest_obj.colour_sequential_mean_diff <- load(data = my.data, x = Group, y = Me
 ```{r}
 dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
 dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
+```
+
+```{r}
+png(file = "assets/multigroup/multigroup_sequential.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "assets/multigroup/multigroup_baseline_colour.jpeg",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE)
+dev.off()
 ```
 
 # proportional dataset
@@ -2308,6 +2330,39 @@ dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
 ```
 
 ```{r}
+png(file = "assets/proportion/2group_proportion_float_false.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+dev.off()
+
+png(file = "assets/proportion/2group_proportion_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_proportional.mean_diff, TRUE)
+dev.off()
+
+jpeg(file = "assets/proportion/multigroup_proportion.jpeg",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dev.off()
+```
+
+```{r}
 dabest_obj_sankey.mean_diff <- load(data = my.data.proportional, 
                                   x = Group, 
                                   y = Success, 
@@ -2349,6 +2404,38 @@ dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional,
 dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
 dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
 ```
+```{r}
+png(file = "assets/proportion/2group_sankey_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
+dev.off()
+
+png(file = "assets/proportion/multigroup_sankey_baseline.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "assets/proportion/multigroup_sankey_sequential.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dev.off()
+```
 
 # minimeta dataset
 ```{r}
@@ -2382,6 +2469,18 @@ dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_mini
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 ```
 
+```{r}
+png(file = "assets/minimeta/multigroup_minimeta.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
+dev.off()
+```
+
 # deltadelta dataset
 ```{r}
 set.seed(12345)
@@ -2408,11 +2507,12 @@ my.data <- wide.data %>%
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment =Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")))
+dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment =Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), colour = Genotype)
 dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
 
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
 ```
+
 
 ## paired
 ```{r}
@@ -2423,6 +2523,24 @@ dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_mult
 dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
 ```
 
-
 ```{r}
+png(file = "assets/deltadelta/multigroup_deltadelta_unpaired.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+dev.off()
+
+png(file = "assets/deltadelta/multigroup_deltadelta_paired.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE)
+dev.off()
 ```
