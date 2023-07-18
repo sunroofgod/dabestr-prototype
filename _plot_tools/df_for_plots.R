@@ -1,7 +1,7 @@
 #' Helper functions that generate dfs for plot
 #' 
 #' @description
-#' Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw` for generation of dfs.
+#' Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw`, `create_dfs_for_proportion_bar` for generation of dfs.
 #' 
 #' Also includes `plot_slopegraph` (for plotting of slopegraph).
 
@@ -218,4 +218,33 @@ create_dfs_for_xaxis_redraw <- function(idx) {
   )
   
   return(dfs_for_xaxis_redraw)
+}
+
+create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, gap = 0) {
+  df_for_proportion_bar <- data.frame(
+    x_failure = NA,
+    y_failure = NA,
+    x_success = NA,
+    y_success = NA,
+    tag = NA
+  )
+  
+  for (i in 1:length(proportion_success)) {
+    y <- proportion_success[i]
+    
+    x_failure_success <- c(x-width/2, x+width/2, x+width/2, x-width/2)
+    y_success = c(y-gap/2, y-gap/2, 0, 0)
+    y_failure = c(1, 1, y+gap/2, y+gap/2)
+    temp_df_proportion_bar <- data.frame(
+      x_failure = x_failure_success,
+      y_failure = y_failure,
+      x_success = x_failure_success,
+      y_success = y_success,
+      tag = rep(toString(i), 4)
+    )
+    
+    df_for_proportion_bar <- rbind(df_for_proportion_bar, temp_df_proportion_bar)
+  }
+  
+  return(df_for_proportion_bar)
 }

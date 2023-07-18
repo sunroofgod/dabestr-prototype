@@ -109,9 +109,9 @@ load <- function(
       dplyr::count()
     Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
     
-    # (Don't need the below code anymore due to change in implementation)
-    # buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
-    # Ns <- rbind(Ns)
+    # Extending ylim for plotting
+    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
     
     if(isTRUE(proportional)){
       ## include checks here for data to see if it is proportional data
@@ -126,11 +126,6 @@ load <- function(
       test_summary <- proportional_data$proportion_success[2]
         
     } else {
-      
-      # Extending ylim for plotting
-      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
-      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
-      
       # Calculation of summary lines
       summaries <- raw_data %>%
         group_by(!!enquo_x) %>%
@@ -938,6 +933,36 @@ create_rawplot_components <- function(proportional,
   )
   return(plot_component)
 }
+
+create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, gap = 0) {
+  df_for_proportion_bar <- data.frame(
+    x_failure = NA,
+    y_failure = NA,
+    x_success = NA,
+    y_success = NA,
+    tag = NA
+  )
+    
+  for (x in 1:length(proportion_success)) {
+    y <- proportion_success[x]
+    
+    x_failure_success <- c(x-bar_width/2, x+bar_width/2, x+bar_width/2, x-bar_width/2)
+    y_success <- c(y-gap/2, y-gap/2, 0, 0)
+    y_failure <- c(1, 1, y+gap/2, y+gap/2)
+    temp_df_proportion_bar <- data.frame(
+      x_failure = x_failure_success,
+      y_failure = y_failure,
+      x_success = x_failure_success,
+      y_success = y_success,
+      tag = rep(toString(x), 4)
+    )
+    
+    df_for_proportion_bar <- rbind(df_for_proportion_bar, temp_df_proportion_bar)
+  }
+  df_for_proportion_bar <- df_for_proportion_bar %>%na.omit()
+  
+  return(df_for_proportion_bar)
+}
 ```
 
 ## assign plot kwargs
@@ -995,57 +1020,27 @@ assign_plot_kwargs <- function(plot_kwargs) {
   if (!is.null(a)) a else b
 }
 
-draw_panel_proportion_bar <- function(data, panel_scales, coord) {
+draw_group_proportion_bar <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   
-  failure_bar <- rectGrob(x = coords$x,
-                          y = 1,
-                          width = coords$width,
-                          height = 1 - coords$y,
-                          default.units = "native",
-                          just = c("center", "top"),
-                          gp = gpar(col = coords$colour,
-                                    fill = "white",
-                                    lwd = coords$size * .pt))
-  
-  success_bar <- rectGrob(x = coords$x,
-                          y = 0,
-                          width = coords$width,
-                          height = coords$y,
-                          default.units = "native",
-                          just = c("center", "bottom"),
-                          gp = gpar(col = coords$colour,
-                                    fill = alpha(coords$fill, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  gTree(children = gList(failure_bar, success_bar))
-  
+  first_row <- coords[1, , drop = FALSE]
+
+  failure_bar <- polygonGrob(x = coords$x,
+                             y = coords$y,
+                             gp = gpar(col = first_row$colour,
+                                       fill = alpha(first_row$fill, first_row$alpha)))
 }
 
-GeomProportionBar <- ggproto("GeomProportionBar", GeomRect,
-                      required_aes = c("x", "y"),
-                      non_missing_aes = c("xmin", "xmax", "ymin", "ymax"),
-                      default_aes = aes(colour = NA,
-                                        width = 0.2,
-                                        fill = "grey35",
-                                        alpha = NA,
-                                        lwd = 2,
-                                        size = 0.7),
-                      
-                      set_up_data = function(data, params) {
-                        data$width <- data$width %||% params$width
-                        data <- transform(data,
-                          ymin = pmin(y, 0), ymax = pmax(y, 1),
-                          xmin = x - width, xmax = x + width,
-                          width = width)
-                        data
-                      },
-                      
-                      draw_key = draw_key_polygon,
-                      draw_panel = draw_panel_proportion_bar)
+GeomProportionBar <- ggproto("GeomProportionBar", Geom,
+                             required_aes = c("x", "y"),
+                             default_aes = aes(colour = "black",
+                                               fill = "white",
+                                               alpha = NA),
+                             draw_key = draw_key_polygon,
+                             draw_group = draw_group_proportion_bar)
 
 geom_proportionbar <- function(mapping = NULL, data = NULL, 
-                               stat = "identity", position = "stack", 
+                               stat = "identity", position = "identity", 
                                ...,
                                show.legend = NA, 
                                na.rm = FALSE, 
@@ -1066,58 +1061,6 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 
 # sankey geoms
 ```{r}
-# sankey bars
-draw_panel_sankey_bar <- function(data, panel_scales, coord) {
-  coords <- coord$transform(data, panel_scales) 
-  
-  failure_bar <- rectGrob(x = coords$x,
-                          y = coords$yfailure + coords$gap/4,
-                          width = coords$width,
-                          height = 1 - coords$proportionsuccess - coords$gap/2,
-                          gp = gpar(col = coords$col_failure,
-                                    fill = alpha(coords$fill_failure, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  success_bar <- rectGrob(x = coords$x,
-                          y = coords$ysuccess - coords$gap/4,
-                          width = coords$width,
-                          height = coords$proportionsuccess - coords$gap/2,
-                          gp = gpar(col = coords$col_success,
-                                    fill = alpha(coords$fill_success, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  gTree(children = gList(failure_bar, success_bar))
-  
-}
-
-GeomSankeyBar <- ggproto("GeomSankeyBar", Geom,
-                      required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
-                      default_aes = aes(col = NA,
-                                        width = 0.2,
-                                        col_failure = NA,
-                                        col_success = NA,
-                                        fill_failure = "#818181",
-                                        fill_success = "#db6159",
-                                        alpha = 1,
-                                        lwd = 2,
-                                        size = 0.7,
-                                        gap = 0.05),
-                      draw_key = draw_key_rect,
-                      draw_panel = draw_panel_sankey_bar)
-
-geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity", 
-                        position = "identity", show.legend = NA, 
-                        na.rm = FALSE, inherit.aes = TRUE, ...) {
-  layer(data = data, 
-        mapping = mapping,
-        stat = stat,
-        geom = GeomSankeyBar,
-        position = position,
-        show.legend = show.legend,
-        inherit.aes = inherit.aes,
-        params = list(na.rm = na.rm, ...))
-}
-
 # sankey flows
 draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
@@ -1204,14 +1147,16 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
 # raw_plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
-  enquo_x = dabest_effectsize_obj$enquo_x
-  enquo_y = dabest_effectsize_obj$enquo_y
-  enquo_id_col = dabest_effectsize_obj$enquo_id_col
-  enquo_colour = dabest_effectsize_obj$enquo_colour
-  proportional = dabest_effectsize_obj$proportional
-  minimeta = dabest_effectsize_obj$minimeta
-  delta2 = dabest_effectsize_obj$delta2
-  proportional_data = dabest_effectsize_obj$proportional_data
+  enquo_x <- dabest_effectsize_obj$enquo_x
+  enquo_y <- dabest_effectsize_obj$enquo_y
+  enquo_id_col <- dabest_effectsize_obj$enquo_id_col
+  enquo_colour <- dabest_effectsize_obj$enquo_colour
+  proportional <- dabest_effectsize_obj$proportional
+  minimeta <- dabest_effectsize_obj$minimeta
+  delta2 <- dabest_effectsize_obj$delta2
+  proportional_data <- dabest_effectsize_obj$proportional_data
+  
+  proportion_success <- proportional_data$proportion_success
   
   raw_data <- dabest_effectsize_obj$raw_data
   Ns <- dabest_effectsize_obj$Ns
@@ -1251,7 +1196,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
   
-  if(main_plot_type == "sankey"){
+  bar_width <- ifelse(float_contrast, 0.3, 0.15)
+  
+  ## Creation of dfs for specific main_plot_types ##
+  if(main_plot_type == "sankey") {
     sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
@@ -1265,13 +1213,23 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     flow_success_to_success <- sankey_df$flow_success_to_success
     flow_failure_to_failure <- sankey_df$flow_failure_to_failure
     sankey_bars <- sankey_df$sankey_bars
+    sankey_bars <- create_dfs_for_proportion_bar(sankey_bars$proportion_success, 
+                                                 bar_width = bar_width, 
+                                                 gap = sankey_bar_gap)
   }
   
+  if(main_plot_type == "unpaired proportions") {
+    if(isTRUE(float_contrast)) {
+      raw_y_max <- 1
+      raw_y_min <- 0
+    }
+    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success)
+  }
+  
+  ## Adjustment of labels
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
-  
-  bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
@@ -1285,20 +1243,19 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                         colour = !!enquo_colour),
                     cex = 2,
                     method = "swarm",
-                    corral = "wrap",
-                    corral.width = 0.3),
+                    side = 1L),
     
     "slope" = 
       plot_slopegraph(dabest_effectsize_obj),
     
     "unpaired proportions" = 
       ggplot() +
-      geom_proportionbar(data = proportional_data,
-                         aes(x = x_axis_raw,
-                             y = proportion_success,
-                             colour = !!enquo_x, 
-                             fill = !!enquo_x,
-                             width = bar_width)),
+      # failure bar
+      geom_proportionbar(data = df_for_proportion_bar,
+                         aes(x = x_failure, y = y_failure, colour = tag)) +
+      # success bar
+      geom_proportionbar(data = df_for_proportion_bar,
+                         aes(x = x_success, y = y_success, colour = tag, fill = tag)),
     
     "sankey" =
       ggplot() +
@@ -1310,20 +1267,18 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
       geom_sankeyflow(data = flow_failure_to_failure, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
-      geom_sankeybar(data = sankey_bars, 
-                     aes(x = x_axis_raw,
-                         ysuccess = y_success, 
-                         yfailure = y_failure, 
-                         proportionsuccess = proportion_success, 
-                         width = bar_width,
-                         gap = sankey_bar_gap))
+      geom_proportionbar(data = sankey_bars, 
+                         aes(x = x_failure, y = y_failure, group = tag, colour = NA), fill = "#818181") +
+      geom_proportionbar(data = sankey_bars, 
+                         aes(x = x_success, y = y_success, group = tag, colour = NA), fill = "#db6159")
+      
   )
   
   #### Add scaling Component ####
   raw_plot <- raw_plot +
     theme_classic() +
     coord_cartesian(ylim = c(raw_y_min, raw_y_max),
-                    xlim = c(0.6,raw_x_max+0.5),
+                    xlim = c(0.6, raw_x_max+0.5),
                     expand = FALSE,
                     clip = "off") +
     scale_x_continuous(breaks = c(x_axis_raw),
@@ -1353,7 +1308,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
       tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.20)
+    tufte_side_adjust_value <- ifelse(proportional, 0, -0.05)
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -1626,7 +1581,7 @@ create_violinplot_components <- function(boots,
       
       temp_df_violin <- data.frame(x = x_coords_ci,
                                    y = y_coords_ci,
-                                   tag = rep(toString(curr_x_idx),512))
+                                   tag = rep(toString(curr_x_idx), 512))
       
       df_for_violin <- rbind(df_for_violin, temp_df_violin)
       
@@ -1652,6 +1607,7 @@ create_violinplot_components <- function(boots,
 plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx = dabest_effectsize_obj$idx
   bootstraps = dabest_effectsize_obj$bootstraps
+  proportional <- dabest_effectsize_obj$proportional
   
   delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
   delta_y_labels = dabest_effectsize_obj$delta_y_labels
@@ -1730,7 +1686,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   )
   
   #### Add scaling Component ####
-  if (isTRUE(float_contrast)) {
+  if(isTRUE(float_contrast)) {
+    raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
+    main_plot_type <- raw_plot_components$main_plot_type
+    if(main_plot_type == "unpaired proportions") {
+      raw_y_range_vector <- c(0, 1)
+    }
     # Calculate new ylims to align summary lines
     min_raw_y <- raw_y_range_vector[1]
     max_raw_y <- raw_y_range_vector[2]
@@ -1741,7 +1702,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_plot <- delta_plot +
       theme_classic() +
       coord_cartesian(ylim = c(min_y_coords, min_y_coords + delta_y_range),
-                      xlim = c(1.8,delta_x_max+0.25),
+                      xlim = c(1.8, delta_x_max+0.25),
                       expand = FALSE) +
       scale_x_continuous(breaks = c(2),
                          labels = delta_x_labels) +
