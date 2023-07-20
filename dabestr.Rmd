@@ -739,6 +739,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    x_axis_raw,
                                    idx,
                                    scale_factor_sig = 0.8,
+                                   bar_width = 0.15,
                                    gap) {
   
   type <- ifelse(length(unlist(idx)) <= 2, 
@@ -749,6 +750,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   flow_success_to_success = tibble()
   flow_failure_to_success = tibble()
   flow_failure_to_failure = tibble()
+  
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   if(type == "single sankey" && float_contrast){
@@ -762,7 +764,6 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   }
   means_c_t <- proportional_data$proportion_success
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
-   
   
   prop <- proportional_data
   ind <- 1
@@ -1005,15 +1006,26 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
 ## assign plot kwargs
 ```{r}
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
+  custom_palette <- "d3"
+  
   swarm_label <- dabest_effectsize_obj$raw_y_labels
   contrast_label <- dabest_effectsize_obj$delta_y_labels
-  custom_palette <- "d3"
+  delta2_label <- NULL
+  
   swarm_ylim <- NULL
   contrast_ylim <- NULL
   delta2_ylim <- NULL
-  delta2_label <- NULL
+  
   show_delta2 <- dabest_effectsize_obj$delta2
   show_mini_meta <- dabest_effectsize_obj$minimeta
+  
+  raw_marker_size <- 1.5
+  raw_marker_alpha <- 1
+  raw_marker_spread <- 2
+  raw_bar_width <- 0.3
+  tufte_size <- 0.8
+  es_marker_size <- 0.5
+  es_line_size <- 0.8
   
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
@@ -1042,6 +1054,28 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$show_mini_meta))) {
     show_mini_meta <- plot_kwargs$show_mini_meta
   }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_size))) {
+    raw_marker_size <- plot_kwargs$raw_marker_size
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_alpha))) {
+    raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  }
+  if(isFALSE(is.null(plot_kwargs$tufte_size))) {
+    tufte_size <- plot_kwargs$tufte_size
+  }
+  if(isFALSE(is.null(plot_kwargs$es_marker_size))) {
+    es_marker_size <- plot_kwargs$es_marker_size
+  }
+  if(isFALSE(is.null(plot_kwargs$es_line_size))) {
+    es_line_size <- plot_kwargs$es_line_size
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_bar_width))) {
+    raw_bar_width <- plot_kwargs$raw_bar_width
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_spread))) {
+    raw_marker_spread <- plot_kwargs$raw_marker_spread
+  }
+  
   return(list(
     swarm_label = swarm_label,
     contrast_label = contrast_label,
@@ -1051,7 +1085,14 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     delta2_ylim = delta2_ylim,
     delta2_label = delta2_label,
     show_delta2 = show_delta2,
-    show_mini_meta = show_mini_meta
+    show_mini_meta = show_mini_meta,
+    raw_marker_size = raw_marker_size,
+    raw_marker_alpha = raw_marker_alpha,
+    raw_marker_spread = raw_marker_spread,
+    raw_bar_width = raw_bar_width,
+    tufte_size = tufte_size,
+    es_marker_size = es_marker_size,
+    es_line_size = es_line_size
   ))
 }
 ```
@@ -1138,8 +1179,11 @@ geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity",
 
 ## plot slopegraph
 ```{r}
-plot_slopegraph <- function(dabest_effectsize_obj) {
+plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_data <- dabest_effectsize_obj$raw_data
+  
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   
   enquo_x = dabest_effectsize_obj$enquo_x
   enquo_y = dabest_effectsize_obj$enquo_y
@@ -1152,7 +1196,7 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
   idx = dabest_effectsize_obj$idx
   
   raw_plot <- ggplot()
-  slopegraph_params <- list(linewidth = 0.3, alpha = 0.5)
+  slopegraph_params <- list(linewidth = raw_marker_size, alpha = raw_marker_alpha)
   
   for(subplot_groups in idx) {
     # Assign subplot.
@@ -1227,13 +1271,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     float_contrast = FALSE
   }
   
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_marker_spread <- plot_kwargs$raw_marker_spread
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
+  
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
-  
-  bar_width <- ifelse(float_contrast, 0.3, 0.15)
   
   ## Creation of dfs for specific main_plot_types ##
   if(main_plot_type == "sankey") {
@@ -1251,7 +1302,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     flow_failure_to_failure <- sankey_df$flow_failure_to_failure
     sankey_bars <- sankey_df$sankey_bars
     sankey_bars <- create_dfs_for_proportion_bar(sankey_bars$proportion_success, 
-                                                 bar_width = bar_width, 
+                                                 bar_width = raw_bar_width, 
                                                  gap = sankey_bar_gap)
   }
   
@@ -1260,10 +1311,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       raw_y_max <- 1
       raw_y_min <- 0
     }
-    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success)
+    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success, bar_width = raw_bar_width)
   }
   
-  ## Adjustment of labels
+  ## Adjustment of labels ##
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
@@ -1278,15 +1329,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2,
+                    cex = raw_marker_spread,
                     method = "swarm",
                     side = -1L,
-                    size = rel(1.3),
+                    size = raw_marker_size,
+                    alpha = raw_marker_alpha,
                     corral = "wrap",
                     corral.width = 0.35),
     
     "slope" = 
-      plot_slopegraph(dabest_effectsize_obj),
+      plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
     
     "unpaired proportions" = 
       ggplot() +
@@ -1382,7 +1434,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     if(isTRUE(proportional) | isTRUE(is_colour)) {
       raw_plot <- raw_plot +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -1391,7 +1443,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                          colour = !!enquo_x),
                      lineend = "square") +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -1401,14 +1453,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                      lineend = "square")
     } else {
       raw_plot <- raw_plot +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_bot_t$y, 
                          yend = y_bot_t$yend,
                          colour = !!enquo_x),
                      lineend = "square") +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_top_t$y, 
@@ -1687,6 +1739,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     float_contrast <- FALSE
   }
   
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
+  
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
                                                        is_paired, 
@@ -1745,8 +1805,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   
   if(isTRUE(float_contrast)) {
+    difference = boot_result$difference
+    
     raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
     main_plot_type <- raw_plot_components$main_plot_type
+    
     if(main_plot_type == "unpaired proportions") {
       raw_y_range_vector <- c(0, 1)
     }
@@ -1805,7 +1868,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       geom_bootci(aes(x = x_axis_breaks,
                   ymin = ci_low,
                   ymax = ci_high,
-                  middle = difference))
+                  middle = difference,
+                  dotsize = es_marker_size,
+                  linesize = es_line_size))
   }
   
   #### Add summary lines Component ####
@@ -2078,12 +2143,12 @@ wide.data <- tibble::tibble(
   Dummy = dummy,
   Gender = gender, ID = id)
 
-my.data <- wide.data %>%
+twogroup_data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
 ```{r}
-dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
+dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 # dabest_obj.hedges_g <- hedges_g(dabest_obj)
 
@@ -2100,16 +2165,19 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 dabest_plot(dabest_obj.mean_diff, TRUE, swarm_label = "This is my\nrawdata", contrast_label="The bootstrap\ndistribtions!")
 dabest_plot(dabest_obj.mean_diff, TRUE, swarm_ylim = c(50, 120), custom_palette = "jama")
 dabest_plot(dabest_obj.mean_diff, FALSE, swarm_ylim = c(50, 120), custom_palette = "lancet")
-dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
+```
+
+```{r}
+dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm", raw_marker_size = 1, tufte_size = 1, es_marker_size = 1, es_line_size = 1.5, raw_marker_spread = 1.8)
 ```
 
 ## unpaired colour
 ```{r}
-dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
+dabest_obj.colour_mean_diff <- load(data = twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
   mean_diff()
 
 dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
-dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco", raw_marker_size = 1)
 ```
 
 
@@ -2178,7 +2246,7 @@ wide.data <- tibble::tibble(
   Dummy = dummy,
   Gender = gender, ID = id)
 
-my.data <- wide.data %>%
+multigroup_data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 # multigroup
 ## multigroup unpaired
@@ -2186,7 +2254,7 @@ my.data <- wide.data %>%
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
+dabest_obj_multigroup <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
 dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 ```
 
@@ -2197,7 +2265,7 @@ dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama")
 
 ## unpaired colour
 ```{r}
-dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
+dabest_obj.colour_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
   mean_diff()
 
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
@@ -2239,30 +2307,30 @@ dev.off()
 
 ## paired
 ```{r}
-dabest_obj_multigroup_sequential <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
+dabest_obj_multigroup_sequential <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
 dabest_obj_multigroup_sequential.mean_diff <- mean_diff(dabest_obj_multigroup_sequential)
 
-dabest_obj_multigroup_baseline <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID)
+dabest_obj_multigroup_baseline <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID)
 dabest_obj_multigroup_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_baseline)
 ```
 
 ```{r}
-dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
-dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE, contrast_ylim = c(2, -2), contrast_label = "More negative is better")
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE, contrast_ylim = c(2, -2), contrast_label = "More negative is better", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 ```
 
 ## paired colour
 ```{r}
-dabest_obj.colour_baseline_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
+dabest_obj.colour_baseline_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
   mean_diff()
 
-dabest_obj.colour_sequential_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID, colour = Gender) %>%
+dabest_obj.colour_sequential_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID, colour = Gender) %>%
   mean_diff()
 ```
 
 ```{r}
-dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
-dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
+dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 ```
 
 ```{r}
@@ -2273,7 +2341,7 @@ png(file = "figures/multigroup/multigroup_sequential.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 
 jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
@@ -2284,7 +2352,7 @@ jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 ```
 
@@ -2347,7 +2415,7 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
 ## unpaired
 ```{r}
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "igv") 
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago", raw_bar_width = 0.15)
 ```
 
 ```{r}
@@ -2361,9 +2429,8 @@ dabest_obj_proportional_multigroup.cohens_h <- load(data = my.data.proportional,
 
 ## multi unpaired
 ```{r}
-
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, TRUE, custom_palette = "brewer")
-dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.20)
 ```
 
 ```{r}
@@ -2374,7 +2441,7 @@ png(file = "figures/proportion/2group_proportion_float_false.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 
 png(file = "figures/proportion/2group_proportion_float_true.png",
@@ -2395,7 +2462,7 @@ jpeg(file = "figures/proportion/multigroup_proportion.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.15)
 dev.off()
 ```
 
@@ -2438,9 +2505,10 @@ dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional,
 
 ## multi sankey
 ```{r}
-dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
-dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 ```
+
 ```{r}
 png(file = "figures/proportion/2group_sankey_float_true.png",
     width = 5.5,
@@ -2459,7 +2527,7 @@ png(file = "figures/proportion/multigroup_sankey_baseline.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 
 jpeg(file = "figures/proportion/multigroup_sankey_sequential.png",
@@ -2470,7 +2538,7 @@ jpeg(file = "figures/proportion/multigroup_sankey_sequential.png",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 ```
 
@@ -2560,20 +2628,20 @@ dabest_obj_multigroup_deltadelta_baseline <- load(data = deltadelta_data, x = Tr
 
 dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_baseline)
 
-dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
-dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE, show_delta2 = FALSE)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE, show_delta2 = FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 ```
 
 ## no idx
 ```{r}
-dabest_obj_multigroup_deltadelta_no_idx <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype)
+dabest_obj_multigroup_deltadelta_no_idx <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype)
 dabest_obj_multigroup_deltadelta_no_idx.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_no_idx)
 
 dabest_plot(dabest_obj_multigroup_deltadelta_no_idx.mean_diff, TRUE)
 ```
 ## setting levels
 ```{r}
-dabest_obj_multigroup_deltadelta_levels <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype, experiment_label = c("Placebo", "Drug"), x1_level = c("W", "M"))
+dabest_obj_multigroup_deltadelta_levels <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype, experiment_label = c("Placebo", "Drug"), x1_level = c("W", "M"))
 dabest_obj_multigroup_deltadelta_levels.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_levels)
 
 dabest_plot(dabest_obj_multigroup_deltadelta_levels.mean_diff, TRUE)
@@ -2597,6 +2665,6 @@ png(file = "figures/deltadelta/multigroup_deltadelta_paired.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 ```

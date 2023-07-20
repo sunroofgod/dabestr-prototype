@@ -43,13 +43,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     float_contrast = FALSE
   }
   
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_marker_spread <- plot_kwargs$raw_marker_spread
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
+  
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
-  
-  bar_width <- ifelse(float_contrast, 0.3, 0.15)
   
   ## Creation of dfs for specific main_plot_types ##
   if(main_plot_type == "sankey") {
@@ -67,7 +74,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     flow_failure_to_failure <- sankey_df$flow_failure_to_failure
     sankey_bars <- sankey_df$sankey_bars
     sankey_bars <- create_dfs_for_proportion_bar(sankey_bars$proportion_success, 
-                                                 bar_width = bar_width, 
+                                                 bar_width = raw_bar_width, 
                                                  gap = sankey_bar_gap)
   }
   
@@ -76,10 +83,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       raw_y_max <- 1
       raw_y_min <- 0
     }
-    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success)
+    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success, bar_width = raw_bar_width)
   }
   
-  ## Adjustment of labels
+  ## Adjustment of labels ##
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
@@ -94,15 +101,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2,
+                    cex = raw_marker_spread,
                     method = "swarm",
                     side = -1L,
-                    size = rel(1.3),
+                    size = raw_marker_size,
+                    alpha = raw_marker_alpha,
                     corral = "wrap",
                     corral.width = 0.35),
     
     "slope" = 
-      plot_slopegraph(dabest_effectsize_obj),
+      plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
     
     "unpaired proportions" = 
       ggplot() +
@@ -198,7 +206,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     if(isTRUE(proportional) | isTRUE(is_colour)) {
       raw_plot <- raw_plot +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -207,7 +215,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                          colour = !!enquo_x),
                      lineend = "square") +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -217,14 +225,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                      lineend = "square")
     } else {
       raw_plot <- raw_plot +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_bot_t$y, 
                          yend = y_bot_t$yend,
                          colour = !!enquo_x),
                      lineend = "square") +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_top_t$y, 
@@ -313,6 +321,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     float_contrast <- FALSE
   }
   
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
+  
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
                                                        is_paired, 
@@ -371,8 +387,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   
   if(isTRUE(float_contrast)) {
+    difference = boot_result$difference
+    
     raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
     main_plot_type <- raw_plot_components$main_plot_type
+    
     if(main_plot_type == "unpaired proportions") {
       raw_y_range_vector <- c(0, 1)
     }
@@ -431,7 +450,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       geom_bootci(aes(x = x_axis_breaks,
                       ymin = ci_low,
                       ymax = ci_high,
-                      middle = difference))
+                      middle = difference,
+                      dotsize = es_marker_size,
+                      linesize = es_line_size))
   }
   
   #### Add summary lines Component ####
