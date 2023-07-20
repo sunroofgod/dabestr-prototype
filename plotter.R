@@ -5,15 +5,15 @@
 #' 
 #' To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
 
-dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
+dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   plot_kwargs <- list(...)
-  plot_kwargs <- assign_plot_kwargs(plot_kwargs)
+  plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
   
   custom_palette <- plot_kwargs$custom_palette
   
-  is_colour <- dabest_obj.mean_diff$is_colour
-  is_deltadelta <- dabest_obj.mean_diff$delta2
-  idx <- dabest_obj.mean_diff$idx
+  is_colour <- dabest_effectsize_obj$is_colour
+  is_deltadelta <- plot_kwargs$show_delta2
+  idx <- dabest_effectsize_obj$idx
   raw_legend <- NULL
   
   if(length(unlist(idx)) >= 3) {
@@ -21,8 +21,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   }
   
   if(isFALSE(float_contrast)) {
-    raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
-    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
+    raw_plot <- apply_palette(plot_raw(dabest_effectsize_obj, float_contrast=FALSE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_effectsize_obj, float_contrast=FALSE, plot_kwargs), custom_palette)
     
     raw_legend <- get_legend(raw_plot + 
                                guides(alpha = "none") +
@@ -62,8 +62,8 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     
   } else {
     #isTRUE(float_contrast)
-    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
-    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+    raw_plot <-  apply_palette(plot_raw(dabest_effectsize_obj, float_contrast=TRUE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_effectsize_obj, float_contrast=TRUE, plot_kwargs), custom_palette)
     
     final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 

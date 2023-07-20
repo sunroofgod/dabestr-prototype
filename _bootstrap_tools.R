@@ -38,7 +38,7 @@ bootstrap <- function(
     seed = 12345,
     reps = 5000,
     boot_labs
-    ){
+){
   
   boot_result <- tibble()
   
@@ -54,6 +54,8 @@ bootstrap <- function(
   paired <- dabest_obj$paired
   is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
+  
+  proportional <- dabest_obj$proportional
   
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
@@ -196,18 +198,19 @@ bootstrap <- function(
   if (isTRUE(minimeta)){
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
   }
   if (isTRUE(delta2)) {
     boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
     boot_result <- bind_rows(boot_result,boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
+  
+  raw_y_labels <- ifelse(proportional, "proportion of success", "value")
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
+              raw_y_labels = raw_y_labels,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -219,7 +222,7 @@ bootstrap <- function(
               enquo_y = dabest_obj$enquo_y,
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
-              proportional = dabest_obj$proportional,
+              proportional = proportional,
               minimeta = minimeta,
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
