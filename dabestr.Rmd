@@ -391,6 +391,7 @@ bootstrap <- function(
     reps = 5000,
     boot_labs
     ){
+  
   boot_result <- tibble()
   
   raw_data <- dabest_obj$raw_data
@@ -399,16 +400,15 @@ bootstrap <- function(
   if (isFALSE(is.list(idx))) {
     idx <- list(idx)
   }
-  proportional <- dabest_obj$proportional
   enquo_x <- dabest_obj$enquo_x
   enquo_y <- dabest_obj$enquo_y
   ci <- dabest_obj$ci
   paired <- dabest_obj$paired
   is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
-  enquo_effect_size_func <- enquo(effect_size_func)
   
-  quoname_effect_size_func <- as_name(enquo_effect_size_func)
+  proportional <- dabest_obj$proportional
+  
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
   delta_x_labels <- list()
@@ -420,10 +420,9 @@ bootstrap <- function(
   ## Validity Checks
   if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
     stop("`paired` is not NULL; therefore Cliff's delta is not defined.")
-  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h"))) {
+  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
     stop("`proportional` is TRUE; therefore effect size other than mean_diff and cohens_h is not defined.")
   }
-  
   
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
@@ -558,18 +557,19 @@ bootstrap <- function(
   if (isTRUE(minimeta)){
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
   }
   if (isTRUE(delta2)) {
     boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
     boot_result <- bind_rows(boot_result,boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
+  
+  raw_y_labels <- ifelse(proportional, "proportion of success", "value")
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
+              raw_y_labels = raw_y_labels,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -581,7 +581,7 @@ bootstrap <- function(
               enquo_y = dabest_obj$enquo_y,
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
-              proportional = dabest_obj$proportional,
+              proportional = proportional,
               minimeta = minimeta,
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
