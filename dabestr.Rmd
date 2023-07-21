@@ -56,11 +56,32 @@ load <- function(
   is_colour <- isTRUE(as_label(enquo_colour) != "NULL")
   is_paired <- isFALSE(is.null(paired))
   
-  # to add: if is_paired is TRUE --> id_col cannot be NULl
-  # to add: paired must be either "baseline" or "sequential"
-  
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
+
+  ##Check that id_col is not NULL if is_paired is TRUE(Not working)
+  if (isTRUE(is_paired) & quo_is_null(enquo_id_col)) {
+    stop("`paired` is TRUE but no `id_col` was supplied.")
+  }
+  
+  ## Check that paired must be either "baseline" or "sequential"
+  if (isTRUE(is_paired)) {
+    paired_check <- arg_match(paired,c("baseline","sequential"),error_arg = "paired")
+  }
+  
+  ## Check for valid mini-meta 
+  if (isTRUE(minimeta)) {
+    if (isTRUE(proportional)) {
+      stop("`proportional` and `minimeta` cannot be TRUE at the same time.")
+    } else if (isTRUE(delta2)) {
+      stop("`delta2` and `minimeta` cannot be TRUE at the same time.")
+    }
+    
+    all_idx_lengths <- sapply(idx,length)
+    if (any(all_idx_lengths!=2)==TRUE) {
+      stop("`minimeta` is TRUE, but some idx does not consist of exactly 2 groups.")
+    }
+  }
   
   if (isTRUE(delta2)) {
     enquo_experiment <- enquo(experiment)
