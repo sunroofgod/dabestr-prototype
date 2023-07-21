@@ -84,15 +84,17 @@ load <- function(
   }
   
   if (isTRUE(delta2)) {
+    if (isTRUE(proportional)) {
+      stop("`proportional` and `minimeta` cannot be TRUE at the same time.")
+    }
+    
     enquo_experiment <- enquo(experiment)
     name_experiment <- as_name(enquo_experiment)
 
     # Make sure that data is a 2x2 ANOVA case
     if (length(unique(data[[name_experiment]]))!=2) {
       stop("`experiment` does not have a length of 2")
-    } 
-    
-    if (length(unique(data[[name_x]]))!=2) {
+    } else if (length(unique(data[[name_x]]))!=2) {
       stop("`x` does not have a length of 2")
     }
     
