@@ -83,6 +83,23 @@ load <- function(
     }
   }
   
+  if (isFALSE(delta2)) {
+    if (is.list(idx)) {
+        general_idx_lengths <- sapply(idx,length)
+      if (any(general_idx_lengths<2)==TRUE) {
+        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
+                    "x" = "Make sure each nested group in {.field idx} has length >=2."))
+        }
+      } else {
+      general_idx_lengths <- length(idx)
+      if (any(general_idx_lengths<2)==TRUE) {
+        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
+                    "x" = "Make sure each nested group in {.field idx} has length >=2."))
+      }
+    }
+  }  
+
+  
   ## Check that data is proportional
   if (isTRUE(proportional)) {
     values <- unique(data[[name_y]])
@@ -100,26 +117,33 @@ load <- function(
   
   ## Check that paired must be either "baseline" or "sequential"
   if (isTRUE(is_paired)) {
-    paired_check <- arg_match(paired, c("baseline","sequential"), error_arg = "paired")
+    if (isFALSE(paired %in% c("baseline","sequential"))) {
+      cli::cli_abort(c("{.field paired} is not 'baseline' or 'sequential'.", 
+                    "x" = "{.field paired} can only be 'baseline' or 'sequential'."))
+    }
   }
   
   ## Check for valid mini-meta 
   if (isTRUE(minimeta)) {
     if (isTRUE(proportional)) {
-      stop("`proportional` and `minimeta` cannot be TRUE at the same time.")
+      cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.", 
+                    "x" = "{.field proportional} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
     } else if (isTRUE(delta2)) {
-      stop("`delta2` and `minimeta` cannot be TRUE at the same time.")
+      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.", 
+                    "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
     }
     
-    all_idx_lengths <- sapply(idx,length)
-    if (any(all_idx_lengths!=2)==TRUE) {
-      stop("`minimeta` is TRUE, but some idx does not consist of exactly 2 groups.")
+    minimeta_idx_lengths <- sapply(idx,length)
+    if (any(minimeta_idx_lengths!=2)==TRUE) {
+      cli::cli_abort(c("{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
+                  "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."))
     }
   }
   
   if (isTRUE(delta2)) {
     if (isTRUE(proportional)) {
-      stop("`proportional` and `minimeta` cannot be TRUE at the same time.")
+      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field proportional} is also {.strong TRUE}.", 
+                    "x" = "{.field delta2} and {.field proportional} cannot be {.strong TRUE} at the same time."))
     }
     
     enquo_experiment <- enquo(experiment)
@@ -127,9 +151,11 @@ load <- function(
 
     # Make sure that data is a 2x2 ANOVA case
     if (length(unique(data[[name_experiment]]))!=2) {
-      stop("`experiment` does not have a length of 2")
+      cli::cli_abort(c("{.field experiment} does not have a length of 2.", 
+                    "x" = "There can only be 2 groups in {.field experiment} when {.field delta2} is {.strong TRUE}."))
     } else if (length(unique(data[[name_x]]))!=2) {
-      stop("`x` does not have a length of 2")
+      cli::cli_abort(c("{.field x} does not have a length of 2.", 
+                    "x" = "There can only be 2 groups in {.field x} when {.field delta2} is {.strong TRUE}."))
     }
     
     # Check for idx, experiment_label and x1_level
@@ -455,9 +481,10 @@ bootstrap <- function(
   
   ## Validity Checks
   if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
-    stop("`paired` is not NULL; therefore Cliff's delta is not defined.")
+    cli::cli_abort(c("{.var Cliffs delta} cannot be found when {.field paired} is not NULL.",
+                     "x" = "Please change {.var effect_size_func}."))
   } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
-    stop("`proportional` is TRUE; therefore effect size other than mean_diff and cohens_h is not defined.")
+    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
   }
   
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
@@ -505,8 +532,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -567,8 +594,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -623,6 +650,8 @@ bootstrap <- function(
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
   
+  class(out) <- c("dabest_effectsize")
+  
   return(out)
 }
 ```
@@ -630,6 +659,11 @@ bootstrap <- function(
 # effect_size functions
 ```{r}
 mean_diff <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
@@ -648,6 +682,11 @@ mean_diff <- function(dabest_obj) {
 
 median_diff <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
       return(median(test) - median(control))
@@ -665,6 +704,11 @@ median_diff <- function(dabest_obj) {
 
 cohens_d <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
   }
@@ -673,6 +717,11 @@ cohens_d <- function(dabest_obj) {
 }
 
 hedges_g <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   cohens_d_ <- function(control, test, paired) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
@@ -689,6 +738,11 @@ hedges_g <- function(dabest_obj) {
 
 cliffs_delta <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired=NA) {
     return(effsize::cliff.delta(test, control)$estimate)
   }
@@ -697,6 +751,11 @@ cliffs_delta <- function(dabest_obj) {
 }
 
 cohens_h <- function(dabest_obj){
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     #remove nas and nulls later on
@@ -2132,6 +2191,12 @@ apply_palette <- function(ggplot_object, palette_name) {
 # dabest_plot functin
 ```{r}
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
+  
+  if (class(dabest_effectsize_obj)!="dabest_effectsize") {
+    cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
+                   "x" = "Please supply a {.cls dabest_effectsize} object.")
+  }
+  
   plot_kwargs <- list(...)
   plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
   
