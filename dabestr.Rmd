@@ -897,6 +897,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   prop <- proportional_data
   ind <- 1
   x_start <- 1
+
   if (isTRUE(sankey)){
     for (group in idx) {
       group_length <- length(group)

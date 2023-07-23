@@ -15,7 +15,10 @@ load <- function(
     colour = NULL,
     proportional = FALSE,
     minimeta = FALSE,
-    delta2 = FALSE
+    delta2 = FALSE,
+    experiment = NULL,
+    experiment_label = NULL,
+    x1_level = NULL
 ){
   
   # Storing plotting params as quosures
@@ -32,6 +35,62 @@ load <- function(
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
+  
+  if (isTRUE(delta2)) {
+    enquo_experiment <- enquo(experiment)
+    name_experiment <- as_name(enquo_experiment)
+    
+    # Make sure that data is a 2x2 ANOVA case
+    if (length(unique(data[[name_experiment]]))!=2) {
+      stop("`experiment` does not have a length of 2")
+    } 
+    
+    if (length(unique(data[[name_x]]))!=2) {
+      stop("`x` does not have a length of 2")
+    }
+    
+    # Check for idx, experiment_label and x1_level
+    if (isTRUE(is.null(idx))) {
+      # Set levels for experiment and x if they are present
+      if (isFALSE(is.null(experiment_label))) {
+        data[[name_experiment]] = factor(x = data[[name_experiment]], levels = experiment_label)
+      }
+      if (isFALSE(is.null(x1_level))) {
+        data[[name_x]] = factor(x = data[[name_x]], levels = x1_level)
+      }
+      data <- data %>%
+        arrange(!!enquo_experiment, !!enquo_x)
+    }
+    
+    data <- data %>%
+      mutate(grouping = !!enquo_x) %>%
+      unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    if (as_label(enquo_colour) == "NULL") {
+      enquo_colour <- enquo_x
+    }
+    enquo_x <- enquo_experiment
+    name_x <- as_name(enquo_x)
+    is_colour <- TRUE
+    
+    # Obtain idx if is null
+    if (isTRUE(is.null(idx))) {
+      spread_idx <- unique(data[[name_experiment]])
+      idx <- list()
+      delta_group_size <- 2
+      curr_group_size <- 0
+      curr_group_vector <- c()
+      for (group_name in spread_idx) {
+        if (curr_group_size == delta_group_size) {
+          curr_group_size <- 0
+          idx <- c(idx, list(curr_group_vector))
+          curr_group_vector <- c()
+        }
+        curr_group_vector <- append(curr_group_vector, group_name)
+        curr_group_size <- curr_group_size + 1
+      }
+      idx <- c(idx, list(curr_group_vector))
+    }
+  }
   
   unlist_idx <- unlist(idx)
   
@@ -58,9 +117,9 @@ load <- function(
       dplyr::count()
     Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
     
-    # (Don't need the below code anymore due to change in implementation)
-    # buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
-    # Ns <- rbind(Ns)
+    # Extending ylim for plotting
+    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
     
     if(isTRUE(proportional)){
       ## include checks here for data to see if it is proportional data
@@ -75,11 +134,6 @@ load <- function(
       test_summary <- proportional_data$proportion_success[2]
       
     } else {
-      
-      # Extending ylim for plotting
-      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
-      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
-      
       # Calculation of summary lines
       summaries <- raw_data %>%
         group_by(!!enquo_x) %>%
