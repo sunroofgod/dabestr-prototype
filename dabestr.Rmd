@@ -1014,6 +1014,11 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
       x_start <- x_start + 1
       ind <- ind + 1
     }
+  } else {
+    flow_success_to_failure = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_failure_to_success = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_success_to_success = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_failure_to_failure = data.frame(x = NaN, y = NaN, tag = NaN)
   }
   
   redraw_x_axis <- c(1 : length(unlist(idx)))
@@ -1159,6 +1164,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   es_marker_size <- 0.5
   es_line_size <- 0.8
   
+  sankey <- TRUE
+  
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
   }
@@ -1207,6 +1214,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$raw_marker_spread))) {
     raw_marker_spread <- plot_kwargs$raw_marker_spread
   }
+  if(isFALSE(is.null(plot_kwargs$sankey))) {
+    sankey <- plot_kwargs$sankey
+  }
   
   return(list(
     swarm_label = swarm_label,
@@ -1224,7 +1234,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     raw_bar_width = raw_bar_width,
     tufte_size = tufte_size,
     es_marker_size = es_marker_size,
-    es_line_size = es_line_size
+    es_line_size = es_line_size,
+    sankey = sankey
   ))
 }
 ```
@@ -1411,6 +1422,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
+  sankey <- plot_kwargs$sankey
   
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
@@ -1427,6 +1439,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
                                        gap = sankey_bar_gap,
+                                       sankey = sankey,
                                        idx = idx)
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
@@ -1483,13 +1496,13 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow_success_to_failure, 
+      geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_success, 
+      geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
-      geom_sankeyflow(data = flow_success_to_success, 
+      geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_failure, 
+      geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
       geom_proportionbar(data = sankey_bars, 
                          aes(x = x_failure, y = y_failure, group = tag, colour = NA), fill = "#818181") +
@@ -2687,6 +2700,7 @@ dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional,
 ```{r}
 dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15, sankey = FALSE)
 ```
 
 ```{r}
