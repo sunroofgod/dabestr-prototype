@@ -65,6 +65,14 @@ bootstrap <- function(
   minimeta <- dabest_obj$minimeta
   delta2 <- dabest_obj$delta2
   
+  ## Validity Checks
+  if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
+    cli::cli_abort(c("{.var Cliffs delta} cannot be found when {.field paired} is not NULL.",
+                     "x" = "Please change {.var effect_size_func}."))
+  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
+    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
+  }
+  
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
       group_length <- length(group)
@@ -110,8 +118,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -172,8 +180,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -227,6 +235,8 @@ bootstrap <- function(
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
+  
+  class(out) <- c("dabest_effectsize")
   
   return(out)
 }

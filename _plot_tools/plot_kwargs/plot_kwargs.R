@@ -26,6 +26,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   es_marker_size <- 0.5
   es_line_size <- 0.8
   
+  sankey <- TRUE
+  
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
   }
@@ -74,6 +76,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$raw_marker_spread))) {
     raw_marker_spread <- plot_kwargs$raw_marker_spread
   }
+  if(isFALSE(is.null(plot_kwargs$sankey))) {
+    sankey <- plot_kwargs$sankey
+  }
   
   return(list(
     swarm_label = swarm_label,
@@ -91,6 +96,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     raw_bar_width = raw_bar_width,
     tufte_size = tufte_size,
     es_marker_size = es_marker_size,
-    es_line_size = es_line_size
+    es_line_size = es_line_size,
+    sankey = sankey
   ))
 }

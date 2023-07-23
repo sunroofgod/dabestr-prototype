@@ -51,6 +51,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
+  sankey <- plot_kwargs$sankey
   
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
@@ -67,6 +68,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
                                        gap = sankey_bar_gap,
+                                       sankey = sankey,
                                        idx = idx)
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
@@ -123,13 +125,13 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow_success_to_failure, 
+      geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_success, 
+      geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
-      geom_sankeyflow(data = flow_success_to_success, 
+      geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_failure, 
+      geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
       geom_proportionbar(data = sankey_bars, 
                          aes(x = x_failure, y = y_failure, group = tag, colour = NA), fill = "#818181") +
@@ -527,37 +529,36 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   delta_plot <- delta_plot +
     labs(y = delta_y_labels)
   
-  #### Add deltadelta yaxis Component
-  if (isTRUE(is_deltadelta)) {
-    delta_delta_plot <- ggplot() +
-      theme_classic() +
-      non_float_contrast_theme +
-      
-      # Setting scaling and limits
-      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10, 
-                               delta_y_max),
-                      xlim = c(0, 1),
-                      expand = FALSE) +
-      scale_x_continuous(breaks = c(0.5),
-                         labels = "") +
-      labs(y = "delta-delta") +
-      scale_y_continuous(position = "right") +
-      
-      # Drawing y = 0 line
-      geom_hline(linewidth = 0.3,
-                 yintercept = 0)
-    
-    delta_plot <- cowplot::plot_grid(
-      plotlist = list(delta_plot + theme(legend.position="none",
-                                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")), 
-                      delta_delta_plot + theme(legend.position="none",
-                                               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
-      nrow = 1, 
-      rel_widths = c(0.9, 0.1),
-      axis = "lr",
-      align = "h"
-    )
-  }
+  # if (isTRUE(is_deltadelta)) {
+  #   delta_delta_plot <- ggplot() +
+  #     theme_classic() +
+  #     non_float_contrast_theme +
+  # 
+  #     # Setting scaling and limits
+  #     coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10,
+  #                              delta_y_max),
+  #                     xlim = c(0, 1),
+  #                     expand = FALSE) +
+  #     scale_x_continuous(breaks = c(0.5),
+  #                        labels = "") +
+  #     labs(y = "delta-delta") +
+  #     scale_y_continuous(position = "right") +
+  # 
+  #     # Drawing y = 0 line
+  #     geom_hline(linewidth = 0.3,
+  #                yintercept = 0)
+  # 
+  #   delta_plot <- cowplot::plot_grid(
+  #     plotlist = list(delta_plot + theme(legend.position="none",
+  #                                        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")),
+  #                     delta_delta_plot + theme(legend.position="none",
+  #                                              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
+  #     nrow = 1,
+  #     rel_widths = c(0.9, 0.1),
+  #     axis = "lr",
+  #     align = "h"
+  #     )
+  # }
   
-  return(delta_plot)
+  return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean/10, delta_y_max)))
 }
