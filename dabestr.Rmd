@@ -103,7 +103,7 @@ load <- function(
   ## Check that data is proportional
   if (isTRUE(proportional)) {
     values <- unique(data[[name_y]])
-    if (isFALSE((values == c(0, 1) || values == c(1, 0)))) {
+    if (isFALSE(setequal(c(0,1), values))) {
       cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field data} is not proportional.", 
                "x" = "{.field y} Column of {.field data} should only contain 1 and 0."))
     }
@@ -2847,4 +2847,15 @@ png(file = "figures/deltadelta/multigroup_deltadelta_paired.png",
     bg = "white")
 dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
+```
+
+# capturing errors
+## non proportional data given
+```{r}
+dabest_obj_proportional.mean_diff <- load(data = multigroup_data, 
+                                  x = Group, 
+                                  y = Measurement, 
+                                  idx = c("Control1", "Test1"),
+                                  proportional = TRUE) %>%
+  mean_diff()
 ```
