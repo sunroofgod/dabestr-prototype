@@ -35,7 +35,8 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    scale_factor_sig = 0.8,
                                    bar_width = 0.15,
                                    gap,
-                                   sankey = TRUE) {
+                                   sankey = TRUE,
+                                   flow = TRUE) {
   
   type <- ifelse(length(unlist(idx)) <= 2, 
                  "single sankey", 
@@ -57,13 +58,37 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   else{
     scale_factor_sig <- 0.95
   }
-  means_c_t <- proportional_data$proportion_success
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
   
   prop <- proportional_data
   ind <- 1
   x_start <- 1
   
+  sankey_bars <- prop
+  
+  if (isFALSE(flow)){
+    sankey_bars <- tibble()
+    
+    for (group in idx){
+      group_length <- length(group)
+      
+      for (i in 1: (group_length - 1)){
+        ctrl <- group[i]
+        treat <- group[i+1]
+        temp_row_ctrl <- prop %>% 
+          group_by(Group) %>%
+          filter(Group == ctrl)
+        
+        temp_row_treat <- prop %>% 
+          group_by(Group) %>%
+          filter(Group == treat)
+        pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
+        sankey_bars <- bind_rows(sankey_bars, pair_rows)
+      }
+    }
+  }
+  
+  means_c_t <- sankey_bars$proportion_success
   if (isTRUE(sankey)){
     for (group in idx) {
       group_length <- length(group)
@@ -188,7 +213,6 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   }
   
   redraw_x_axis <- c(1 : length(unlist(idx)))
-  sankey_bars <- proportional_data
   dfs_for_sankeys <- list(flow_success_to_failure = flow_success_to_failure,
                           flow_failure_to_success = flow_failure_to_success,
                           flow_success_to_success = flow_success_to_success,

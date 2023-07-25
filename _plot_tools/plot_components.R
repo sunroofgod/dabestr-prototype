@@ -85,7 +85,8 @@ create_violinplot_components <- function(boots,
                                          idx, 
                                          float_contrast, 
                                          delta_y_max,
-                                         delta_y_min) {
+                                         delta_y_min,
+                                         flow = TRUE) {
   df_for_violin <- data.frame(
     x = NA,
     y = NA,
@@ -93,8 +94,9 @@ create_violinplot_components <- function(boots,
   )
   
   x_axis_breaks <- c()
-  curr_boot_idx = 1
-  curr_x_idx = 0
+  curr_boot_idx <- 1
+  curr_x_idx <- 0
+  x_axis_scalar <- ifelse(flow, 0, 0.5)
   
   for (group in idx) {
     curr_x_idx <- curr_x_idx + 1
@@ -121,7 +123,7 @@ create_violinplot_components <- function(boots,
         y_coords_ci <- y_coords_ci/1.5
       }
       
-      y_coords_ci <- y_coords_ci + curr_x_idx
+      y_coords_ci <- y_coords_ci + curr_x_idx - x_axis_scalar
       
       min_x_coords <- min(x_coords_ci)
       max_x_coords <- max(x_coords_ci)
@@ -136,7 +138,7 @@ create_violinplot_components <- function(boots,
       
       temp_df_violin <- data.frame(x = x_coords_ci,
                                    y = y_coords_ci,
-                                   tag = rep(toString(curr_x_idx),512))
+                                   tag = rep(toString(curr_x_idx), 512))
       
       df_for_violin <- rbind(df_for_violin, temp_df_violin)
       
