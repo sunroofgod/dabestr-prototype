@@ -98,7 +98,7 @@ draw_group_proportion_bar <- function(data, panel_scales, coord) {
 
 GeomProportionBar <- ggproto("GeomProportionBar", Geom,
                              required_aes = c("x", "y"),
-                             default_aes = aes(colour = "black",
+                             default_aes = aes(colour = NA,
                                                fill = "white",
                                                alpha = NA),
                              draw_key = draw_key_polygon,

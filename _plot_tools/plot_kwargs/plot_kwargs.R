@@ -27,6 +27,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   es_line_size <- 0.8
   
   sankey <- TRUE
+  flow <- TRUE
   
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
@@ -79,6 +80,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$sankey))) {
     sankey <- plot_kwargs$sankey
   }
+  if(isFALSE(is.null(plot_kwargs$flow))) {
+    flow <- plot_kwargs$flow
+  }
   
   return(list(
     swarm_label = swarm_label,
@@ -97,6 +101,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     tufte_size = tufte_size,
     es_marker_size = es_marker_size,
     es_line_size = es_line_size,
-    sankey = sankey
+    sankey = sankey,
+    flow = flow
   ))
 }

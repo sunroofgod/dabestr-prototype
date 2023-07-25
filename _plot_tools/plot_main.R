@@ -27,9 +27,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_paired <- dabest_effectsize_obj$is_paired
   is_colour <- dabest_effectsize_obj$is_colour
   
+  paired <- dabest_effectsize_obj$paired
+  
   idx <- dabest_effectsize_obj$idx
+  separated_idx <- idx
   raw_x_max = length(unlist(idx))
-  x_axis_raw <- c(seq(1, raw_x_max,1))
+  x_axis_raw <- c(seq(1, raw_x_max, 1))
   
   # Extend x_axis if minimeta/deltadelta is being plotted.
   if(isTRUE(minimeta) || isTRUE(delta2)) {
@@ -52,6 +55,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
   sankey <- plot_kwargs$sankey
+  flow <- plot_kwargs$flow
   
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
@@ -61,15 +65,21 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   ## Creation of dfs for specific main_plot_types ##
   if(main_plot_type == "sankey") {
+    if(isFALSE(flow)) {
+      separated_idx <- separate_idx(idx, paired)
+      raw_x_max = length(unlist(separated_idx))
+      x_axis_raw <- c(seq(2, raw_x_max, 2)) - 0.5 
+      is_tufte_lines <- FALSE
+    }
     sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
                                        enquo_id_col = enquo_id_col,
-                                       x_axis_raw = x_axis_raw,
                                        gap = sankey_bar_gap,
                                        sankey = sankey,
-                                       idx = idx)
+                                       idx = separated_idx,
+                                       flow = flow)
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
     flow_success_to_success <- sankey_df$flow_success_to_success
@@ -134,13 +144,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
       geom_proportionbar(data = sankey_bars, 
-                         aes(x = x_failure, y = y_failure, group = tag, colour = NA), fill = "#818181") +
+                         aes(x = x_failure, y = y_failure, group = tag, colour = NULL), fill = "#818181") +
       geom_proportionbar(data = sankey_bars, 
-                         aes(x = x_success, y = y_success, group = tag, colour = NA), fill = "#db6159")
+                         aes(x = x_success, y = y_success, group = tag, colour = NULL), fill = "#db6159")
     
   )
   
   #### Add scaling Component ####
+  raw_x_labels <- Ns$swarmticklabs
+  if(main_plot_type == "sankey" && isFALSE(flow)) {
+    raw_x_labels <- create_xlabs_for_sankey(idx, Ns)
+  }
   raw_ylim <- plot_kwargs$swarm_ylim
   raw_ylim <- if (is.null(raw_ylim)){raw_y_range_vector} else {raw_ylim}
   
@@ -161,7 +175,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     expand = FALSE,
                     clip = "off") +
     scale_x_continuous(breaks = c(x_axis_raw),
-                       labels = Ns$swarmticklabs)
+                       labels = raw_x_labels)
   
   #### Add summary_lines component ####
   if(isTRUE(is_summary_lines)) {
@@ -254,9 +268,25 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
   } else {
     # Obtain dfs for xaxis redraw
-    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
-    df_for_line <- dfs_for_xaxis_redraw$df_for_line
-    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+    if(main_plot_type == "sankey" && isFALSE(flow)) {
+      idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
+      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+      df_for_line <- dfs_for_xaxis_redraw$df_for_line
+      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+      
+      df_for_line <- df_for_line %>%
+        mutate(x = x + 0.5 + (x-1),
+               xend = xend + 0.5 + (xend-1))
+      
+      df_for_ticks <- df_for_ticks %>%
+        mutate(x = x + 0.5 + (x-1))
+      
+    } else {
+      idx_for_xaxis_redraw <- idx
+      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+      df_for_line <- dfs_for_xaxis_redraw$df_for_line
+      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+    }
     
     raw_plot <- raw_plot +
       non_float_contrast_theme +
@@ -290,8 +320,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 # Delta plot function
 plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx = dabest_effectsize_obj$idx
+  separated_idx <- idx
   bootstraps = dabest_effectsize_obj$bootstraps
   proportional <- dabest_effectsize_obj$proportional
+  paired <- dabest_effectsize_obj$paired
   
   delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
   delta_y_labels = plot_kwargs$contrast_label
@@ -330,6 +362,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
+  flow <- plot_kwargs$flow
   
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
@@ -342,23 +375,36 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_bootci <- delta_plot_components$is_bootci
   is_deltadelta <- delta_plot_components$is_deltadelta
   
+  raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
+  main_plot_type <- raw_plot_components$main_plot_type
+  
   #### initialise delta_plot & Add main_violin_type component ####
   # Extend idx and labels if minimeta or deltadelta
   if (isTRUE(minimeta) || isTRUE(delta2)) {
-    idx <- c(idx, list(c("minimeta", "deltadelta")))
+    separated_idx <- c(separated_idx, list(c("minimeta", "deltadelta")))
+    idx <- separated_idx
+  }
+  if(main_plot_type == "sankey" && isFALSE(flow)) {
+    separated_idx <- separate_idx(idx, paired)
+    delta_x_max = length(unlist(separated_idx))
+    is_tufte_lines <- FALSE
   }
   
   violin_plot_components <- create_violinplot_components(boots, 
-                                                         idx, 
+                                                         separated_idx, 
                                                          float_contrast, 
                                                          delta_y_max,
-                                                         delta_y_min)
+                                                         delta_y_min,
+                                                         flow)
   
   df_for_violin <- violin_plot_components$df_for_violin
   delta_y_min <- violin_plot_components$delta_y_min
   delta_y_max <- violin_plot_components$delta_y_max
   delta_y_mean <- (delta_y_max - delta_y_min)/2
   x_axis_breaks <- violin_plot_components$x_axis_breaks
+  if(main_plot_type == "sankey" && isFALSE(flow)) {
+    x_axis_breaks <- x_axis_breaks - 0.5
+  }
   
   delta_plot <- switch(
     main_violin_type,
@@ -390,9 +436,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   if(isTRUE(float_contrast)) {
     difference = boot_result$difference
-    
-    raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
-    main_plot_type <- raw_plot_components$main_plot_type
     
     if(main_plot_type == "unpaired proportions") {
       raw_y_range_vector <- c(0, 1)
@@ -482,9 +525,24 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                  yintercept = min_y_coords)
   } else {
     # Obtain xaxis line and ticks elements for xaxis redraw
-    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
-    df_for_line <- dfs_for_xaxis_redraw$df_for_line
-    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+    if(main_plot_type == "sankey" && isFALSE(flow)) {
+      idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
+      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+      df_for_line <- dfs_for_xaxis_redraw$df_for_line
+      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+      
+      df_for_line <- df_for_line %>%
+        mutate(x = x + 0.5 + (x-1),
+               xend = xend + 0.5 + (xend-1))
+      
+      df_for_ticks <- df_for_ticks %>%
+        mutate(x = x + 0.5 + (x-1))
+      
+    } else {
+      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
+      df_for_line <- dfs_for_xaxis_redraw$df_for_line
+      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+    }
     
     delta_plot <- delta_plot + 
       non_float_contrast_theme +
