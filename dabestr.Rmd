@@ -861,6 +861,23 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   return(tufte_lines_df)
 }
 
+
+create_dfs_for_nonflow_tufte_lines <- function(idx,
+                                               tufte_lines_df,
+                                               enquo_x){
+  new_tufte_lines_df <- tibble()
+  total_length <- length(unlist(idx))
+  temp_idx <- unlist(idx)
+  for (i in (1: total_length)){
+    group_name <- temp_idx[i]
+    row <- tufte_lines_df %>% 
+      filter(!!enquo_x == group_name)
+    new_tufte_lines_df <- bind_rows(new_tufte_lines_df, row)
+  }
+  return (new_tufte_lines_df)
+}
+
+
 create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    raw_data,
                                    proportional_data,
@@ -1528,7 +1545,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       separated_idx <- separate_idx(idx, paired)
       raw_x_max = length(unlist(separated_idx))
       x_axis_raw <- c(seq(2, raw_x_max, 2)) - 0.5 
-      is_tufte_lines <- FALSE
+      is_tufte_lines <- TRUE
     }
     sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
@@ -1656,6 +1673,11 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
       tufte_gap_value <- sankey_bar_gap
+      if(isFALSE(flow)){
+        tufte_lines_df <- create_dfs_for_nonflow_tufte_lines(tufte_lines_df, 
+                                                             idx =separated_idx,
+                                                             enquo_x =enquo_x)
+      }
     } else {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
       tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
@@ -1664,7 +1686,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
-    x_ref <- row_ref
+    if (isFALSE(flow)){
+      row_ref <- c(seq(1, raw_x_max, 1)) + + tufte_side_adjust_value
+    }
     
     y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  
                    yend = tufte_lines_df$upper_sd)
