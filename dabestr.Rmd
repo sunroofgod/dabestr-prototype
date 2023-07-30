@@ -2132,7 +2132,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   ## Add labels ##
   if (isTRUE(minimeta)) {
-    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
+    delta_x_labels <- append(delta_x_labels, "Weighted\nDelta")
   } 
   if (isTRUE(delta2)) {
     delta_x_labels <- append(delta_x_labels, "delta-delta")
@@ -2396,6 +2396,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   
   is_colour <- dabest_effectsize_obj$is_colour
   is_deltadelta <- plot_kwargs$show_delta2
+  is_mini_meta <- plot_kwargs$show_mini_meta
   idx <- dabest_effectsize_obj$idx
   raw_legend <- NULL
   
@@ -2417,9 +2418,17 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
                          guides(alpha = "none") +
                          theme(legend.box.margin = margin(0, 0, 0, 0)))
     
+    plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
+    
+    if(isTRUE(is_mini_meta)) {
+      plot_margin <- ggplot2::unit(c(0, 5.5, 0, 0), "pt")
+    }
+    
     final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none"),
-                        delta_plot + theme(legend.position="none")),
+      plotlist   = list(raw_plot + theme(legend.position="none",
+                                         plot.margin = plot_margin),
+                        delta_plot + theme(legend.position="none",
+                                           plot.margin = plot_margin)),
       nrow       = 2,
       ncol       = 1,
       axis       = "tblr",
@@ -2429,7 +2438,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     if(isTRUE(is_deltadelta)) {
       extra_yaxis_plot <- plot_extra_yaxis(delta_range, "right", 0, "delta-delta")
 
-      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.50, 0.4184, 0.0816))
+      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.50, 0.402, 0.098))
 
       final_plot <- cowplot::plot_grid(
         plotlist = list(final_plot, extra_yaxis_plot),
@@ -2570,7 +2579,7 @@ png(file = "figures/2group/2group_float_true.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj.mean_diff, TRUE)
+dabest_plot(dabest_obj.mean_diff, TRUE, es_marker_size = 1, es_line_size = 1)
 dev.off()
 
 jpeg(file = "figures/2group/2group_float_false.jpeg",
@@ -2581,7 +2590,7 @@ jpeg(file = "figures/2group/2group_float_false.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj.mean_diff, FALSE)
+dabest_plot(dabest_obj.mean_diff, FALSE, es_marker_size = 1, es_line_size = 1, raw_marker_spread = 2.8)
 dev.off()
 ```
 
@@ -2647,24 +2656,24 @@ dev.off()
 ## export
 ```{r}
 png(file = "figures/multigroup/multigroup_unpaired.png",
-    width = 5.5,
+    width = 7,
     height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, es_marker_size = 1, raw_marker_spread = 1.5, raw_marker_size = 1.2)
 dev.off()
 
 jpeg(file = "figures/multigroup/multigroup_unpaired_colour.jpeg",
-    width = 7,
+    width = 7.2,
     height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, FALSE, raw_marker_spread = 1.5, raw_marker_size = 1.2)
 dev.off()
 ```
 
@@ -2698,7 +2707,7 @@ dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco"
 ## export
 ```{r}
 png(file = "figures/multigroup/multigroup_sequential.png",
-    width = 5.5,
+    width = 7,
     height = 5.5,
     units = "in",
     pointsize = 12,
@@ -2954,7 +2963,7 @@ dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE, show_mini_meta = FAL
 
 ```{r}
 png(file = "figures/minimeta/multigroup_minimeta.png",
-    width = 7,
+    width = 8,
     height = 5.5,
     units = "in",
     pointsize = 12,
