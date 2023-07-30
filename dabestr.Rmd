@@ -2807,13 +2807,13 @@ dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 
 ## export
 ```{r}
 png(file = "figures/proportion/2group_proportion_float_false.png",
-    width = 5.5,
+    width = 3,
     height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, raw_bar_width = 0.4)
 dev.off()
 
 png(file = "figures/proportion/2group_proportion_float_true.png",
@@ -2834,7 +2834,7 @@ jpeg(file = "figures/proportion/multigroup_proportion.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.4)
 dev.off()
 ```
 
@@ -2960,7 +2960,7 @@ dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_mini
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE, show_mini_meta = FALSE)
 ```
-
+## export
 ```{r}
 png(file = "figures/minimeta/multigroup_minimeta.png",
     width = 8,
