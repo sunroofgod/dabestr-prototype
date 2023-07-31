@@ -1318,6 +1318,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   contrast_y_text <- 15
   contrast_x_text <- 11
   
+  zero_dot <- TRUE
+  
   sankey <- TRUE
   flow <- TRUE
   
@@ -1387,6 +1389,10 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$contrast_x_text))) {
     contrast_x_text <- plot_kwargs$contrast_x_text
   }
+  if(isFALSE(is.null(plot_kwargs$zero_dot))) {
+    zero_dot <- plot_kwargs$zero_dot
+  }
+  
   
   return(list(
     swarm_label = swarm_label,
@@ -1410,7 +1416,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     swarm_y_text = swarm_y_text, 
     swarm_x_text = swarm_x_text,
     contrast_y_text = contrast_y_text,
-    contrast_x_text = contrast_x_text
+    contrast_x_text = contrast_x_text,
+    zero_dot = zero_dot
   ))
 }
 ```
@@ -2023,17 +2030,23 @@ create_deltaplot_components <- function(proportional,
                                         is_paired, 
                                         float_contrast,
                                         is_colour,
-                                        delta2) {
+                                        delta2,
+                                        zero_dot,
+                                        flow) {
   main_violin_type <- "multicolour"
   is_summary_lines <- TRUE
   is_bootci <- TRUE
   is_deltadelta <- FALSE
+  is_zero_dot <- FALSE
   
   if(isTRUE(is_paired) || isTRUE(is_colour)) {
     main_violin_type <- "singlecolour"
   }
   if(isTRUE(delta2)) {
     is_deltadelta <- TRUE
+  }
+  if(isTRUE(zero_dot) && isTRUE(flow)) {
+    is_zero_dot <- TRUE
   }
   if(isFALSE(float_contrast)) {
     is_summary_lines <- FALSE
@@ -2043,7 +2056,8 @@ create_deltaplot_components <- function(proportional,
     main_violin_type = main_violin_type,
     is_summary_lines = is_summary_lines,
     is_bootci = is_bootci,
-    is_deltadelta = is_deltadelta
+    is_deltadelta = is_deltadelta,
+    is_zero_dot = is_zero_dot
   )
   return(plot_component)
 }
@@ -2053,7 +2067,8 @@ create_violinplot_components <- function(boots,
                                          float_contrast, 
                                          delta_y_max,
                                          delta_y_min,
-                                         flow = TRUE) {
+                                         flow = TRUE,
+                                         zero_dot = TRUE) {
   df_for_violin <- data.frame(
     x = NA,
     y = NA,
@@ -2061,19 +2076,23 @@ create_violinplot_components <- function(boots,
   )
   
   x_axis_breaks <- c()
+  zero_dot_x_breaks <- c()
   curr_boot_idx <- 1
   curr_x_idx <- 0
   x_axis_scalar <- ifelse(flow, 0, 0.5)
   
-  for (group in idx) {
+  for(group in idx) {
     curr_x_idx <- curr_x_idx + 1
+    if(isTRUE(zero_dot)) {
+      zero_dot_x_breaks <- append(zero_dot_x_breaks, curr_x_idx)
+    }
     temp_df_violin <- data.frame(x = NA,
                                  y = NA,
                                  tag = toString(curr_x_idx))
     
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
     
-    for (i in 2:length(group)) {
+    for(i in 2:length(group)) {
       curr_x_idx <- curr_x_idx + 1
       x_axis_breaks <- append(x_axis_breaks, curr_x_idx)
       
@@ -2096,10 +2115,10 @@ create_violinplot_components <- function(boots,
       max_x_coords <- max(x_coords_ci)
       
       # Keeping track of ylim limits
-      if (min_x_coords < delta_y_min) {
+      if(min_x_coords < delta_y_min) {
         delta_y_min <- min_x_coords
       }
-      if (max_x_coords > delta_y_max) {
+      if(max_x_coords > delta_y_max) {
         delta_y_max <- max_x_coords
       }
       
@@ -2119,7 +2138,8 @@ create_violinplot_components <- function(boots,
     df_for_violin = df_for_violin,
     delta_y_min = delta_y_min,
     delta_y_max = delta_y_max,
-    x_axis_breaks = x_axis_breaks
+    x_axis_breaks = x_axis_breaks,
+    zero_dot_x_breaks = zero_dot_x_breaks
   )
   
   return(plot_component)
@@ -2175,17 +2195,21 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   flow <- plot_kwargs$flow
   contrast_x_text <- plot_kwargs$contrast_x_text
   contrast_y_text <- plot_kwargs$contrast_y_text
+  zero_dot <- plot_kwargs$zero_dot
   
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
                                                        is_paired, 
                                                        float_contrast,
                                                        is_colour,
-                                                       delta2)
+                                                       delta2,
+                                                       zero_dot,
+                                                       flow)
   main_violin_type <- delta_plot_components$main_violin_type
   is_summary_lines <- delta_plot_components$is_summary_lines
   is_bootci <- delta_plot_components$is_bootci
   is_deltadelta <- delta_plot_components$is_deltadelta
+  is_zero_dot <- delta_plot_components$is_zero_dot
   
   raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- raw_plot_components$main_plot_type
@@ -2207,13 +2231,16 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                                          float_contrast, 
                                                          delta_y_max,
                                                          delta_y_min,
-                                                         flow)
+                                                         flow,
+                                                         zero_dot)
   
   df_for_violin <- violin_plot_components$df_for_violin
   delta_y_min <- violin_plot_components$delta_y_min
   delta_y_max <- violin_plot_components$delta_y_max
   delta_y_mean <- (delta_y_max - delta_y_min)/2
   x_axis_breaks <- violin_plot_components$x_axis_breaks
+  zero_dot_x_breaks <- violin_plot_components$zero_dot_x_breaks
+  
   if(main_plot_type == "sankey" && isFALSE(flow)) {
     x_axis_breaks <- x_axis_breaks - 0.5
   }
@@ -2294,7 +2321,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   
   #### Add bootci Component ####
-  # Extracting geom_bootci params
+  # if isFALSE(show_delta = FALSE) || isFALSE(show_mini_meta)
   if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
     boot_result <- boot_result[-nrow(boot_result),]
   }
@@ -2308,6 +2335,22 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                   ymin = ci_low,
                   ymax = ci_high,
                   middle = difference,
+                  dotsize = es_marker_size,
+                  linesize = es_line_size))
+  }
+  
+  #### Add zero_dot Component ####
+  # removes extra dot if isTRUE(show_delta2) || isTRUE(show_mini_meta)
+  if (isTRUE(delta2) || isTRUE(minimeta)) {
+    zero_dot_x_breaks <- zero_dot_x_breaks[-length(zero_dot_x_breaks)]
+  }
+    
+  if (isTRUE(is_zero_dot)) {
+    delta_plot <- delta_plot +
+      geom_bootci(aes(x = zero_dot_x_breaks,
+                  ymin = 0,
+                  ymax = 0,
+                  middle = 0,
                   dotsize = es_marker_size,
                   linesize = es_line_size))
   }
@@ -2398,6 +2441,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   #### Add y_labels Component ####
   delta_plot <- delta_plot +
     labs(y = delta_y_labels)
+  
+  #### Add extra_axis Componenet ####
+  if(isTRUE(is_deltadelta)) {
+    delta_plot <- delta_plot +
+      scale_y_continuous(sec.axis = dup_axis(name = "delta-delta"))
+  }
   
   #### Adjust font sizes ####
   delta_plot <- delta_plot +
@@ -2542,19 +2591,6 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       axis       = "tblr",
       align      = "vh"
       )
-
-    if(isTRUE(is_deltadelta)) {
-      extra_yaxis_plot <- plot_extra_yaxis(delta_range, "right", 0, "delta-delta")
-
-      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.50, 0.402, 0.098))
-
-      final_plot <- cowplot::plot_grid(
-        plotlist = list(final_plot, extra_yaxis_plot),
-        nrow = 1,
-        ncol = 2,
-        rel_widths = c(0.9, 0.1)
-      )
-    }
 
     if(isTRUE(is_colour)) {
       legend_plot <- cowplot::plot_grid(
@@ -2739,7 +2775,7 @@ dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 
 ```{r}
 dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
-dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama")
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama", zero_dot = FALSE)
 ```
 
 ## unpaired colour
