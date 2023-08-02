@@ -2691,22 +2691,6 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       align      = "vh"
       )
 
-<<<<<<< HEAD
-=======
-    if(isTRUE(is_deltadelta)) {
-      extra_yaxis_plot <- plot_extra_yaxis(delta_range, "right", 0, "delta-delta")
-
-      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.50, 0.402, 0.098))
-
-      final_plot <- cowplot::plot_grid(
-        plotlist = list(final_plot, extra_yaxis_plot),
-        nrow = 1,
-        ncol = 2,
-        rel_widths = c(0.9, 0.1)
-      )
-    }
-
->>>>>>> 47ca352ad45b932408f25d516793ff9aa601e03f
     if(isTRUE(is_colour)) {
       legend_plot <- cowplot::plot_grid(
         plotlist = list(raw_legend, NULL),
