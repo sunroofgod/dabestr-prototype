@@ -1,9 +1,24 @@
-#' Main api
-#' 
-#' @description
-#' Contains unified `load()` function that checks the data for errors and configures it to 
-#' the proper format for effect size calculations.
-
+#' Main load api
+#'
+#' @param data tidydataframe
+#' @param x 
+#' @param y 
+#' @param idx 
+#' @param paired 
+#' @param id_col 
+#' @param ci 
+#' @param colour 
+#' @param proportional 
+#' @param minimeta 
+#' @param delta2 
+#' @param experiment 
+#' @param experiment_label 
+#' @param x1_level 
+#'
+#' @return dabest_object
+#' @export
+#'
+#' @examples
 load <- function(
     data,
     x,

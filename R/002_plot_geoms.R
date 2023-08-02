@@ -16,12 +16,12 @@ draw_group_halfviolin <- function(data, panel_scales, coord) {
   
 }
 
-GeomHalfViolin <- ggproto("GeomHalfViolin", Geom,
+GeomHalfViolin <- ggplot2::ggproto("GeomHalfViolin", ggplot2::Geom,
                           required_aes = c("x", "y"),
-                          default_aes = aes(colour = NA, 
+                          default_aes = ggplot2::aes(colour = NA, 
                                             fill = "grey35",
                                             alpha = 0.8),
-                          draw_key = draw_key_point,
+                          draw_key = ggplot2::draw_key_point,
                           draw_group = draw_group_halfviolin)
 
 geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity", 
@@ -57,14 +57,14 @@ draw_panel_boot_ci <- function(data, panel_scales, coord) {
   
 }
 
-GeomBootCI <- ggproto("GeomBootCI", Geom,
+GeomBootCI <- ggplot2::ggproto("GeomBootCI", ggplot2::Geom,
                       required_aes = c("x", "ymin", "ymax", "middle"),
-                      default_aes = aes(linesize = 0.8,
+                      default_aes = ggplot2::aes(linesize = 0.8,
                                         dotsize = 0.5,
                                         shape = 19, 
                                         lwd = 2,
                                         lineend = "square"),
-                      draw_key = draw_key_point,
+                      draw_key = ggplot2::draw_key_point,
                       draw_panel = draw_panel_boot_ci)
 
 geom_bootci <- function(mapping = NULL, data = NULL, stat = "identity", 
@@ -96,12 +96,12 @@ draw_group_proportion_bar <- function(data, panel_scales, coord) {
                                        fill = alpha(first_row$fill, first_row$alpha)))
 }
 
-GeomProportionBar <- ggproto("GeomProportionBar", Geom,
+GeomProportionBar <- ggplot2::ggproto("GeomProportionBar", ggplot2::Geom,
                              required_aes = c("x", "y"),
-                             default_aes = aes(colour = NA,
+                             default_aes = ggplot2::aes(colour = NA,
                                                fill = "white",
                                                alpha = NA),
-                             draw_key = draw_key_polygon,
+                             draw_key = ggplot2::draw_key_polygon,
                              draw_group = draw_group_proportion_bar)
 
 geom_proportionbar <- function(mapping = NULL, data = NULL, 
@@ -133,12 +133,12 @@ draw_group_sankey_flow <- function(data, panel_scales, coord) {
                                 fill = alpha(first_row$fillcol, first_row$alpha)))
 }
 
-GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
+GeomSankeyFlow <- ggplot2::ggproto("GeomSankeyFlow", ggplot2::Geom,
                           required_aes = c("x", "y"),
-                          default_aes = aes(colour = NA,
+                          default_aes = ggplot2::aes(colour = NA,
                                             fillcol = "gray50",
                                             alpha = 0.5),
-                          draw_key = draw_key_polygon,
+                          draw_key = ggplot2::draw_key_polygon,
                           draw_group = draw_group_sankey_flow)
 
 geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity", 
