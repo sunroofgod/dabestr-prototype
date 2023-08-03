@@ -18,7 +18,6 @@
 #' @return dabest_object
 #' @export
 #'
-#' @examples
 load <- function(
     data,
     x,
