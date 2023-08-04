@@ -1,10 +1,9 @@
-#' Functions that generate main_plots based on the main_plot_type of `create_rawplot_components`.
-#' 
-#' @description
-#' Contains function `plot_slopegraph`.
+# Functions that generate main_plots based on the main_plot_type of `create_rawplot_components`.
+# 
+# Contains function `plot_slopegraph`.
 
 
-#' Function that plots slopegraph
+# Function that plots slopegraph
 plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_data <- dabest_effectsize_obj$raw_data
   

@@ -1,7 +1,6 @@
-#' Formulas used
-#' 
-#' @description
-#' Contains functions `sigmoid`, `flipped_sig`, `calculate_group_variance`, `calculate_weighted_delta`, `confinterval` and `var_w_df`.
+# Formulas used
+# 
+# Contains functions `sigmoid`, `flipped_sig`, `calculate_group_variance`, `calculate_weighted_delta`, `confinterval` and `var_w_df`.
 
 sigmoid <- function(x_from, factor, y_from, y_to, smooth = 5.5, n = 300) {
   x <- seq(-smooth, smooth, length = n)

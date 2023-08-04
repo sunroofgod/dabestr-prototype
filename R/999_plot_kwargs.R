@@ -1,9 +1,8 @@
-#' Helper functions that deal with assignment of plot_kwargs for plot
-#' 
-#' @description
-#' Contains function `assign_plot_kwargs`.
+# Helper functions that deal with assignment of plot_kwargs for plot
+# 
+# Contains function `assign_plot_kwargs`.
 
-#' Function that handles plot_kwargs for final plotting
+# Function that handles plot_kwargs for final plotting
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   custom_palette <- "d3"
   

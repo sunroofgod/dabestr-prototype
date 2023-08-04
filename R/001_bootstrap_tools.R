@@ -1,7 +1,6 @@
-#' Obtains bootstraps as well as bca intervals
-#' 
-#' @description
-#' Contains functions `effsize_boot`, `bootstrap`, `bca` and `boot_weighted_row`. 
+# Obtains bootstraps as well as bca intervals
+# 
+# Contains functions `effsize_boot`, `bootstrap`, `bca` and `boot_weighted_row`. 
 
 effsize_boot <- function(
     data, 
@@ -38,7 +37,7 @@ bootstrap <- function(
     seed = 12345,
     reps = 5000,
     boot_labs
-){
+    ){
   
   boot_result <- tibble()
   

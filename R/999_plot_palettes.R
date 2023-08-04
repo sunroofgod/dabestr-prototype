@@ -1,7 +1,6 @@
-#' Helper functions that deal with assignment of colour palettes for the overall plots
-#' 
-#' @description
-#' Contains function `apply_palette`.
+# Helper functions that deal with assignment of colour palettes for the overall plots
+# 
+# Contains function `apply_palette`.
 
 # Applies palettes to <ggplot> objects
 apply_palette <- function(ggplot_object, palette_name) {

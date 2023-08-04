@@ -1,7 +1,6 @@
-#' Contains functions responsible for generation of raw_plot and delta_plot.
-#' 
-#' @description
-#' Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
+# Contains functions responsible for generation of raw_plot and delta_plot.
+# 
+# Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
 
 # Raw plot function
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
@@ -586,37 +585,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   #### Add y_labels Component ####
   delta_plot <- delta_plot +
     labs(y = delta_y_labels)
-  
-  # if (isTRUE(is_deltadelta)) {
-  #   delta_delta_plot <- ggplot() +
-  #     theme_classic() +
-  #     non_float_contrast_theme +
-  # 
-  #     # Setting scaling and limits
-  #     coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10,
-  #                              delta_y_max),
-  #                     xlim = c(0, 1),
-  #                     expand = FALSE) +
-  #     scale_x_continuous(breaks = c(0.5),
-  #                        labels = "") +
-  #     labs(y = "delta-delta") +
-  #     scale_y_continuous(position = "right") +
-  # 
-  #     # Drawing y = 0 line
-  #     geom_hline(linewidth = 0.3,
-  #                yintercept = 0)
-  # 
-  #   delta_plot <- cowplot::plot_grid(
-  #     plotlist = list(delta_plot + theme(legend.position="none",
-  #                                        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")),
-  #                     delta_delta_plot + theme(legend.position="none",
-  #                                              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
-  #     nrow = 1,
-  #     rel_widths = c(0.9, 0.1),
-  #     axis = "lr",
-  #     align = "h"
-  #     )
-  # }
   
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean/10, delta_y_max)))
 }
