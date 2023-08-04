@@ -14,5 +14,4 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackagePath: /Users/liankahseng/Desktop/Work/NUS/dabestr
 PackageInstallArgs: --no-multiarch --with-keep.source
