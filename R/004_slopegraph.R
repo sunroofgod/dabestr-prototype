@@ -15,12 +15,12 @@ plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
   enquo_id_col = dabest_effectsize_obj$enquo_id_col
   enquo_colour = dabest_effectsize_obj$enquo_colour
   
-  name_x <- as_name(enquo_x)
-  name_y <- as_name(enquo_y)
+  name_x <- rlang::as_name(enquo_x)
+  name_y <- rlang::as_name(enquo_y)
   
   idx = dabest_effectsize_obj$idx
   
-  raw_plot <- ggplot()
+  raw_plot <- ggplot2::ggplot()
   slopegraph_params <- list(linewidth = raw_marker_size, alpha = raw_marker_alpha)
   
   for(subplot_groups in idx) {

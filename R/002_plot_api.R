@@ -74,6 +74,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
+                                       enquo_x = enquo_x,
+                                       enquo_y = enquo_y,
                                        enquo_id_col = enquo_id_col,
                                        gap = sankey_bar_gap,
                                        sankey = sankey,
@@ -98,7 +100,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   
   ## Adjustment of labels ##
-  if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
+  if(ggplot2::as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
   
@@ -107,9 +109,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     main_plot_type,
     
     "swarmplot" =
-      ggplot() +
-      geom_beeswarm(data = raw_data, 
-                    aes(x = x_axis_raw, 
+      ggplot2::ggplot() +
+      ggbeeswarm::geom_beeswarm(data = raw_data, 
+                    ggplot2::aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
                     cex = raw_marker_spread,
@@ -124,35 +126,35 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
     
     "unpaired proportions" = 
-      ggplot() +
+      ggplot2::ggplot() +
       # failure bar
       geom_proportionbar(data = df_for_proportion_bar,
-                         aes(x = x_failure, y = y_failure, colour = tag)) +
+                         ggplot2::aes(x = x_failure, y = y_failure, colour = tag)) +
       # success bar
       geom_proportionbar(data = df_for_proportion_bar,
-                         aes(x = x_success, y = y_success, colour = tag, fill = tag)),
+                         ggplot2::aes(x = x_success, y = y_success, colour = tag, fill = tag)),
     
     "sankey" =
-      ggplot() +
+      ggplot2::ggplot() +
       geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
-                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+                      ggplot2::aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
       geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
-                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+                      ggplot2::aes(x = x, y = y, fillcol = "#818181", group = tag)) +
       geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
-                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+                      ggplot2::aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
       geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
-                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+                      ggplot2::aes(x = x, y = y, fillcol = "#818181", group = tag)) +
       geom_proportionbar(data = sankey_bars, 
-                         aes(x = x_failure, y = y_failure, group = tag, colour = NULL), fill = "#818181") +
+                         ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL), fill = "#818181") +
       geom_proportionbar(data = sankey_bars, 
-                         aes(x = x_success, y = y_success, group = tag, colour = NULL), fill = "#db6159")
+                         ggplot2::aes(x = x_success, y = y_success, group = tag, colour = NULL), fill = "#db6159")
     
   )
   
   #### Add scaling Component ####
   raw_x_labels <- Ns$swarmticklabs
   if(main_plot_type == "sankey" && isFALSE(flow)) {
-    raw_x_labels <- create_xlabs_for_sankey(idx, Ns)
+    raw_x_labels <- create_xlabs_for_sankey(idx, Ns, enquo_x)
   }
   raw_ylim <- plot_kwargs$swarm_ylim
   raw_ylim <- if (is.null(raw_ylim)){raw_y_range_vector} else {raw_ylim}
@@ -168,24 +170,24 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
   
   raw_plot <- raw_plot +
-    theme_classic() +
-    coord_cartesian(ylim = c(raw_y_min, raw_y_max),
+    ggplot2::theme_classic() +
+    ggplot2::coord_cartesian(ylim = c(raw_y_min, raw_y_max),
                     xlim = c(raw_x_min, raw_x_max+raw_x_scalar),
                     expand = FALSE,
                     clip = "off") +
-    scale_x_continuous(breaks = c(x_axis_raw),
+    ggplot2::scale_x_continuous(breaks = c(x_axis_raw),
                        labels = raw_x_labels)
   
   #### Add summary_lines component ####
   if(isTRUE(is_summary_lines)) {
     raw_plot <- raw_plot +
-      geom_segment(colour = "black",linewidth = 0.3,
-                   aes(x = 1, 
+      ggplot2::geom_segment(colour = "black",linewidth = 0.3,
+                            ggplot2::aes(x = 1, 
                        xend = raw_x_max+raw_x_scalar,
                        y = control_summary, 
                        yend = control_summary)) +
-      geom_segment(colour = "black", linewidth = 0.3,
-                   aes(x = 2, 
+      ggplot2::geom_segment(colour = "black", linewidth = 0.3,
+                            ggplot2::aes(x = 2, 
                        xend = raw_x_max+raw_x_scalar, 
                        y = test_summary, 
                        yend = test_summary))
@@ -210,7 +212,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    yend = tufte_lines_df$upper_sd)
     y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
                    yend = tufte_lines_df$lower_sd) 
-    if (isTRUE(str_detect(effsize_type, "edian"))) {
+    if (isTRUE(stringr::str_detect(effsize_type, "edian"))) {
       y_top_t <-list(y = tufte_lines_df$median + tufte_gap_value,  
                      yend = tufte_lines_df$upper_quartile)
       y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
@@ -220,19 +222,19 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     # to change: temporary fix for tufte lines black for proportional graphs
     if(isTRUE(proportional) | isTRUE(is_colour)) {
       raw_plot <- raw_plot +
-        geom_segment(data = tufte_lines_df, 
+        ggplot2::geom_segment(data = tufte_lines_df, 
                      linewidth = tufte_size,
                      colour = "black",
-                     aes(x = row_ref, 
+                     ggplot2::aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_bot_t$y, 
                          yend = y_bot_t$yend,
                          colour = !!enquo_x),
                      lineend = "square") +
-        geom_segment(data = tufte_lines_df, 
+        ggplot2::geom_segment(data = tufte_lines_df, 
                      linewidth = tufte_size,
                      colour = "black",
-                     aes(x = row_ref, 
+                     ggplot2::aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_top_t$y, 
                          yend = y_top_t$yend,
@@ -240,15 +242,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                      lineend = "square")
     } else {
       raw_plot <- raw_plot +
-        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
-                     aes(x = row_ref, 
+        ggplot2::geom_segment(data = tufte_lines_df, linewidth = tufte_size,
+                              ggplot2::aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_bot_t$y, 
                          yend = y_bot_t$yend,
                          colour = !!enquo_x),
                      lineend = "square") +
-        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
-                     aes(x = row_ref, 
+        ggplot2::geom_segment(data = tufte_lines_df, linewidth = tufte_size,
+                              ggplot2::aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_top_t$y, 
                          yend = y_top_t$yend,
@@ -261,9 +263,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if(isTRUE(float_contrast)) {
     raw_plot <- raw_plot +
       float_contrast_theme +
-      geom_segment(linewidth = 0.4, 
+      ggplot2::geom_segment(linewidth = 0.4, 
                    color = "black",
-                   aes(x = raw_x_min, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
+                   ggplot2::aes(x = raw_x_min, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
     
   } else {
     # Obtain dfs for xaxis redraw
@@ -274,11 +276,11 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
       
       df_for_line <- df_for_line %>%
-        mutate(x = x + 0.5 + (x-1),
+        dplyr::mutate(x = x + 0.5 + (x-1),
                xend = xend + 0.5 + (xend-1))
       
       df_for_ticks <- df_for_ticks %>%
-        mutate(x = x + 0.5 + (x-1))
+        dplyr::mutate(x = x + 0.5 + (x-1))
       
     } else {
       idx_for_xaxis_redraw <- idx
@@ -290,20 +292,20 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     raw_plot <- raw_plot +
       non_float_contrast_theme +
       # Redraw xaxis line
-      geom_segment(data = df_for_line,
+      ggplot2::geom_segment(data = df_for_line,
                    linewidth = 0.5,
                    lineend = "square", 
                    color = "black",
-                   aes(x = x, 
+                   ggplot2::aes(x = x, 
                        xend = xend, 
                        y = raw_y_min + raw_y_mean/40, 
                        yend = raw_y_min + raw_y_mean/40))  +
       # Redraw xaxis ticks
-      geom_segment(data = df_for_ticks,
+      ggplot2::geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
                    lineend = "square", 
                    color = "black",
-                   aes(x = x, 
+                   ggplot2::aes(x = x, 
                        xend = x, 
                        y = raw_y_min + raw_y_mean/40, 
                        yend = raw_y_min))
@@ -311,7 +313,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   #### Add y_labels component ####
   raw_plot <- raw_plot +
-    labs(y = raw_y_labels)
+    ggplot2::labs(y = raw_y_labels)
   
   return(raw_plot)
 }
@@ -409,16 +411,16 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     main_violin_type,
     
     "multicolour" = 
-      ggplot() +
+      ggplot2::ggplot() +
       geom_halfviolin(na.rm = TRUE, 
                       data = df_for_violin,
-                      aes(x = y, y = x, fill = tag)),
+                      ggplot2::aes(x = y, y = x, fill = tag)),
     
     "singlecolour" = 
-      ggplot() +
+      ggplot2::ggplot() +
       geom_halfviolin(na.rm = TRUE, 
                       data = df_for_violin,
-                      aes(x = y, y = x, group = tag))
+                      ggplot2::aes(x = y, y = x, group = tag))
   )
   
   #### Add scaling Component ####
@@ -447,13 +449,13 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_y_range <- raw_y_range * -min_y_coords/(control_summary - min_raw_y)
     
     delta_plot <- delta_plot +
-      theme_classic() +
-      coord_cartesian(ylim = c(min_y_coords, min_y_coords + delta_y_range),
+      ggplot2::theme_classic() +
+      ggplot2::coord_cartesian(ylim = c(min_y_coords, min_y_coords + delta_y_range),
                       xlim = c(1.8, delta_x_max+0.25),
                       expand = FALSE) +
-      scale_x_continuous(breaks = c(2),
+      ggplot2::scale_x_continuous(breaks = c(2),
                          labels = delta_x_labels) +
-      scale_y_continuous(position = "right") 
+      ggplot2::scale_y_continuous(position = "right") 
     
   } else {
     delta_x_min <- 0.6
@@ -471,12 +473,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     }
     
     delta_plot <- delta_plot +
-      theme_classic() +
-      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10, 
+      ggplot2::theme_classic() +
+      ggplot2::coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10, 
                                delta_y_max),
                       xlim = c(delta_x_min, delta_x_max+delta_x_scalar),
                       expand = FALSE) +
-      scale_x_continuous(breaks = x_axis_breaks,
+      ggplot2::scale_x_continuous(breaks = x_axis_breaks,
                          labels = delta_x_labels)
   }
   
@@ -491,7 +493,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   if (isTRUE(is_bootci)) {
     delta_plot <- delta_plot +
-      geom_bootci(aes(x = x_axis_breaks,
+      geom_bootci(ggplot2::aes(x = x_axis_breaks,
                       ymin = ci_low,
                       ymax = ci_high,
                       middle = difference,
@@ -502,15 +504,15 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   #### Add summary lines Component ####
   if (isTRUE(is_summary_lines)) {
     delta_plot <- delta_plot +
-      geom_segment(colour = "black", 
+      ggplot2::geom_segment(colour = "black", 
                    linewidth = 0.3, 
-                   aes(x = 1.8, 
+                   ggplot2::aes(x = 1.8, 
                        xend = delta_x_max+0.25, 
                        y = difference, 
                        yend = difference)) +
-      geom_segment(colour = "black", 
+      ggplot2::geom_segment(colour = "black", 
                    linewidth = 0.3, 
-                   aes(x = 1.8, 
+                   ggplot2::aes(x = 1.8, 
                        xend = delta_x_max+0.25, 
                        y = 0, 
                        yend = 0))
@@ -520,7 +522,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if (isTRUE(float_contrast)) {
     delta_plot <- delta_plot +
       float_contrast_theme +
-      geom_hline(linewidth = 0.8,
+      ggplot2::geom_hline(linewidth = 0.8,
                  yintercept = min_y_coords)
   } else {
     # Obtain xaxis line and ticks elements for xaxis redraw
@@ -531,11 +533,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
       
       df_for_line <- df_for_line %>%
-        mutate(x = x + 0.5 + (x-1),
+        dplyr::mutate(x = x + 0.5 + (x-1),
                xend = xend + 0.5 + (xend-1))
       
       df_for_ticks <- df_for_ticks %>%
-        mutate(x = x + 0.5 + (x-1))
+        dplyr::mutate(x = x + 0.5 + (x-1))
       
     } else {
       dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
@@ -547,21 +549,21 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       non_float_contrast_theme +
       
       # Redraw xaxis line
-      geom_segment(data = df_for_line,
+      ggplot2::geom_segment(data = df_for_line,
                    linewidth = 0.5,
                    lineend = "square", 
                    color = "black",
-                   aes(x = x, 
+                   ggplot2::aes(x = x, 
                        xend = xend, 
                        y = delta_y_min - delta_y_mean/22, 
                        yend = delta_y_min - delta_y_mean/22)) +
       
       # Redraw xaxis ticks
-      geom_segment(data = df_for_ticks,
+      ggplot2::geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
                    lineend = "square", 
                    color = "black",
-                   aes(x = x, 
+                   ggplot2::aes(x = x, 
                        xend = x, 
                        y = delta_y_min - delta_y_mean/22, 
                        yend = delta_y_min - delta_y_mean/10))
@@ -574,9 +576,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       zero_line_xend <- zero_line_xend + 0.2
     }
     delta_plot <- delta_plot +
-      geom_segment(colour = "black", 
+      ggplot2::geom_segment(colour = "black", 
                    linewidth = 0.3, 
-                   aes(x = 0.6, 
+                   ggplot2::aes(x = 0.6, 
                        xend = zero_line_xend, 
                        y = 0, 
                        yend = 0))
@@ -584,7 +586,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   #### Add y_labels Component ####
   delta_plot <- delta_plot +
-    labs(y = delta_y_labels)
+    ggplot2::labs(y = delta_y_labels)
   
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean/10, delta_y_max)))
 }

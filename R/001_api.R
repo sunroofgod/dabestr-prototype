@@ -33,7 +33,7 @@ load <- function(
     experiment = NULL,
     experiment_label = NULL,
     x1_level = NULL
-){
+    ){
   
   # Storing plotting params as quosures
   enquo_x <- enquo(x)

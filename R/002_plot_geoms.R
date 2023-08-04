@@ -1,17 +1,17 @@
 # Contains custom <ggproto> geom_objects for plotting.
 # 
 # Contains main geoms `geom_halfviolin`, `geom_bootci`, `geom_proportionbar`, `geom_sankeybar` and `geom_sankeyflow`.
-
+#' @importFrom ggplot2 .pt
 # Halfviolin Geom
 draw_group_halfviolin <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   
   first_row <- coords[1, , drop = FALSE]
   
-  violin <- polygonGrob(x = coords$x,
+  violin <- grid::polygonGrob(x = coords$x,
                         y = coords$y,
-                        gp = gpar(col = first_row$colour,
-                                  fill = alpha(first_row$fill, first_row$alpha)))
+                        gp = grid::gpar(col = first_row$colour,
+                                  fill = scales::alpha(first_row$fill, first_row$alpha)))
   
 }
 
@@ -26,7 +26,7 @@ GeomHalfViolin <- ggplot2::ggproto("GeomHalfViolin", ggplot2::Geom,
 geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity", 
                             position = "identity", show.legend = NA, 
                             na.rm = FALSE, inherit.aes = TRUE, ...) {
-  layer(data = data, 
+  ggplot2::layer(data = data, 
         mapping = mapping,
         stat = stat,
         geom = GeomHalfViolin,
@@ -40,19 +40,19 @@ geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity",
 draw_panel_boot_ci <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   
-  ci_line <- segmentsGrob(x0 = coords$x,
+  ci_line <- grid::segmentsGrob(x0 = coords$x,
                           x1 = coords$x,
                           y0 = coords$ymin,
                           y1 = coords$ymax,
-                          gp = gpar(lwd = coords$linesize * .pt,
+                          gp = grid::gpar(lwd = coords$linesize * .pt,
                                     lineend = coords$lineend))
   
-  ci_dot <- pointsGrob(x = coords$x,
+  ci_dot <- grid::pointsGrob(x = coords$x,
                        y = coords$middle,
                        pch = coords$shape,
-                       size = unit(coords$dotsize, "char"))
+                       size = grid::unit(coords$dotsize, "char"))
   
-  gTree(children = gList(ci_line, ci_dot))
+  grid::gTree(children = grid::gList(ci_line, ci_dot))
   
 }
 
@@ -69,7 +69,7 @@ GeomBootCI <- ggplot2::ggproto("GeomBootCI", ggplot2::Geom,
 geom_bootci <- function(mapping = NULL, data = NULL, stat = "identity", 
                         position = "identity", show.legend = NA, 
                         na.rm = FALSE, inherit.aes = TRUE, ...) {
-  layer(data = data, 
+  ggplot2::layer(data = data, 
         mapping = mapping,
         stat = stat,
         geom = GeomBootCI,
@@ -89,10 +89,10 @@ draw_group_proportion_bar <- function(data, panel_scales, coord) {
   
   first_row <- coords[1, , drop = FALSE]
   
-  failure_bar <- polygonGrob(x = coords$x,
+  failure_bar <- grid::polygonGrob(x = coords$x,
                              y = coords$y,
-                             gp = gpar(col = first_row$colour,
-                                       fill = alpha(first_row$fill, first_row$alpha)))
+                             gp = grid::gpar(col = first_row$colour,
+                                       fill = scales::alpha(first_row$fill, first_row$alpha)))
 }
 
 GeomProportionBar <- ggplot2::ggproto("GeomProportionBar", ggplot2::Geom,
@@ -109,7 +109,7 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
                                show.legend = NA, 
                                na.rm = FALSE, 
                                inherit.aes = TRUE) {
-  layer(data = data, 
+  ggplot2::layer(data = data, 
         mapping = mapping,
         stat = stat,
         geom = GeomProportionBar,
@@ -126,10 +126,10 @@ draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   first_row <- coords[1, , drop = FALSE]
   
-  flow <- polygonGrob(x = coords$x,
+  flow <- grid::polygonGrob(x = coords$x,
                       y = coords$y,
-                      gp = gpar(col = first_row$colour,
-                                fill = alpha(first_row$fillcol, first_row$alpha)))
+                      gp = grid::gpar(col = first_row$colour,
+                                fill = scales::alpha(first_row$fillcol, first_row$alpha)))
 }
 
 GeomSankeyFlow <- ggplot2::ggproto("GeomSankeyFlow", ggplot2::Geom,
@@ -143,7 +143,7 @@ GeomSankeyFlow <- ggplot2::ggproto("GeomSankeyFlow", ggplot2::Geom,
 geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity", 
                             position = "identity", show.legend = NA, 
                             na.rm = FALSE, inherit.aes = TRUE, ...) {
-  layer(data = data, 
+  ggplot2::layer(data = data, 
         mapping = mapping,
         stat = stat,
         geom = GeomSankeyFlow,

@@ -4,12 +4,12 @@
 # 
 
 # Function for creation of df for tuftelines plot
-create_create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
+create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
-                     median = median(!!enquo_y),
-                     sd = sd(!!enquo_y),
+                     median = stats::median(!!enquo_y),
+                     sd = stats::sd(!!enquo_y),
                      lower_quartile = stats::quantile(!!enquo_y)[2],
                      upper_quartile = stats::quantile(!!enquo_y)[4])
   
@@ -24,26 +24,30 @@ create_create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional)
 }
 
 # Function for creation of df for sankey plot
-create_dfs_for_sankey <-  function(float_contrast = FALSE,
-                                   raw_data,
-                                   proportional_data,
-                                   enquo_id_col,
-                                   x_axis_raw,
-                                   idx,
-                                   scale_factor_sig = 0.8,
-                                   bar_width = 0.15,
-                                   gap,
-                                   sankey = TRUE,
-                                   flow = TRUE) {
+create_dfs_for_sankey <-  function(
+    float_contrast = FALSE,
+    raw_data,
+    proportional_data,
+    enquo_x,
+    enquo_y,
+    enquo_id_col,
+    x_axis_raw,
+    idx,
+    scale_factor_sig = 0.8,
+    bar_width = 0.15,
+    gap,
+    sankey = TRUE,
+    flow = TRUE
+    ){
   
   type <- ifelse(length(unlist(idx)) <= 2, 
                  "single sankey", 
                  "multiple sankeys")
   
-  flow_success_to_failure = tibble()
-  flow_success_to_success = tibble()
-  flow_failure_to_success = tibble()
-  flow_failure_to_failure = tibble()
+  flow_success_to_failure = tibble::tibble()
+  flow_success_to_success = tibble::tibble()
+  flow_failure_to_success = tibble::tibble()
+  flow_failure_to_failure = tibble::tibble()
   
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
@@ -65,7 +69,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   sankey_bars <- prop
   
   if (isFALSE(flow)){
-    sankey_bars <- tibble()
+    sankey_bars <- tibble::tibble()
     
     for (group in idx){
       group_length <- length(group)
@@ -74,14 +78,14 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
         ctrl <- group[i]
         treat <- group[i+1]
         temp_row_ctrl <- prop %>% 
-          group_by(Group) %>%
-          filter(Group == ctrl)
+          dplyr::group_by(!!enquo_x) %>%
+          dplyr::filter(!!enquo_x == ctrl)
         
         temp_row_treat <- prop %>% 
-          group_by(Group) %>%
-          filter(Group == treat)
+          dplyr::group_by(!!enquo_x) %>%
+          dplyr::filter(!!enquo_x == treat)
         pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
-        sankey_bars <- bind_rows(sankey_bars, pair_rows)
+        sankey_bars <- dplyr::bind_rows(sankey_bars, pair_rows)
       }
     }
   }
@@ -94,40 +98,40 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
       for (i in 1: (group_length - 1)) {
         #redraw_x_axis <- append(redraw_x_axis, x_start)
         success_success <- raw_data %>%
-          group_by(!!enquo_id_col) %>%
-          summarise(success_change =
-                      any(Success == 1 & Group == group[i]) &
-                      any(Success == 1 &
-                            Group == group[i + 1])) %>%
-          filter(success_change) %>%
-          summarise(SS = n() / N)
+          dplyr::group_by(!!enquo_id_col) %>%
+          dplyr::summarise(success_change =
+                      any(!!enquo_y == 1 & !!enquo_x == group[i]) &
+                      any(!!enquo_y == 1 &
+                            !!enquo_x == group[i + 1])) %>%
+          dplyr::filter(success_change) %>%
+          dplyr::summarise(SS = n() / N)
         
         success_failure <- raw_data %>%
-          group_by(!!enquo_id_col) %>%
-          summarise(sf_change =
-                      any(Success == 1 & Group == group[i]) &
-                      any(Success == 0 &
-                            Group == group[i + 1])) %>%
-          filter(sf_change) %>%
-          summarise(SF = n() / N)
+          dplyr::group_by(!!enquo_id_col) %>%
+          dplyr::summarise(sf_change =
+                      any(!!enquo_y == 1 & !!enquo_x == group[i]) &
+                      any(!!enquo_y == 0 &
+                            !!enquo_x == group[i + 1])) %>%
+          dplyr::filter(sf_change) %>%
+          dplyr::summarise(SF = n() / N)
         
         failure_failire <- raw_data %>%
-          group_by(!!enquo_id_col) %>%
-          summarise(failure_change =
-                      any(Success == 0 & Group == group[i]) &
-                      any(Success == 0 &
-                            Group == group[i + 1])) %>%
-          filter(failure_change) %>%
-          summarise(FF = n() / N)
+          dplyr::group_by(!!enquo_id_col) %>%
+          dplyr::summarise(failure_change =
+                      any(!!enquo_y == 0 & !!enquo_x == group[i]) &
+                      any(!!enquo_y == 0 &
+                            !!enquo_x == group[i + 1])) %>%
+          dplyr::filter(failure_change) %>%
+          dplyr::summarise(FF = n() / N)
         
         failure_success <- raw_data %>%
-          group_by(!!enquo_id_col) %>%
-          summarise(failure_change =
-                      any(Success == 0 & Group == group[i]) &
-                      any(Success == 1 &
-                            Group == group[i + 1])) %>%
-          filter(failure_change) %>%
-          summarise(FS = n() / N)
+          dplyr::group_by(!!enquo_id_col) %>%
+          dplyr::summarise(failure_change =
+                      any(!!enquo_y == 0 & !!enquo_x == group[i]) &
+                      any(!!enquo_y == 1 &
+                            !!enquo_x == group[i + 1])) %>%
+          dplyr::filter(failure_change) %>%
+          dplyr::summarise(FS = n() / N)
         # find values for lower flow success to failure flow
         ss <- success_success$SS[1]
         ff <- failure_failire$FF[1]
@@ -154,7 +158,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                            scale_factor_sig,
                                            sf_start2 - 0.002,
                                            sf_end2 + 0.002)
-        sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
+        sig_success_failure_bot <- dplyr::arrange(sig_success_failure_bot, dplyr::desc(x))
         sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
                                                scale_factor_sig,
                                                fs_start1 + 0.002,
@@ -163,7 +167,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                                scale_factor_sig,
                                                fs_start2 + 0.002,
                                                fs_end2 - 0.002)
-        sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
+        sig_failure_success_bot <- dplyr::arrange(sig_failure_success_bot, dplyr::desc(x))
         
         #number of points of data points
         N_points <- length(sig_success_failure_bot)
@@ -190,13 +194,13 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
         
         ind <- ind + 1
         #` update the 4 sankey flow dfs for plotting
-        flow_success_to_failure <- bind_rows(flow_success_to_failure,
+        flow_success_to_failure <- dplyr::bind_rows(flow_success_to_failure,
                                              sankey_success_failure)
-        flow_success_to_success <- bind_rows(flow_success_to_success,
+        flow_success_to_success <- dplyr::bind_rows(flow_success_to_success,
                                              sankey_success_success)
-        flow_failure_to_success <- bind_rows(flow_failure_to_success,
+        flow_failure_to_success <- dplyr::bind_rows(flow_failure_to_success,
                                              sankey_failure_success)
-        flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
+        flow_failure_to_failure <- dplyr::bind_rows(flow_failure_to_failure,
                                              sankey_failure_failure)
       }
       
@@ -261,22 +265,23 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
     tag = NA
   )
   
-  for (i in 1:length(proportion_success)) {
-    y <- proportion_success[i]
+  for (x in 1:length(proportion_success)) {
+    y <- proportion_success[x]
     
-    x_failure_success <- c(x-width/2, x+width/2, x+width/2, x-width/2)
-    y_success = c(y-gap/2, y-gap/2, 0, 0)
-    y_failure = c(1, 1, y+gap/2, y+gap/2)
+    x_failure_success <- c(x-bar_width/2, x+bar_width/2, x+bar_width/2, x-bar_width/2)
+    y_success <- c(y-gap/2, y-gap/2, 0, 0)
+    y_failure <- c(1, 1, y+gap/2, y+gap/2)
     temp_df_proportion_bar <- data.frame(
       x_failure = x_failure_success,
       y_failure = y_failure,
       x_success = x_failure_success,
       y_success = y_success,
-      tag = rep(toString(i), 4)
+      tag = rep(toString(x), 4)
     )
     
     df_for_proportion_bar <- rbind(df_for_proportion_bar, temp_df_proportion_bar)
   }
+  df_for_proportion_bar <- df_for_proportion_bar %>% stats::na.omit()
   
   return(df_for_proportion_bar)
 }

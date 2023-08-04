@@ -1102,6 +1102,7 @@ create_dfs_for_nonflow_tufte_lines <- function(idx,
 create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    raw_data,
                                    proportional_data,
+                                   enquo_x,
                                    enquo_id_col,
                                    x_axis_raw,
                                    idx,
@@ -1149,12 +1150,12 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
         ctrl <- group[i]
         treat <- group[i+1]
         temp_row_ctrl <- prop %>% 
-          group_by(Group) %>%
-          filter(Group == ctrl)
+          group_by(!!enquo_x) %>%
+          filter(!!enquo_x == ctrl)
         
         temp_row_treat <- prop %>% 
-          group_by(Group) %>%
-          filter(Group == treat)
+          group_by(!!enquo_x) %>%
+          filter(!!enquo_x == treat)
         pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
         sankey_bars <- bind_rows(sankey_bars, pair_rows)
       }
@@ -1171,36 +1172,36 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
         success_success <- raw_data %>%
           group_by(!!enquo_id_col) %>%
           summarise(success_change =
-                      any(Success == 1 & Group == group[i]) &
+                      any(Success == 1 & !!enquo_x == group[i]) &
                       any(Success == 1 &
-                            Group == group[i + 1])) %>%
+                            !!enquo_x == group[i + 1])) %>%
           filter(success_change) %>%
           summarise(SS = n() / N)
         
         success_failure <- raw_data %>%
           group_by(!!enquo_id_col) %>%
           summarise(sf_change =
-                      any(Success == 1 & Group == group[i]) &
+                      any(Success == 1 & !!enquo_x == group[i]) &
                       any(Success == 0 &
-                            Group == group[i + 1])) %>%
+                            !!enquo_x == group[i + 1])) %>%
           filter(sf_change) %>%
           summarise(SF = n() / N)
         
         failure_failire <- raw_data %>%
           group_by(!!enquo_id_col) %>%
           summarise(failure_change =
-                      any(Success == 0 & Group == group[i]) &
+                      any(Success == 0 & !!enquo_x == group[i]) &
                       any(Success == 0 &
-                            Group == group[i + 1])) %>%
+                            !!enquo_x == group[i + 1])) %>%
           filter(failure_change) %>%
           summarise(FF = n() / N)
         
         failure_success <- raw_data %>%
           group_by(!!enquo_id_col) %>%
           summarise(failure_change =
-                      any(Success == 0 & Group == group[i]) &
+                      any(Success == 0 & !!enquo_x == group[i]) &
                       any(Success == 1 &
-                            Group == group[i + 1])) %>%
+                            !!enquo_x == group[i + 1])) %>%
           filter(failure_change) %>%
           summarise(FS = n() / N)
         # find values for lower flow success to failure flow
@@ -1655,7 +1656,8 @@ remove_last_ele_from_nested_list <- function(nested_list) {
 }
 
 create_xlabs_for_sankey <- function(idx, 
-                                    Ns) {
+                                    Ns,
+                                    enquo_x) {
   sankey_x_labels <- c()
   Ns_sankey <- ungroup(Ns)
   for (group in idx){
@@ -1664,7 +1666,7 @@ create_xlabs_for_sankey <- function(idx,
         ctrl <- group[i]
         treat <- group[i+1]
         count_for_pair <- Ns_sankey %>% 
-          filter(Group == treat) %>% 
+          filter(!!enquo_x == treat) %>% 
           select(n) %>% pull()
         label <- paste(ctrl, "\nv.s.\n", treat, "\nN=", count_for_pair)
         sankey_x_labels <- c(sankey_x_labels, label)
@@ -1802,6 +1804,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
+                                       enquo_x = enquo_x,
                                        enquo_id_col = enquo_id_col,
                                        gap = sankey_bar_gap,
                                        sankey = sankey,
@@ -1880,7 +1883,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   #### Add scaling Component ####
   raw_x_labels <- Ns$swarmticklabs
   if(main_plot_type == "sankey" && isFALSE(flow)) {
-    raw_x_labels <- create_xlabs_for_sankey(idx, Ns)
+    raw_x_labels <- create_xlabs_for_sankey(idx, Ns, enquo_x)
   }
   raw_ylim <- plot_kwargs$swarm_ylim
   raw_ylim <- if (is.null(raw_ylim)){raw_y_range_vector} else {raw_ylim}
