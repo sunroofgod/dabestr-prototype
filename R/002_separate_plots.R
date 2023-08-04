@@ -1,9 +1,8 @@
-#' Contains functions responsible for separate plot functionalities via flow = FALSE.
-#' 
-#' @description
-#' Contains `separate_idx`, `remove_last_ele_from_nested_list`, `create_xlabs_for_sankey` functions.
+# Contains functions responsible for separate plot functionalities via flow = FALSE.
+# 
+# Contains `separate_idx`, `remove_last_ele_from_nested_list`, `create_xlabs_for_sankey` functions.
 
-#' Separate idx function
+# Separate idx function
 separate_idx <- function(idx, paired) {
   separated_idx <- list()
   curr_group_vector <- c()
@@ -31,7 +30,7 @@ separate_idx <- function(idx, paired) {
   return(separated_idx)
 }
 
-#' Function that removes the last element from each subgroup within a list()
+# Function that removes the last element from each subgroup within a list()
 remove_last_ele_from_nested_list <- function(nested_list) {
   ## nested_array can be in the form of list[][] or list(vectors[])
   for(index in 1:length(nested_list)) {
@@ -41,7 +40,7 @@ remove_last_ele_from_nested_list <- function(nested_list) {
   return(nested_list)
 }
 
-#' Function that creates xlabels for separated sankey diagrams
+# Function that creates xlabels for separated sankey diagrams
 create_xlabs_for_sankey <- function(idx, 
                                     Ns) {
   sankey_x_labels <- c()

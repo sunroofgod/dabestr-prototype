@@ -1,7 +1,6 @@
-#' Contains custom <ggproto> geom_objects for plotting.
-#' 
-#' @description
-#' Contains main geoms `geom_halfviolin`, `geom_bootci`, `geom_proportionbar`, `geom_sankeybar` and `geom_sankeyflow`.
+# Contains custom <ggproto> geom_objects for plotting.
+# 
+# Contains main geoms `geom_halfviolin`, `geom_bootci`, `geom_proportionbar`, `geom_sankeybar` and `geom_sankeyflow`.
 
 # Halfviolin Geom
 draw_group_halfviolin <- function(data, panel_scales, coord) {

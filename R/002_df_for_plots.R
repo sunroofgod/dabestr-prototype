@@ -1,11 +1,9 @@
-#' Helper functions that generate dfs for plot
-#' 
-#' @description
-#' Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw`, `create_dfs_for_proportion_bar` for generation of dfs.
-#' 
-#' Also includes `plot_slopegraph` (for plotting of slopegraph).
+# Helper functions that generate dfs for plot
+# 
+# Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw`, `create_dfs_for_proportion_bar` for generation of dfs.
+# 
 
-#' Function for creation of df for tuftelines plot
+# Function for creation of df for tuftelines plot
 create_create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
@@ -25,7 +23,7 @@ create_create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional)
   return(tufte_lines_df)
 }
 
-#' Function for creation of df for sankey plot
+# Function for creation of df for sankey plot
 create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    raw_data,
                                    proportional_data,
@@ -223,7 +221,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   return(dfs_for_sankeys)
 }
 
-#' Function for creation of df for xaxis redraw for float_contrast FALSE plot
+# Function for creation of df for xaxis redraw for float_contrast FALSE plot
 create_dfs_for_xaxis_redraw <- function(idx) {
   x_axis_pointer <- 0
   xaxis_line_x_vector <- c()

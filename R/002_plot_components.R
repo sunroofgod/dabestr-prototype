@@ -1,9 +1,8 @@
-#' Helper functions that generates plot components.
-#' 
-#' @description
-#' Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
+# Helper functions that generates plot components.
+# 
+# Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
 
-#' Function for creation of list of TRUE/FALSE for raw plot components that will be built
+# Function for creation of list of TRUE/FALSE for raw plot components that will be built
 create_rawplot_components <- function(proportional, 
                                       is_paired, 
                                       float_contrast) {
@@ -50,7 +49,7 @@ create_rawplot_components <- function(proportional,
   return(plot_component)
 }
 
-#' Function for creation of list of TRUE/FALSE for delta plot components that will be built
+# Function for creation of list of TRUE/FALSE for delta plot components that will be built
 create_deltaplot_components <- function(proportional, 
                                         is_paired, 
                                         float_contrast,
@@ -80,7 +79,7 @@ create_deltaplot_components <- function(proportional,
   return(plot_component)
 }
 
-#' Function for creation of list of values of the violin plot components that will be built
+# Function for creation of list of values of the violin plot components that will be built
 create_violinplot_components <- function(boots, 
                                          idx, 
                                          float_contrast, 
