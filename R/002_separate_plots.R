@@ -42,17 +42,18 @@ remove_last_ele_from_nested_list <- function(nested_list) {
 
 # Function that creates xlabels for separated sankey diagrams
 create_xlabs_for_sankey <- function(idx, 
-                                    Ns) {
+                                    Ns,
+                                    enquo_x) {
   sankey_x_labels <- c()
-  Ns_sankey <- ungroup(Ns)
+  Ns_sankey <- dplyr::ungroup(Ns)
   for (group in idx){
     group_length <- length(group)
     for (i in 1: (group_length - 1)){
       ctrl <- group[i]
       treat <- group[i+1]
       count_for_pair <- Ns_sankey %>% 
-        filter(Group == treat) %>% 
-        select(n) %>% pull()
+        dplyr::filter(!!enquo_x == treat) %>% 
+        dplyr::select(n) %>% dplyr::pull()
       label <- paste(ctrl, "\nv.s.\n", treat, "\nN=", count_for_pair)
       sankey_x_labels <- c(sankey_x_labels, label)
     }

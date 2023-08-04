@@ -88,9 +88,9 @@ median_diff <- function(dabest_obj) {
   
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
-      return(median(test) - median(control))
+      return(stats::median(test) - stats::median(control))
     }
-    return(median(test - control))
+    return(stats::median(test - control))
   }
   
   is_paired <- dabest_obj$is_paired

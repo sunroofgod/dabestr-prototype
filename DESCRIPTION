@@ -28,6 +28,7 @@ Imports:
   cowplot, 
   tidyr, 
   dplyr, 
+  tibble,
   stringr, 
   rlang, 
   magrittr, 
@@ -38,6 +39,10 @@ Imports:
   scales,
   ggsci,
   colorspace,
-  cli
+  cli,
+  boot,
+  stats,
+  scales,
+  stringr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

@@ -19,7 +19,7 @@ effsize_boot <- function(
     return(effect_size_func(c, t, paired))
   }
   
-  b <- boot(
+  b <- boot::boot(
     c(data$control, data$test),
     statistic = bootboot,
     R = reps,
@@ -39,7 +39,7 @@ bootstrap <- function(
     boot_labs
     ){
   
-  boot_result <- tibble()
+  boot_result <- tibble::tibble()
   
   raw_data <- dabest_obj$raw_data
   idx <- dabest_obj$idx
@@ -56,8 +56,8 @@ bootstrap <- function(
   
   proportional <- dabest_obj$proportional
   
-  quoname_x <- as_name(enquo_x)
-  quoname_y <- as_name(enquo_y)
+  quoname_x <- rlang::as_name(enquo_x)
+  quoname_y <- rlang::as_name(enquo_y)
   delta_x_labels <- list()
   delta_y_labels <- boot_labs
   
@@ -77,7 +77,7 @@ bootstrap <- function(
       group_length <- length(group)
       
       ctrl_tibble <- raw_data %>% 
-        filter(!!enquo_x == !!group[1])
+        dplyr::filter(!!enquo_x == !!group[1])
       ctrl_measurement <- ctrl_tibble[[quoname_y]]
       
       tests <- group[2:group_length]
@@ -88,7 +88,7 @@ bootstrap <- function(
       
       for (test_group in tests) {
         test_tibble <- raw_data %>%
-          filter(!!enquo_x == !!test_group)
+          dplyr::filter(!!enquo_x == !!test_group)
         
         test_measurement <- test_tibble[[quoname_y]]
         
@@ -121,7 +121,7 @@ bootstrap <- function(
                            "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
-        bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
+        bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
         
         boot_row <- list(
           control_group = group[1],
@@ -136,7 +136,7 @@ bootstrap <- function(
           difference = boots$t0,
           weight = weight
         )
-        boot_result <- bind_rows(boot_result, boot_row)
+        boot_result <- dplyr::bind_rows(boot_result, boot_row)
       }
     }
   } else {
@@ -147,11 +147,11 @@ bootstrap <- function(
         test_group <- group[i+1]
         
         ctrl_tibble <- raw_data %>% 
-          filter(!!enquo_x == !!control_group)
+          dplyr::filter(!!enquo_x == !!control_group)
         ctrl_measurement <- ctrl_tibble[[quoname_y]]
         
         test_tibble <- raw_data %>% 
-          filter(!!enquo_x == !!test_group)
+          dplyr::filter(!!enquo_x == !!test_group)
         test_measurement <- test_tibble[[quoname_y]]
         
         xlabels <- paste(test_group, control_group, sep="\nminus\n")
@@ -183,7 +183,7 @@ bootstrap <- function(
                            "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
-        bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
+        bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
         
         boot_row <- list(
           control_group = group[1],
@@ -198,17 +198,17 @@ bootstrap <- function(
           difference = boots$t0,
           weight = weight
         )
-        boot_result <- bind_rows(boot_result, boot_row)
+        boot_result <- dplyr::bind_rows(boot_result, boot_row)
       }
     }
   }
   if (isTRUE(minimeta)){
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
-    boot_result <- bind_rows(boot_result, boot_last_row)
+    boot_result <- dplyr::bind_rows(boot_result, boot_last_row)
   }
   if (isTRUE(delta2)) {
     boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
-    boot_result <- bind_rows(boot_result,boot_last_row)
+    boot_result <- dplyr::bind_rows(boot_result,boot_last_row)
   }
   
   raw_y_labels <- ifelse(proportional, "proportion of success", "value")
