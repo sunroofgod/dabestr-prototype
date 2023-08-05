@@ -1,8 +1,14 @@
 # Byte-compiled / optimized / DLL files
 
 # Knitted html file
-dabestr-v1.html
+dabestr.html
 
 # Mac
 **/.DS_Store
+
+# RProj
 .Rproj.user
+.RData
+.Rhistory
+.Ruserdata
+.RProfile
