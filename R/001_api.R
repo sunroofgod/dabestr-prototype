@@ -1,22 +1,141 @@
 #' Main load api
+#'Prepare Data for Analysis with dabestr
 #'
-#' @param data tidydataframe
-#' @param x 
-#' @param y 
-#' @param idx 
-#' @param paired 
-#' @param id_col 
-#' @param ci 
-#' @param colour 
-#' @param proportional 
-#' @param minimeta 
-#' @param delta2 
-#' @param experiment 
-#' @param experiment_label 
-#' @param x1_level 
+#'Estimation statistics is a statistical framework that focuses on effect sizes
+#'and confidence intervals around them, rather than \emph{P} values and
+#'associated dichotomous hypothesis testing.
 #'
-#' @return dabest_object
-#' @export
+#' \code{load}() collates the data in preparation for the computation of
+#  {effect sizes}. Bootstrap resampling is used to compute
+#' non-parametric assumption-free confidence intervals. Visualization of the
+#' effect sizes and their confidence intervals using estimation plots is then
+#' performed with a specialized {plotting} function.
+#'
+#' 
+#' 
+#' @param data a tidydataframe
+#' @param x column name in \code{.data} that specifies the treatment group of 
+#' the \code{.data}.
+#' @param y column name in \code{.data} that specifies the measurement values 
+#'  of the \code{.data}.
+#' @param idx A vector containing factors or strings, formatted as a vector 
+#'  of multiple lists of strings in the \code{x} columns.
+#'  These must be quoted (ie. surrounded by quotation marks). It specifies which 
+#'  groups are selected for the boostrap calculations etc. 
+#' @param paired Boolean, default FALSE. If TRUE, the two (or more than 2) 
+#'  groups are treated as
+#'  paired samples. The first group is treated as pre-intervention and the
+#'  second group is considered post-intervention.
+#' @param id_col Default NULL. A column name indicating the identity of the
+#'  datapoint if the data is paired. \emph{This must be supplied if paired is
+#'  \code{TRUE}.}
+#' @param ci A double, default 95, ranging from 0 to 100, it is the width of the 
+#'  confidence interval for the bca_low and bca_high confidence interval 
+#'  calculations
+#' @param colour String, default NULL. A column name in in the \code{x} column, 
+#'  it specifies the column to implement colour aesthetics in plotting functions
+#'  to distinguish each treatment groups from the other 
+#'  (or differentiate experiment factors or factor levels).
+#' @param proportional Boolean, default FALSE. If TRUE, the \code{.data} provided
+#'  is binary data containing 0s and 1s. Proportion of success, failure, etc, 
+#'  will be calculated based on the data entries.
+#' @param minimeta Boolean, default FALSE. If TRUE, a mini meta-analysis will 
+#'  be conducted if the dabest object is parsed into the effect-size functions across all groups 
+#'  specified in \code{idx}. The weighted average of the effectsizes and 
+#'  differences between groups will be calculated.
+#' @param delta2 Boolean, default FALSE. A parameter for 2 by 2 factorial 
+#'  experiment design. If TRUE, a delta-delta analysis will be conducted if 
+#'  the dabest object is parsed into the effect-size functions. 
+#' @param experiment Default NULL. This is the experiment column name for delta2 
+#'  analysis, e.g Treatment (shouldn't be quoted).
+#' @param experiment_label String, default NULL. It specifies 
+#' the experiment label that is used to distinguish 
+#' the experiment and the factors (being used in the plotting labels).
+#' @param x1_level String, default NULL. Setting the first factor level in 
+#' a 2 by 2 experimental design (corresponding to \code{delta2} parameter.
+#'
+#' @return A dabest object with 18 elements
+
+#'  * raw_data    [tibble] The dataset passed to \code{\link{dabest}}, 
+#' stored here as a \code{\link[tibble]{tibble}}.
+
+#'  * proportional_data     [tibble] The proportional data passed to 
+#' \code{\link{load}()} or calculated based on the \code{proportional}, 
+#' stored here as a \code{\link[tibble]{tibble}}.
+
+#'  * enquo_x     [quoted variable] The columns in \code{data} 
+#' used to plot the x axis, respectively, as supplied to \code{\link{load}()}, 
+#' this will be the treatment group column names. These are 
+#' \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
+#' \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
+#' computation of effect sizes.
+
+#'  * enquo_y     [quoted variable] The columns in \code{data} 
+#' used to plot the y axis, respectively, as supplied to \code{\link{load}()}, 
+#' it is the column name for measurement values. These are
+#' \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for 
+#' \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
+#' computation of effect sizes.
+
+#'  * enquo_id_col    [quoted variable] The columns in \code{.data} 
+#' used to distinguish subjects in repeated measures (i.e enquo_id_col). 
+#' This is \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable} 
+#' for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
+#' computation of effect sizes.
+
+#'  * enquo_colour    [Boolean] Whether to plot colour aesthetics 
+#' where the column name enquo_colour is supplied. This is 
+#' \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable} 
+#' for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during 
+#' the computation of effect sizes.
+
+#'  * proportional    [Boolean] Whether the .data provided 
+#' is proportional (i.e proportional) for 
+#' plotting the proportional bars or sankey diagrams.
+
+#'  * minimeta    [Boolean] Whether mini meta analysis is 
+#' conducted and plotted.
+
+#'  * delta2    [Boolean] Whether delta-delta analysis for 
+#' 2 by 2 experimental designs are conducted.
+
+#'  * idx     [Vector] The vector of control-test groupings. 
+#' For each pair in idx, an effect size will be computed by downstream 
+#' dabestr functions used to compute \link[=mean_diff]{effect sizes} 
+#' (such as mean_diff()).
+
+#'  * is_paired     [Boolean] Whether or not the experiment consists 
+#' of paired (aka repeated) observations.
+
+#'  * is_colour     [Boolean] Whether or not the plots produced 
+#' later will have/implement colour aesthetics to distinguish between 
+#' experimental factor levels or treatment groups.
+
+#'  * paired     [Character] {paired: Whether or not the 
+#' experiment consists of paired (aka repeated) observations. Whether 
+#' they are compared with "baseline": all other groups compared with 
+#' one control group; or "sequential": paired-wise comparison and calculations 
+#' based on the order of consecutive pairs.}
+
+#'  * ci     [Numeric] The width of the confidence interval 
+#' specified at the beginning for the effect size, and bootstrap calculations.
+
+#'  * Ns     [tibble] A tibble that contains Group (group names), 
+#' n (number of data points in the group), and swarmtick labels 
+#' for plotting (swarmticklabs).
+
+#'  * control_summary    [List] Summary values 
+#' (mean values are calculated as default), for each control group, 
+#' stored in a list respectively.
+
+#'  * test_summary     [List] Summary values 
+#' (mean values are calculated as default), for each test group, 
+#' stored in a list respectively.
+
+#'  * ylim     [Numeric] A vector of 2 doubles that 
+#' specifies min and max values of the data. This will also 
+#' be used for plotting in producing the plots.
+#' @export load
 #'
 load <- function(
     data,
