@@ -19,6 +19,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   
   is_colour <- dabest_effectsize_obj$is_colour
   is_deltadelta <- plot_kwargs$show_delta2
+  is_mini_meta <- plot_kwargs$show_mini_meta
   idx <- dabest_effectsize_obj$idx
   raw_legend <- NULL
   
@@ -40,31 +41,22 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
                                guides(alpha = "none") +
                                theme(legend.box.margin = margin(0, 0, 0, 0)))
     
-    # if (isTRUE(is_deltadelta)) {
-    #   raw_plot <- plot_grid(raw_plot, ggplot(), nrow = 1, rel_widths = c(0.9, 0.1))
-    # }
+    plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
+    
+    if(isTRUE(is_mini_meta)) {
+      plot_margin <- ggplot2::unit(c(0, 5.5, 0, 0), "pt")
+    }
     
     final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        delta_plot + theme(legend.position="none")),
+      plotlist   = list(raw_plot + theme(legend.position="none",
+                                         plot.margin = plot_margin),
+                        delta_plot + theme(legend.position="none",
+                                           plot.margin = plot_margin)),
       nrow       = 2,
       ncol       = 1,
       axis       = "tblr",
       align      = "vh"
     )
-    
-    if(isTRUE(is_deltadelta)) {
-      extra_yaxis_plot <- plot_extra_yaxis(delta_range, "right", 0, "delta-delta")
-      
-      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.51, 0.42, 0.07))
-      
-      final_plot <- cowplot::plot_grid(
-        plotlist = list(final_plot, extra_yaxis_plot),
-        nrow = 1,
-        ncol = 2,
-        rel_widths = c(0.9, 0.1)
-      )
-    }
     
     if(isTRUE(is_colour)) {
       legend_plot <- cowplot::plot_grid(
@@ -95,7 +87,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
                         delta_plot + theme(legend.position="none")),
       nrow       = 1,
       ncol       = 2,
-      rel_widths = c(0.8, 0.2),
+      rel_widths = c(0.75, 0.25),
       axis       = "lr",
       align      = "h"
     )
