@@ -1,9 +1,36 @@
-#' Main plotting api
+#' Plotting function for dabest_effectsize_obj
 #' 
+#' @name dabest_plot
+#' 
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a dabest_obj along with other specified parameters with the [effect_size()] function.
+#' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. If FALSE, a Cumming estimation plot will be produced.
+#' @param ... Adjustment parameters to control the appearance of the plot can be found under [adjust_plot_kwargs()] function
+#' 
+#' @returns 
+#' A plot which shows the a beeswarm plot of the raw data while having the bootstrap effect sizes beside or below the raw data in the form of a violinplot.
+#'
 #' @description
-#' Contains function `dabest_plot`.
+#' Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending on whether
+#' float_contrast is TRUE. The plot presents all datapoints as a swarmplot, which orders each point to
+#' display the underlying distribution. It also presents the effect size as a bootstrap 95% confidence interval
+#' (95% CI) on a separate but aligned axes.
+#' 
+#' @details 
+#' There are some customizable aesthetics which can be inputted to change the details of the plot. Some common examples include:
+#' - swarm_label
+#' - contrast_label
+#' - custom_palette ("jama","lancet","nejm")
+#' - contrast_x_text
+#' - swarm_x_text
+#' 
+#' @examples 
+#' dabest_obj <- load(data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
+#' dabest_obj.mean_diff <- mean_diff(dabest_obj)
+#' dabest_plot(dabest_obj.mean_diff, TRUE) 
 #' 
 #' To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
+#' 
+#' @export
 
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   
