@@ -23,6 +23,22 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   return(tufte_lines_df)
 }
 
+# Function for creation of df for flow = FALSE plot
+create_dfs_for_nonflow_tufte_lines <- function(idx,
+                                               tufte_lines_df,
+                                               enquo_x){
+  new_tufte_lines_df <- tibble()
+  total_length <- length(unlist(idx))
+  temp_idx <- unlist(idx)
+  for (i in (1: total_length)){
+    group_name <- temp_idx[i]
+    row <- tufte_lines_df %>% 
+      dplyr::filter(!!enquo_x == group_name)
+    new_tufte_lines_df <- dplyr::bind_rows(new_tufte_lines_df, row)
+  }
+  return (new_tufte_lines_df)
+}
+
 # Function for creation of df for sankey plot
 create_dfs_for_sankey <-  function(
     float_contrast = FALSE,

@@ -25,6 +25,13 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   es_marker_size <- 0.5
   es_line_size <- 0.8
   
+  swarm_y_text <- 15
+  swarm_x_text <- 11
+  contrast_y_text <- 15
+  contrast_x_text <- 11
+  
+  zero_dot <- TRUE
+  
   sankey <- TRUE
   flow <- TRUE
   
@@ -82,6 +89,22 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$flow))) {
     flow <- plot_kwargs$flow
   }
+  if(isFALSE(is.null(plot_kwargs$swarm_y_text))) {
+    swarm_y_text <- plot_kwargs$swarm_y_text
+  }
+  if(isFALSE(is.null(plot_kwargs$swarm_x_text))) {
+    swarm_x_text <- plot_kwargs$swarm_x_text
+  }
+  if(isFALSE(is.null(plot_kwargs$contrast_y_text))) {
+    contrast_y_text <- plot_kwargs$contrast_y_text
+  }
+  if(isFALSE(is.null(plot_kwargs$contrast_x_text))) {
+    contrast_x_text <- plot_kwargs$contrast_x_text
+  }
+  if(isFALSE(is.null(plot_kwargs$zero_dot))) {
+    zero_dot <- plot_kwargs$zero_dot
+  }
+  
   
   return(list(
     swarm_label = swarm_label,
@@ -101,6 +124,11 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     es_marker_size = es_marker_size,
     es_line_size = es_line_size,
     sankey = sankey,
-    flow = flow
+    flow = flow, 
+    swarm_y_text = swarm_y_text, 
+    swarm_x_text = swarm_x_text,
+    contrast_y_text = contrast_y_text,
+    contrast_x_text = contrast_x_text,
+    zero_dot = zero_dot
   ))
 }

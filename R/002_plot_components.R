@@ -54,17 +54,23 @@ create_deltaplot_components <- function(proportional,
                                         is_paired, 
                                         float_contrast,
                                         is_colour,
-                                        delta2) {
+                                        delta2,
+                                        zero_dot,
+                                        flow) {
   main_violin_type <- "multicolour"
   is_summary_lines <- TRUE
   is_bootci <- TRUE
   is_deltadelta <- FALSE
+  is_zero_dot <- FALSE
   
   if(isTRUE(is_paired) || isTRUE(is_colour)) {
     main_violin_type <- "singlecolour"
   }
   if(isTRUE(delta2)) {
     is_deltadelta <- TRUE
+  }
+  if(isTRUE(zero_dot) && isTRUE(flow)) {
+    is_zero_dot <- TRUE
   }
   if(isFALSE(float_contrast)) {
     is_summary_lines <- FALSE
@@ -74,7 +80,8 @@ create_deltaplot_components <- function(proportional,
     main_violin_type = main_violin_type,
     is_summary_lines = is_summary_lines,
     is_bootci = is_bootci,
-    is_deltadelta = is_deltadelta
+    is_deltadelta = is_deltadelta,
+    is_zero_dot = is_zero_dot
   )
   return(plot_component)
 }
@@ -85,7 +92,8 @@ create_violinplot_components <- function(boots,
                                          float_contrast, 
                                          delta_y_max,
                                          delta_y_min,
-                                         flow = TRUE) {
+                                         flow = TRUE,
+                                         zero_dot = TRUE) {
   df_for_violin <- data.frame(
     x = NA,
     y = NA,
@@ -93,23 +101,27 @@ create_violinplot_components <- function(boots,
   )
   
   x_axis_breaks <- c()
+  zero_dot_x_breaks <- c()
   curr_boot_idx <- 1
   curr_x_idx <- 0
   x_axis_scalar <- ifelse(flow, 0, 0.5)
   
-  for (group in idx) {
+  for(group in idx) {
     curr_x_idx <- curr_x_idx + 1
+    if(isTRUE(zero_dot)) {
+      zero_dot_x_breaks <- append(zero_dot_x_breaks, curr_x_idx)
+    }
     temp_df_violin <- data.frame(x = NA,
                                  y = NA,
                                  tag = toString(curr_x_idx))
     
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
     
-    for (i in 2:length(group)) {
+    for(i in 2:length(group)) {
       curr_x_idx <- curr_x_idx + 1
       x_axis_breaks <- append(x_axis_breaks, curr_x_idx)
       
-      ci_coords <- stats::density(boots[[curr_boot_idx]])
+      ci_coords <- density(boots[[curr_boot_idx]])
       
       x_coords_ci <- ci_coords$x
       y_coords_ci <- ci_coords$y
@@ -128,10 +140,10 @@ create_violinplot_components <- function(boots,
       max_x_coords <- max(x_coords_ci)
       
       # Keeping track of ylim limits
-      if (min_x_coords < delta_y_min) {
+      if(min_x_coords < delta_y_min) {
         delta_y_min <- min_x_coords
       }
-      if (max_x_coords > delta_y_max) {
+      if(max_x_coords > delta_y_max) {
         delta_y_max <- max_x_coords
       }
       
@@ -145,13 +157,14 @@ create_violinplot_components <- function(boots,
     }
   }
   df_for_violin <- df_for_violin %>%
-    dplyr::arrange(tag, x , y)
+    arrange(tag, x , y)
   
   plot_component <- list(
     df_for_violin = df_for_violin,
     delta_y_min = delta_y_min,
     delta_y_max = delta_y_max,
-    x_axis_breaks = x_axis_breaks
+    x_axis_breaks = x_axis_breaks,
+    zero_dot_x_breaks = zero_dot_x_breaks
   )
   
   return(plot_component)

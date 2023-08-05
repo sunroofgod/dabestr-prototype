@@ -2200,6 +2200,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
                                        enquo_x = enquo_x,
+                                       enquo_y = enquo_y,
                                        enquo_id_col = enquo_id_col,
                                        gap = sankey_bar_gap,
                                        sankey = sankey,
