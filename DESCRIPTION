@@ -41,10 +41,7 @@ Imports:
   ggsci,
   colorspace,
   cli,
-  boot,
   stats,
-  scales,
-  stringr,
   coin
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
