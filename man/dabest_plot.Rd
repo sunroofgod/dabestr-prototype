@@ -37,6 +37,6 @@ dabest_obj <- load(data, x = Group, y = Measurement, idx = c("Control1", "Group1
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 dabest_plot(dabest_obj.mean_diff, TRUE) 
 
-To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
+# To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
 
 }
