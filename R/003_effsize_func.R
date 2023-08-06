@@ -4,7 +4,7 @@
 #' 
 #' @param dabest_obj dabest_obj created by loading in dataset along with other specified parameters with the [load()] function.
 #' @returns 
-#' A `dabest_effectsize` list with 22 elements. The following are the elements contained within:
+#' A `dabest_effectsize_obj` list with 22 elements. The following are the elements contained within:
 
 #' * `raw_data` The dataset passed to [load()] that was cleaned and altered for plotting.
 #' * `idx` The list of control-test groupings as initially passed to [load()].
@@ -29,7 +29,6 @@
 #' * `boot_result` list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
 #' * `permtest_pvals` list containing values related to the calculations of permutation t tests and the corresponding p values, 
 #' and p values for different types of effect sizes and different statistical tests.
-#' 
 #' @description
 #' Calculates the effect size for each pairing of control and test group in `dabest_obj$idx`.
 #' These five effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
