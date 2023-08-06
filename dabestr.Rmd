@@ -3288,7 +3288,7 @@ dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 
 ```{r}
 dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
-dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama", zero_dot = FALSE)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama", zero_dot = FALSE, raw_marker_side_shift = 0.2, raw_marker_spread = 2)
 ```
 
 ## unpaired colour

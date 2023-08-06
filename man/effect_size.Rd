@@ -26,7 +26,7 @@ cohens_h(dabest_obj)
 \item{dabest_obj}{dabest_obj created by loading in dataset along with other specified parameters with the \code{\link[=load]{load()}} function.}
 }
 \value{
-A \code{dabest_effectsize_obj} list with 21 elements. The following are the elements contained within:
+A \code{dabest_effectsize} list with 22 elements. The following are the elements contained within:
 \itemize{
 \item \code{raw_data} The dataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
 \item \code{idx} The list of control-test groupings as initially passed to \code{\link[=load]{load()}}.
@@ -49,6 +49,8 @@ A \code{dabest_effectsize_obj} list with 21 elements. The following are the elem
 \item \code{delta} boolean value as initially passed to \code{\link[=load]{load()}}.
 \item \code{proportional_data} list of calculations related to the plotting of proportion plots.
 \item \code{boot_result} list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
+\item \code{permtest_pvals} list containing values related to the calculations of permutation t tests and the corresponding p values,
+and p values for different types of effect sizes and different statistical tests.
 }
 }
 \description{
