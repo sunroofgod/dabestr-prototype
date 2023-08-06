@@ -283,7 +283,7 @@ load <- function(
     
     data <- data %>%
       dplyr::mutate(grouping = !!enquo_x) %>%
-      dplyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+      tidyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
     if (dplyr::as_label(enquo_colour) == "NULL") {
       enquo_colour <- enquo_x
     }
