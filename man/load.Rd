@@ -2,8 +2,7 @@
 % Please edit documentation in R/001_api.R
 \name{load}
 \alias{load}
-\title{Main load api
-Prepare Data for Analysis with dabestr}
+\title{Main load api}
 \usage{
 load(
   data,
@@ -25,11 +24,11 @@ load(
 \arguments{
 \item{data}{a tidydataframe}
 
-\item{x}{column name in \code{.data} that specifies the treatment group of
-the \code{.data}.}
+\item{x}{column name in \code{ data} that specifies the treatment group of
+the \code{ data}.}
 
-\item{y}{column name in \code{.data} that specifies the measurement values
-of the \code{.data}.}
+\item{y}{column name in \code{ data} that specifies the measurement values
+of the \code{ data}.}
 
 \item{idx}{A vector containing factors or strings, formatted as a vector
 of multiple lists of strings in the \code{x} columns.
@@ -54,7 +53,7 @@ it specifies the column to implement colour aesthetics in plotting functions
 to distinguish each treatment groups from the other
 (or differentiate experiment factors or factor levels).}
 
-\item{proportional}{Boolean, default FALSE. If TRUE, the \code{.data} provided
+\item{proportional}{Boolean, default FALSE. If TRUE, the \code{data} provided
 is binary data containing 0s and 1s. Proportion of success, failure, etc,
 will be calculated based on the data entries.}
 
@@ -80,78 +79,84 @@ a 2 by 2 experimental design (corresponding to \code{delta2} parameter.}
 \value{
 A dabest object with 18 elements
 \itemize{
-\item raw_data    \link{tibble} The dataset passed to \code{\link{dabest}},
-stored here as a \code{\link[tibble]{tibble}}.
-\item proportional_data     \link{tibble} The proportional data passed to
-\code{\link{load}()} or calculated based on the \code{proportional},
-stored here as a \code{\link[tibble]{tibble}}.
-\item enquo_x     \link{quoted variable} The columns in \code{data}
-used to plot the x axis, respectively, as supplied to \code{\link{load}()},
+\item \code{raw_data}    tibble, the dataset passed to \code{\link[=load]{load()}},
+stored here as a tibble.
+\item \code{proportional_data}     tibble, the proportional data passed to
+\code{\link[=load]{load()}} or calculated based on the \code{proportional},
+stored here as a tibble.
+\item \code{enquo_x}     quoted variable, the columns in \code{data}
+used to plot the x axis, respectively, as supplied to \code{\link[=load]{load()}},
 this will be the treatment group column names. These are
 \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
 \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_y     \link{quoted variable} The columns in \code{data}
-used to plot the y axis, respectively, as supplied to \code{\link{load}()},
+\item \code{enquo_y }    quoted variable, The columns in \code{data}
+used to plot the y axis, respectively, as supplied to \code{\link[=load]{load()}},
 it is the column name for measurement values. These are
 \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
 \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_id_col    \link{quoted variable} The columns in \code{.data}
+\item \code{enquo_id_col}    quoted variable. the columns in \code{ data}
 used to distinguish subjects in repeated measures (i.e enquo_id_col).
 This is \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable}
 for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_colour    \link{Boolean} Whether to plot colour aesthetics
+\item \code{enquo_colour}  boolean, whether to plot colour aesthetics
 where the column name enquo_colour is supplied. This is
 \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable}
 for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during
 the computation of effect sizes.
-\item proportional    \link{Boolean} Whether the .data provided
+\item \code{proportional}    boolean Whether the  data provided
 is proportional (i.e proportional) for
 plotting the proportional bars or sankey diagrams.
-\item minimeta    \link{Boolean} Whether mini meta analysis is
-conducted and plotted.
-\item delta2    \link{Boolean} Whether delta-delta analysis for
-2 by 2 experimental designs are conducted.
-\item idx     \link{Vector} The vector of control-test groupings.
+\item \code{minimeta}    Boolean, if TRUE, mini meta analysis will be
+conducted in \code{\link[=effect_size]{effect_size()}} function and plotted in delta plots.
+\item \code{delta2}    Boolean,  if TRUE delta-delta analysis for
+2 by 2 experimental designs will be conducted in \code{\link[=effect_size]{effect_size()}} function and plotted in delta plots.
+\item \code{idx}     Vector, a vector of control-test groupings.
 For each pair in idx, an effect size will be computed by downstream
-dabestr functions used to compute \link[=mean_diff]{effect sizes}
-(such as mean_diff()).
-\item is_paired     \link{Boolean} Whether or not the experiment consists
+dabestr functions used to compute e.g \code{\link[=effect_size]{effect_size()}}
+(such as \code{\link[=mean_diff]{mean_diff()}}).
+\item \code{is_paired}    Boolean, if TRUE, the experiment consists
 of paired (aka repeated) observations.
-\item is_colour     \link{Boolean} Whether or not the plots produced
+\item \code{is_colour}     Boolean, if TRUE, plots produced
 later will have/implement colour aesthetics to distinguish between
 experimental factor levels or treatment groups.
-\item paired     \link{Character} {paired: Whether or not the
+\item \code{paired}    Character, if True, the
 experiment consists of paired (aka repeated) observations. Whether
 they are compared with "baseline": all other groups compared with
 one control group; or "sequential": paired-wise comparison and calculations
-based on the order of consecutive pairs.}
-\item ci     \link{Numeric} The width of the confidence interval
+based on the order of consecutive pairs.
+\item \code{ci}     Numeric, the width of the confidence interval
 specified at the beginning for the effect size, and bootstrap calculations.
-\item Ns     \link{tibble} A tibble that contains Group (group names),
+\item \code{Ns}    A tibble that contains Group (group names),
 n (number of data points in the group), and swarmtick labels
 for plotting (swarmticklabs).
-\item control_summary    \link{List} Summary values
+\item \code{control_summary}   List. Summary values
 (mean values are calculated as default), for each control group,
 stored in a list respectively.
-\item test_summary     \link{List} Summary values
+\item \code{test_summary}     List, Summary values
 (mean values are calculated as default), for each test group,
 stored in a list respectively.
-\item ylim     \link{Numeric} A vector of 2 doubles that
+\item \code{ylim}     Numeric, A vector of 2 doubles that
 specifies min and max values of the data. This will also
 be used for plotting in producing the plots.
 }
 }
 \description{
+Prepare Data for Analysis with dabestr
+}
+\details{
 Estimation statistics is a statistical framework that focuses on effect sizes
 and confidence intervals around them, rather than \emph{P} values and
 associated dichotomous hypothesis testing.
-}
-\details{
+
 \code{load}() collates the data in preparation for the computation of
 non-parametric assumption-free confidence intervals. Visualization of the
 effect sizes and their confidence intervals using estimation plots is then
 performed with a specialized {plotting} function.
+}
+\examples{
+# example code
+
 }

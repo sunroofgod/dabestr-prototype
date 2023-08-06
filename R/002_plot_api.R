@@ -49,6 +49,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   raw_marker_size <- plot_kwargs$raw_marker_size
   raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   raw_marker_spread <- plot_kwargs$raw_marker_spread
+  raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
@@ -113,7 +114,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "swarmplot" =
       ggplot() +
       geom_beeswarm(data = raw_data, 
-                    aes(x = x_axis_raw, 
+                    aes(x = x_axis_raw + raw_marker_side_shift, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
                     cex = raw_marker_spread,
@@ -122,7 +123,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     size = raw_marker_size,
                     alpha = raw_marker_alpha,
                     corral = "wrap",
-                    corral.width = 0.35),
+                    corral.width = 0.35 + raw_marker_spread),
     
     "slope" = 
       plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
@@ -212,9 +213,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     
     row_num <- max(x_axis_raw)
-    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
+    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value + raw_marker_side_shift
     if (isFALSE(flow)){
-      row_ref <- c(seq(1, raw_x_max, 1)) + + tufte_side_adjust_value
+      row_ref <- c(seq(1, raw_x_max, 1)) + tufte_side_adjust_value + raw_marker_side_shift
     }
     
     y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  

@@ -20,6 +20,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_marker_size <- 1.5
   raw_marker_alpha <- 1
   raw_marker_spread <- 2
+  raw_marker_side_shift <- 0
   raw_bar_width <- 0.3
   tufte_size <- 0.8
   es_marker_size <- 0.5
@@ -67,6 +68,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   }
   if(isFALSE(is.null(plot_kwargs$raw_marker_alpha))) {
     raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_side_shift))) {
+    raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   }
   if(isFALSE(is.null(plot_kwargs$tufte_size))) {
     tufte_size <- plot_kwargs$tufte_size
@@ -119,6 +123,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     raw_marker_size = raw_marker_size,
     raw_marker_alpha = raw_marker_alpha,
     raw_marker_spread = raw_marker_spread,
+    raw_marker_side_shift = raw_marker_side_shift,
     raw_bar_width = raw_bar_width,
     tufte_size = tufte_size,
     es_marker_size = es_marker_size,
