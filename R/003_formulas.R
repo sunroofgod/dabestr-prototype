@@ -40,7 +40,7 @@ calculate_delta_difference <- function(differences) {
 confinterval <- function(vector, ci_decimal){
   sample_mean <- mean(vector)
   standard_error <- sd(vector) / sqrt(length(vector))
-  z <- qnorm(1 - (1 - ci_decimal) / 2)
+  z <- stats::qnorm(1 - (1 - ci_decimal) / 2)
   
   margin_of_error <- z * standard_error
   confidence_interval <- c(sample_mean - margin_of_error, 
