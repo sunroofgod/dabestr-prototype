@@ -4,6 +4,7 @@ Title: Data Analysis using Bootstrap-Coupled Estimation
 Version: 0.0.0.9000
 Authors@R: c(
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
+  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("cre", "aut")),
   person("First Name", "Last Name", email = "name@example.com", role = c("aut")),
   person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = c("aut")),
   person("Tayfun", "Tumkaya", role = c("aut")))
@@ -43,6 +44,7 @@ Imports:
   boot,
   stats,
   scales,
-  stringr
+  stringr,
+  coin
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
