@@ -54,7 +54,7 @@
 #' @param x1_level String, default NULL. Setting the first factor level in 
 #' a 2 by 2 experimental design (corresponding to \code{delta2} parameter.
 #'
-#' @return A dabest object with 18 elements
+#' @return A `dabest_obj` object with 18 elements
 
 #'  * `raw_data`    tibble, the dataset passed to [load()], 
 #' stored here as a tibble.
@@ -283,7 +283,7 @@ load <- function(
     
     data <- data %>%
       dplyr::mutate(grouping = !!enquo_x) %>%
-      tidyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+      dplyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
     if (dplyr::as_label(enquo_colour) == "NULL") {
       enquo_colour <- enquo_x
     }
