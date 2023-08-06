@@ -243,7 +243,7 @@ bootstrap <- function(
 # BCA function
 bca <- function(bootstraps, conf.level = .95){
   # Inverse Variance Method
-  if(var(bootstraps)==0){
+  if(stats::var(bootstraps)==0){
     lower <- mean(bootstraps)
     upper <- mean(bootstraps)
     return(c(lower, upper))
@@ -257,15 +257,15 @@ bca <- function(bootstraps, conf.level = .95){
   high <- 1 - low
   sims <- length(bootstraps)
   z.inv <- length(bootstraps[bootstraps < mean(bootstraps)])/sims
-  z <- qnorm(z.inv)
+  z <- stats::qnorm(z.inv)
   U <- (sims - 1) * (mean(bootstraps, na.rm=TRUE) - bootstraps)
   top <- sum(U^3)
   under <- 6 * (sum(U^2))^{3/2}
   a <- top / under
-  lower.inv <-  pnorm(z + (z + qnorm(low))/(1 - a * (z + qnorm(low))))
-  lower <- quantile(bootstraps, lower.inv, names=FALSE)
-  upper.inv <-  pnorm(z + (z + qnorm(high))/(1 - a * (z + qnorm(high))))
-  upper <- quantile(bootstraps, upper.inv, names=FALSE)
+  lower.inv <-  stats::pnorm(z + (z + stats::qnorm(low))/(1 - a * (z + stats::qnorm(low))))
+  lower <- stats::quantile(bootstraps, lower.inv, names=FALSE)
+  upper.inv <-  stats::pnorm(z + (z + stats::qnorm(high))/(1 - a * (z + stats::qnorm(high))))
+  upper <- stats::quantile(bootstraps, upper.inv, names=FALSE)
   return(c(lower, upper))
 } 
 
