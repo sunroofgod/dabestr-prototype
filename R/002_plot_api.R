@@ -58,6 +58,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   flow <- plot_kwargs$flow
   swarm_x_text <- plot_kwargs$swarm_x_text
   swarm_y_text <- plot_kwargs$swarm_y_text
+  asymmetric_side <- plot_kwargs$asymmetric_side
+  asymmetric_side <- ifelse(asymmetric_side=="right", -1, 1)
   
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
@@ -114,12 +116,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "swarmplot" =
       ggplot2::ggplot() +
       ggbeeswarm::geom_beeswarm(data = raw_data, 
-                    ggplot2::aes(x = x_axis_raw + raw_marker_side_shift, 
+                    ggplot2::aes(x = x_axis_raw + asymmetric_side*raw_marker_side_shift, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
                     cex = raw_marker_spread,
                     method = "swarm",
-                    side = -1L,
+                    side = -asymmetric_side*1L,
                     size = raw_marker_size,
                     alpha = raw_marker_alpha,
                     corral = "wrap",
@@ -213,9 +215,9 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     
     row_num <- max(x_axis_raw)
-    row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value + raw_marker_side_shift
+    row_ref <- c(seq(1, row_num, 1)) + asymmetric_side*tufte_side_adjust_value + asymmetric_side*raw_marker_side_shift
     if (isFALSE(flow)){
-      row_ref <- c(seq(1, raw_x_max, 1)) + tufte_side_adjust_value + raw_marker_side_shift
+      row_ref <- c(seq(1, raw_x_max, 1)) + asymmetric_side*tufte_side_adjust_value + asymmetric_side*raw_marker_side_shift
     }
     
     y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  

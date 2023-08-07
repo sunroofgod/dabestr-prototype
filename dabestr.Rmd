@@ -3260,7 +3260,7 @@ c1 <- rnorm(N, mean = 3, sd = 0.4)
 c2 <- rnorm(N, mean = 3.5, sd = 0.75)
 c3 <- rnorm(N, mean = 3.25, sd = 0.4)
 
-g1 <- rnorm(N, mean = 3.5, sd = 0.5)
+g1 <- c1
 g2 <- rnorm(N, mean = 2.5, sd = 0.6)
 g3 <- rnorm(N, mean = 3, sd = 0.75)
 
@@ -3287,8 +3287,8 @@ dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 ```
 
 ```{r}
-dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
-dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama", zero_dot = FALSE, raw_marker_side_shift = 0.2, raw_marker_spread = 2)
+dabest_plot(dabest_obj_multigroup.mean_diff, TRUE, raw_marker_side_shift = 0.3)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama", zero_dot = TRUE, raw_marker_side_shift = 0.2, raw_marker_spread = 2, asymmetric_side = "left")
 ```
 
 ## unpaired colour
