@@ -17,6 +17,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   show_delta2 <- dabest_effectsize_obj$delta2
   show_mini_meta <- dabest_effectsize_obj$minimeta
   
+  asymmetric_side <- "right"
   raw_marker_size <- 1.5
   raw_marker_alpha <- 1
   raw_marker_spread <- 2
@@ -108,6 +109,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$zero_dot))) {
     zero_dot <- plot_kwargs$zero_dot
   }
+  if(isFALSE(is.null(plot_kwargs$asymmetric_side))) {
+    asymmetric_side <- plot_kwargs$asymmetric_side
+  }
   
   
   return(list(
@@ -134,6 +138,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     swarm_x_text = swarm_x_text,
     contrast_y_text = contrast_y_text,
     contrast_x_text = contrast_x_text,
-    zero_dot = zero_dot
+    zero_dot = zero_dot,
+    asymmetric_side = asymmetric_side
   ))
 }
