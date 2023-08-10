@@ -77,7 +77,7 @@ the experiment and the factors (being used in the plotting labels).}
 a 2 by 2 experimental design (corresponding to \code{delta2} parameter.}
 }
 \value{
-A dabest object with 18 elements
+A \code{dabest_obj} object with 18 elements
 \itemize{
 \item \code{raw_data}    tibble, the dataset passed to \code{\link[=load]{load()}},
 stored here as a tibble.

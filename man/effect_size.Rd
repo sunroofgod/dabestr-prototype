@@ -26,7 +26,7 @@ cohens_h(dabest_obj)
 \item{dabest_obj}{dabest_obj created by loading in dataset along with other specified parameters with the \code{\link[=load]{load()}} function.}
 }
 \value{
-A \code{dabest_effectsize} list with 22 elements. The following are the elements contained within:
+A \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
 \itemize{
 \item \code{raw_data} The dataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
 \item \code{idx} The list of control-test groupings as initially passed to \code{\link[=load]{load()}}.
