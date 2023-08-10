@@ -32,7 +32,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   contrast_y_text <- 15
   contrast_x_text <- 11
   
-  zero_dot <- TRUE
+  show_zero_dot <- TRUE
+  show_baseline_ec <- FALSE
   
   sankey <- TRUE
   flow <- TRUE
@@ -106,13 +107,15 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$contrast_x_text))) {
     contrast_x_text <- plot_kwargs$contrast_x_text
   }
-  if(isFALSE(is.null(plot_kwargs$zero_dot))) {
-    zero_dot <- plot_kwargs$zero_dot
+  if(isFALSE(is.null(plot_kwargs$show_zero_dot))) {
+    show_zero_dot <- plot_kwargs$show_zero_dot
+  }
+  if(isFALSE(is.null(plot_kwargs$show_baseline_ec))) {
+    show_baseline_ec <- plot_kwargs$show_baseline_ec
   }
   if(isFALSE(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
   }
-  
   
   return(list(
     swarm_label = swarm_label,
@@ -138,7 +141,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     swarm_x_text = swarm_x_text,
     contrast_y_text = contrast_y_text,
     contrast_x_text = contrast_x_text,
-    zero_dot = zero_dot,
+    show_zero_dot = show_zero_dot,
+    show_baseline_ec = show_baseline_ec,
     asymmetric_side = asymmetric_side
   ))
 }

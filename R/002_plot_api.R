@@ -383,7 +383,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   flow <- plot_kwargs$flow
   contrast_x_text <- plot_kwargs$contrast_x_text
   contrast_y_text <- plot_kwargs$contrast_y_text
-  zero_dot <- plot_kwargs$zero_dot
+  show_zero_dot <- plot_kwargs$show_zero_dot
+  show_baseline_ec <- plot_kwargs$show_baseline_ec
   
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
@@ -391,13 +392,15 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                                        float_contrast,
                                                        is_colour,
                                                        delta2,
-                                                       zero_dot,
-                                                       flow)
+                                                       show_zero_dot,
+                                                       flow,
+                                                       show_baseline_ec)
   main_violin_type <- delta_plot_components$main_violin_type
   is_summary_lines <- delta_plot_components$is_summary_lines
   is_bootci <- delta_plot_components$is_bootci
   is_deltadelta <- delta_plot_components$is_deltadelta
   is_zero_dot <- delta_plot_components$is_zero_dot
+  is_baseline_ec <- delta_plot_components$is_baseline_ec
   
   raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- raw_plot_components$main_plot_type
@@ -420,7 +423,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                                          delta_y_max,
                                                          delta_y_min,
                                                          flow,
-                                                         zero_dot)
+                                                         show_zero_dot)
   
   df_for_violin <- violin_plot_components$df_for_violin
   delta_y_min <- violin_plot_components$delta_y_min
@@ -541,6 +544,41 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                       middle = 0,
                       dotsize = es_marker_size,
                       linesize = es_line_size))
+  }
+  
+  #### Add baseline_error_curve Component ####
+  if (isTRUE(is_baseline_ec)) {
+    # Add violinplot Component
+    baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
+    
+    baseline_boots <- baseline_ec_boot_result$bootstraps
+    baseline_ci_low = baseline_ec_boot_result$bca_ci_low
+    baseline_ci_high = baseline_ec_boot_result$bca_ci_high
+    baseline_difference = baseline_ec_boot_result$difference
+    
+    df_for_baseline_ec_violin <- create_dfs_for_baseline_ec_violin(baseline_boots, 
+                                                                   zero_dot_x_breaks, 
+                                                                   float_contrast, 
+                                                                   flow)
+    if (main_violin_type == "multicolour") {
+      delta_plot <- delta_plot +
+        geom_halfviolin(na.rm = TRUE,
+                        data = df_for_baseline_ec_violin,
+                        ggplot2::aes(x = y, y = x, fill = tag))
+    } else {
+      delta_plot <- delta_plot +
+        geom_halfviolin(na.rm = TRUE,
+                        data = df_for_baseline_ec_violin,
+                        ggplot2::aes(x = y, y = x, group = tag))
+    }
+    # Add bootci Component
+    delta_plot <- delta_plot +
+      geom_bootci(ggplot2::aes(x = zero_dot_x_breaks,
+                               ymin = baseline_ci_low,
+                               ymax = baseline_ci_high,
+                               middle = baseline_difference,
+                               dotsize = es_marker_size,
+                               linesize = es_line_size))
   }
   
   #### Add summary lines Component ####

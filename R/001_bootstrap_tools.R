@@ -40,6 +40,7 @@ bootstrap <- function(
     ){
   
   boot_result <- tibble::tibble()
+  baseline_ec_boot_result <- tibble::tibble()
   
   raw_data <- dabest_obj$raw_data
   idx <- dabest_obj$idx
@@ -72,6 +73,7 @@ bootstrap <- function(
     cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
   }
   
+  ## Getting boot_results
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
       group_length <- length(group)
@@ -211,6 +213,62 @@ bootstrap <- function(
     boot_result <- dplyr::bind_rows(boot_result,boot_last_row)
   }
   
+  ## Getting boot_results for baseline_error_curve
+  for (group in idx) {
+    control_group <- group[1]
+    test_group <- control_group
+    
+    ctrl_tibble <- raw_data %>% 
+      dplyr::filter(!!enquo_x == !!control_group)
+    ctrl_measurement <- ctrl_tibble[[quoname_y]]
+    test_measurement <- ctrl_measurement
+    
+    xlabels <- paste(test_group, control_group, sep="\nminus\n")
+    
+    control_test_measurement <- list(control = ctrl_measurement,
+                                     test = test_measurement)
+    #add weights column
+    ctrl_size <- length(ctrl_measurement)
+    ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
+    test_size <- length(test_measurement)
+    test_var <- var_w_df(test_measurement, test_size)
+    grp_var <- calculate_group_variance(ctrl_var = ctrl_var,
+                                        ctrl_N = ctrl_size,
+                                        test_var = test_var,
+                                        test_N = test_size)
+    
+    weight <- 1/grp_var
+    
+    set.seed(seed)
+    
+    boots <- effsize_boot(data = control_test_measurement,
+                          effect_size_func = effect_size_func,
+                          reps = reps,
+                          paired = is_paired)
+    
+    if (ci < 0 | ci > 100) {
+      cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                       "x" = "{.field ci} must be between 0 and 100, not {ci}."))
+    }
+    
+    bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
+    
+    boot_row <- list(
+      control_group = group[1],
+      test_group = test_group,
+      bootstraps = list(as.vector(boots$t)),
+      nboots = length(boots$t),
+      bca_ci_low = bootci$bca[4],
+      bca_ci_high = bootci$bca[5],
+      pct_ci_low = bootci$percent[4],
+      pct_ci_high = bootci$percent[5],
+      ci = ci,
+      difference = boots$t0,
+      weight = weight
+    )
+    baseline_ec_boot_result <- dplyr::bind_rows(baseline_ec_boot_result, boot_row)
+  }
+  
   raw_y_labels <- ifelse(proportional, "proportion of success", "value")
   
   out <- list(raw_data = raw_data,
@@ -233,7 +291,8 @@ bootstrap <- function(
               minimeta = minimeta,
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
-              boot_result = boot_result)
+              boot_result = boot_result,
+              baseline_ec_boot_result = baseline_ec_boot_result)
   
   class(out) <- c("dabest_effectsize")
   
