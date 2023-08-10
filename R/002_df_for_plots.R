@@ -301,3 +301,42 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
   
   return(df_for_proportion_bar)
 }
+
+create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contrast, flow = TRUE) {
+  df_for_violin <- data.frame(
+    x = NA,
+    y = NA,
+    tag = NA
+  )
+  x_axis_scalar <- ifelse(flow, 0, 0.5)
+  curr_boot_idx <- 1
+  
+  for (i in x_idx_position) {
+    ci_coords <- density(boots[[curr_boot_idx]])
+    
+    x_coords_ci <- ci_coords$x
+    y_coords_ci <- ci_coords$y
+    
+    # Standardise y
+    y_coords_ci <- (y_coords_ci - min(y_coords_ci))/(max(y_coords_ci) - min(y_coords_ci))
+    y_coords_ci <- y_coords_ci/6
+    
+    if (isFALSE(float_contrast)) {
+      y_coords_ci <- y_coords_ci/1.5
+    }
+    
+    y_coords_ci <- y_coords_ci + i - x_axis_scalar
+    
+    temp_df_violin <- data.frame(x = x_coords_ci,
+                                 y = y_coords_ci,
+                                 tag = rep(toString(i), 512))
+    
+    df_for_violin <- rbind(df_for_violin, temp_df_violin)
+    
+    curr_boot_idx <- curr_boot_idx + 1
+  }
+  df_for_violin <- df_for_violin %>%
+    arrange(tag, x , y)
+  
+  return(df_for_violin)
+}

@@ -55,25 +55,30 @@ create_deltaplot_components <- function(proportional,
                                         float_contrast,
                                         is_colour,
                                         delta2,
-                                        zero_dot,
-                                        flow) {
+                                        show_zero_dot,
+                                        flow,
+                                        show_baseline_ec) {
   main_violin_type <- "multicolour"
   is_summary_lines <- TRUE
   is_bootci <- TRUE
   is_deltadelta <- FALSE
   is_zero_dot <- FALSE
+  is_baseline_ec <- FALSE
   
-  if(isTRUE(is_paired) || isTRUE(is_colour)) {
+  if (isTRUE(is_paired) || isTRUE(is_colour)) {
     main_violin_type <- "singlecolour"
   }
-  if(isTRUE(delta2)) {
+  if (isTRUE(delta2)) {
     is_deltadelta <- TRUE
   }
-  if(isTRUE(zero_dot) && isTRUE(flow)) {
+  if (isTRUE(show_zero_dot) && isTRUE(flow)) {
     is_zero_dot <- TRUE
   }
-  if(isFALSE(float_contrast)) {
+  if (isFALSE(float_contrast)) {
     is_summary_lines <- FALSE
+  }
+  if (isTRUE(show_baseline_ec)) {
+    is_baseline_ec <- TRUE
   }
   
   plot_component <- list(
@@ -81,7 +86,8 @@ create_deltaplot_components <- function(proportional,
     is_summary_lines = is_summary_lines,
     is_bootci = is_bootci,
     is_deltadelta = is_deltadelta,
-    is_zero_dot = is_zero_dot
+    is_zero_dot = is_zero_dot,
+    is_baseline_ec = is_baseline_ec
   )
   return(plot_component)
 }
