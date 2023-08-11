@@ -67,10 +67,11 @@ bootstrap <- function(
   
   ## Validity Checks
   if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
-    cli::cli_abort(c("{.var Cliffs delta} cannot be found when {.field paired} is not NULL.",
+    cli::cli_abort(c("{.var Cliffs' delta} cannot be used when {.field paired} is not NULL.",
                      "x" = "Please change {.var effect_size_func}."))
   } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
-    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
+    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be used when {.field proportional} is TRUE.",
+                     "x" = "Please change {.var effect_size_func}."))
   }
   
   ## Getting boot_results

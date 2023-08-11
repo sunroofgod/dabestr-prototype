@@ -29,6 +29,7 @@
 #' * `boot_result` list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
 #' * `permtest_pvals` list containing values related to the calculations of permutation t tests and the corresponding p values, 
 #' and p values for different types of effect sizes and different statistical tests.
+#' 
 #' @description
 #' Calculates the effect size for each pairing of control and test group in `dabest_obj$idx`.
 #' These five effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
@@ -72,14 +73,14 @@ mean_diff <- function(dabest_obj) {
   
   is_paired <- dabest_obj$is_paired
   
-  if(is_paired){
+  if (is_paired){
     main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference")
-    permtest_and_pvalues <- Pvalues_statistics(dabest_obj, ef_size_fn = effect_size_func, effect_size_type = effect_size_type)
-    output <- c(main_results, permtest_and_pvalues)
+  } else {
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference")
   }
-  main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference")
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, ef_size_fn = effect_size_func, effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
+  
   class(output) <- c("dabest_effectsize")
   
   return(output)
@@ -103,23 +104,17 @@ median_diff <- function(dabest_obj) {
   
   is_paired <- dabest_obj$is_paired
   
-  if(is_paired){
-    main_results <- bootstrap(dabest_obj, 
-                              effect_size_func, 
-                              boot_labs = "Paired\nmedian difference")
-    permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
-                                               ef_size_fn = effect_size_func,
-                                               effect_size_type = effect_size_type)
-    output <- c(main_results, permtest_and_pvalues)
-    
+  if (is_paired){
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference")
+  } else {
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference")
   }
-  main_results <- bootstrap(dabest_obj, 
-                            effect_size_func, 
-                            boot_labs = "Median difference")
+  
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
                                              effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
+  
   class(output) <- c("dabest_effectsize")
   return(output)
 }

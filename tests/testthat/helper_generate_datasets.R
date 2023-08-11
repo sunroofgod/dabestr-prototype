@@ -70,8 +70,7 @@ generate_proportional_dataset <- function(N = 40, seed = 12345) {
 
 generate_deltadelta_dataset <- function(N = 40, seed = 12345) {
   set.seed(seed)
-  
-  N = 40
+
   placebo <- rnorm(N, mean = 3, sd = 0.4)
   drug <- rnorm(N, mean = 3.5, sd = 0.75)
   genotype <- c(rep('M', N/2), rep('W', N/2))
@@ -81,7 +80,6 @@ generate_deltadelta_dataset <- function(N = 40, seed = 12345) {
   wide_data <- tibble::tibble(
     Placebo = placebo,
     Drug = drug,
-    Dummy = dummy,
     Genotype = genotype, 
     ID = id,
     Rep = Rep)
