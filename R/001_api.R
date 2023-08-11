@@ -192,8 +192,11 @@ load <- function(
                        "x" = "Please enter a valid entry for {.field colour} in {.fun load}."))
     }
   }
-  
   if (isFALSE(delta2)) {
+    if (is.null(idx)) {
+      cli::cli_abort(c("Column {.field idx} is currently NULL.", 
+                       "x" = "Please enter a valid entry for {.field idx} in {.fun load}."))
+    }
     if (is.list(idx)) {
       general_idx_lengths <- sapply(idx,length)
       if (any(general_idx_lengths<2)==TRUE) {
@@ -233,6 +236,11 @@ load <- function(
     }
   }
   
+  ## Make idx into a list if it is a vector
+  if (typeof(idx) != "list") {
+    idx <- list(idx)
+  }
+  
   ## Check for valid mini-meta 
   if (isTRUE(minimeta)) {
     if (isTRUE(proportional)) {
@@ -243,7 +251,7 @@ load <- function(
                        "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
     }
     
-    minimeta_idx_lengths <- sapply(idx,length)
+    minimeta_idx_lengths <- sapply(idx, length)
     if (any(minimeta_idx_lengths!=2)==TRUE) {
       cli::cli_abort(c("{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
                        "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."))
@@ -313,82 +321,78 @@ load <- function(
   
   unlist_idx <- unlist(idx)
   
-  if (!is.null(idx)){
-    raw_data <- data %>%
-      dplyr::filter(!!enquo_x %in% unlist_idx) %>%
-      dplyr::mutate(x_axis_raw = 0)
-    
-    raw_data[[name_x]] = factor(x = raw_data[[name_x]], levels = unlist_idx)
-    
-    for (i in 1:length(unlist_idx)) {
-      raw_data <- raw_data %>%
-        dplyr::mutate(x_axis_raw = ifelse(
-          !!enquo_x == unlist_idx[i], i, x_axis_raw 
-        ))
-    }
-    
-    # Obtain raw_y_range_vector
-    ylim <- range(raw_data[[name_y]])
-    
-    # Creation of x-axis label
-    Ns <- raw_data %>%
-      dplyr::group_by(!!enquo_x) %>%
-      dplyr::count()
-    Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
-    
-    # Extending ylim for plotting
-    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
-    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
-    
-    if(isTRUE(proportional)){
-      ## include checks here for data to see if it is proportional data
-      proportional_data <- raw_data %>%
-        dplyr::select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
-        dplyr::group_by(!!enquo_x) %>%
-        dplyr::summarise(proportion_success = mean(!!enquo_y),
-                         y_success = proportion_success/2,
-                         y_failure = (1+proportion_success)/2)
-      
-      control_summary <- proportional_data$proportion_success[1]
-      test_summary <- proportional_data$proportion_success[2]
-      
-    } else {
-      # Calculation of summary lines
-      summaries <- raw_data %>%
-        dplyr::group_by(!!enquo_x) %>%
-        dplyr::summarise(summary_stats = mean(!!enquo_y))
-      
-      # Only currently works for two-groups, if needed for extended features in future, to be changed
-      control_summary <- summaries$summary_stats[1]
-      test_summary <- summaries$summary_stats[2]
-      
-      proportional_data <- NULL
-    }
-    
-    dabest_object <- list(
-      raw_data = raw_data,
-      proportional_data = proportional_data,
-      enquo_x = enquo_x,
-      enquo_y = enquo_y,
-      enquo_id_col = enquo_id_col,
-      enquo_colour = enquo_colour,
-      proportional = proportional,
-      minimeta = minimeta,
-      delta2 = delta2,
-      idx = idx,
-      is_paired = is_paired,
-      is_colour = is_colour,
-      paired = paired,
-      ci = ci,
-      Ns = Ns,
-      control_summary = control_summary,
-      test_summary = test_summary,
-      ylim = ylim
-    )
-    
-    class(dabest_object) <- c("dabest")
-    
-    return(dabest_object)
+  raw_data <- data %>%
+    dplyr::filter(!!enquo_x %in% unlist_idx) %>%
+    dplyr::mutate(x_axis_raw = 0)
+  
+  raw_data[[name_x]] = factor(x = raw_data[[name_x]], levels = unlist_idx)
+  
+  for (i in 1:length(unlist_idx)) {
+    raw_data <- raw_data %>%
+      dplyr::mutate(x_axis_raw = ifelse(
+        !!enquo_x == unlist_idx[i], i, x_axis_raw 
+      ))
   }
-  stop()
+  
+  # Obtain raw_y_range_vector
+  ylim <- range(raw_data[[name_y]])
+  
+  # Creation of x-axis label
+  Ns <- raw_data %>%
+    dplyr::group_by(!!enquo_x) %>%
+    dplyr::count()
+  Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
+  
+  # Extending ylim for plotting
+  ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+  ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
+  
+  if(isTRUE(proportional)){
+    proportional_data <- raw_data %>%
+      dplyr::select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
+      dplyr::group_by(!!enquo_x) %>%
+      dplyr::summarise(proportion_success = mean(!!enquo_y),
+                       y_success = proportion_success/2,
+                       y_failure = (1+proportion_success)/2)
+    
+    control_summary <- proportional_data$proportion_success[1]
+    test_summary <- proportional_data$proportion_success[2]
+    
+  } else {
+    # Calculation of summary lines
+    summaries <- raw_data %>%
+      dplyr::group_by(!!enquo_x) %>%
+      dplyr::summarise(summary_stats = mean(!!enquo_y))
+    
+    # Only currently works for two-groups, if needed for extended features in future, to be changed
+    control_summary <- summaries$summary_stats[1]
+    test_summary <- summaries$summary_stats[2]
+    
+    proportional_data <- NULL
+  }
+  
+  dabest_object <- list(
+    raw_data = raw_data,
+    proportional_data = proportional_data,
+    enquo_x = enquo_x,
+    enquo_y = enquo_y,
+    enquo_id_col = enquo_id_col,
+    enquo_colour = enquo_colour,
+    proportional = proportional,
+    minimeta = minimeta,
+    delta2 = delta2,
+    idx = idx,
+    is_paired = is_paired,
+    is_colour = is_colour,
+    paired = paired,
+    ci = ci,
+    Ns = Ns,
+    control_summary = control_summary,
+    test_summary = test_summary,
+    ylim = ylim
+  )
+  
+  class(dabest_object) <- c("dabest")
+  
+  return(dabest_object)
 }
