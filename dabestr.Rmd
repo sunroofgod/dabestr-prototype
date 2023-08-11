@@ -3429,6 +3429,7 @@ my.data.test_proportion5$Success[sample(nrow(my.data.test_proportion5), 4)] <- 1
 
 my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2, my.data.test_proportion3, my.data.test_proportion4, my.data.test_proportion5)
 id <- data.frame(ID = rep(c(1:40), 6))
+
 my.data.proportional <- cbind(my.data.proportional, id)
 ```
 
