@@ -1,23 +1,21 @@
-#' Main load api
 #' 
-#'Prepare Data for Analysis with dabestr
-#'
-#'Estimation statistics is a statistical framework that focuses on effect sizes
-#'and confidence intervals around them, rather than \emph{P} values and
-#'associated dichotomous hypothesis testing.
-#'
-#' \code{load}() collates the data in preparation for the computation of
-#  {effect sizes}. Bootstrap resampling is used to compute
-#' non-parametric assumption-free confidence intervals. Visualization of the
-#' effect sizes and their confidence intervals using estimation plots is then
-#' performed with a specialized {plotting} function.
-#'
+#' Prepare Data for Analysis with dabestr
 #' 
-#' @param data a tidydataframe
-#' @param x column name in \code{ data} that specifies the treatment group of 
-#' the \code{ data}.
-#' @param y column name in \code{ data} that specifies the measurement values 
-#'  of the \code{ data}.
+#' @description 
+#' Estimation statistics is a statistical framework that focuses on effect sizes
+#' and confidence intervals around them, rather than \emph{P} values and
+#' associated dichotomous hypothesis testing. {load}() collates the data in 
+#' preparation for the computation of {effect sizes}. Bootstrap resampling is 
+#' used to compute non-parametric assumption-free confidence intervals. 
+#' Visualization of the effect sizes and their confidence intervals using 
+#' estimation plots is then performed with a specialized {plotting} function.
+#' 
+#' 
+#' @param data A tidydataframe
+#' @param x Column name in \code{.data} that specifies the treatment group of 
+#' the \code{.data}.
+#' @param y Column name in \code{.data} that specifies the measurement values 
+#'  of the \code{.data}.
 #' @param idx A vector containing factors or strings, formatted as a vector 
 #'  of multiple lists of strings in the \code{x} columns.
 #'  These must be quoted (ie. surrounded by quotation marks). It specifies which 
@@ -36,7 +34,7 @@
 #'  it specifies the column to implement colour aesthetics in plotting functions
 #'  to distinguish each treatment groups from the other 
 #'  (or differentiate experiment factors or factor levels).
-#' @param proportional Boolean, default FALSE. If TRUE, the \code{data} provided
+#' @param proportional Boolean, default FALSE. If TRUE, the \code{.data} provided
 #'  is binary data containing 0s and 1s. Proportion of success, failure, etc, 
 #'  will be calculated based on the data entries.
 #' @param minimeta Boolean, default FALSE. If TRUE, a mini meta-analysis will 
@@ -54,90 +52,95 @@
 #' @param x1_level String, default NULL. Setting the first factor level in 
 #' a 2 by 2 experimental design (corresponding to \code{delta2} parameter.
 #'
-#' @return A `dabest_obj` object with 18 elements
+#' @return A dabest object with 18 elements
 
-#'  * `raw_data`    tibble, the dataset passed to [load()], 
-#' stored here as a tibble.
+#'  * raw_data    [tibble] The dataset passed to \code{\link{dabest}}, 
+#' stored here as a \code{\link[tibble]{tibble}}.
 
-#'  * `proportional_data`     tibble, the proportional data passed to 
-#' [load()] or calculated based on the \code{proportional}, 
-#' stored here as a tibble.
+#'  * proportional_data     [tibble] The proportional data passed to 
+#' \code{\link{load}()} or calculated based on the \code{proportional}, 
+#' stored here as a \code{\link[tibble]{tibble}}.
 
-#'  * `enquo_x`     quoted variable, the columns in \code{data} 
-#' used to plot the x axis, respectively, as supplied to [load()], 
+#'  * enquo_x     [quoted variable] The columns in \code{data} 
+#' used to plot the x axis, respectively, as supplied to \code{\link{load}()}, 
 #' this will be the treatment group column names. These are 
 #' \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
 #' \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
 #' computation of effect sizes.
 
-#'  * `enquo_y `    quoted variable, The columns in \code{data} 
-#' used to plot the y axis, respectively, as supplied to [load()], 
+#'  * enquo_y     [quoted variable] The columns in \code{data} 
+#' used to plot the y axis, respectively, as supplied to \code{\link{load}()}, 
 #' it is the column name for measurement values. These are
 #' \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for 
 #' \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
 #' computation of effect sizes.
 
-#'  * `enquo_id_col`    quoted variable. the columns in \code{ data} 
+#'  * enquo_id_col    [quoted variable] The columns in \code{.data} 
 #' used to distinguish subjects in repeated measures (i.e enquo_id_col). 
 #' This is \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable} 
 #' for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the 
 #' computation of effect sizes.
 
-#'  * `enquo_colour`  boolean, whether to plot colour aesthetics 
+#'  * enquo_colour    [Boolean] Whether to plot colour aesthetics 
 #' where the column name enquo_colour is supplied. This is 
 #' \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable} 
 #' for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during 
 #' the computation of effect sizes.
 
-#'  * `proportional`    boolean Whether the  data provided 
+#'  * proportional    [Boolean] Whether the .data provided 
 #' is proportional (i.e proportional) for 
 #' plotting the proportional bars or sankey diagrams.
 
-#'  * `minimeta`    Boolean, if TRUE, mini meta analysis will be
-#' conducted in [effect_size()] function and plotted in delta plots.
+#'  * minimeta    [Boolean] Whether mini meta analysis is 
+#' conducted and plotted.
 
-#'  * `delta2`    Boolean,  if TRUE delta-delta analysis for 
-#' 2 by 2 experimental designs will be conducted in [effect_size()] function and plotted in delta plots.
+#'  * delta2    [Boolean] Whether delta-delta analysis for 
+#' 2 by 2 experimental designs are conducted.
 
-#'  * `idx`     Vector, a vector of control-test groupings. 
+#'  * idx     [Vector] The vector of control-test groupings. 
 #' For each pair in idx, an effect size will be computed by downstream 
-#' dabestr functions used to compute e.g [effect_size()] 
-#' (such as [mean_diff()]).
+#' dabestr functions used to compute \link[=mean_diff]{effect sizes} 
+#' (such as mean_diff()).
 
-#'  * `is_paired`    Boolean, if TRUE, the experiment consists 
+#'  * is_paired     [Boolean] Whether or not the experiment consists 
 #' of paired (aka repeated) observations.
 
-#'  * `is_colour`     Boolean, if TRUE, plots produced 
+#'  * is_colour     [Boolean] Whether or not the plots produced 
 #' later will have/implement colour aesthetics to distinguish between 
 #' experimental factor levels or treatment groups.
 
-#'  * `paired`    Character, if True, the 
+#'  * paired     [Character] {paired: Whether or not the 
 #' experiment consists of paired (aka repeated) observations. Whether 
 #' they are compared with "baseline": all other groups compared with 
 #' one control group; or "sequential": paired-wise comparison and calculations 
-#' based on the order of consecutive pairs.
+#' based on the order of consecutive pairs.}
 
-#'  * `ci`     Numeric, the width of the confidence interval 
+#'  * ci     [Numeric] The width of the confidence interval 
 #' specified at the beginning for the effect size, and bootstrap calculations.
 
-#'  * `Ns`    A tibble that contains Group (group names), 
+#'  * Ns     [tibble] A tibble that contains Group (group names), 
 #' n (number of data points in the group), and swarmtick labels 
 #' for plotting (swarmticklabs).
 
-#'  * `control_summary`   List. Summary values 
+#'  * control_summary    [List] Summary values 
 #' (mean values are calculated as default), for each control group, 
 #' stored in a list respectively.
 
-#'  * `test_summary`     List, Summary values 
+#'  * test_summary     [List] Summary values 
 #' (mean values are calculated as default), for each test group, 
 #' stored in a list respectively.
 
-#'  * `ylim`     Numeric, A vector of 2 doubles that 
+#'  * ylim     [Numeric] A vector of 2 doubles that 
 #' specifies min and max values of the data. This will also 
 #' be used for plotting in producing the plots.
 #' 
-#' @examples
-#' # example code
+#' @examples 
+#' ## Loading in of the dataset
+#' data(twogroup_data)
+#' 
+#' ## Creating a dabest object
+#' dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, 
+#' idx = c("Control1", "Group1"))
 #' 
 #' @export load
 #'
@@ -156,20 +159,20 @@ load <- function(
     experiment = NULL,
     experiment_label = NULL,
     x1_level = NULL
-){
+    ){
   
   # Storing plotting params as quosures
-  enquo_x <- rlang::enquo(x)
-  enquo_y <- rlang::enquo(y)
-  enquo_id_col <- rlang::enquo(id_col)
-  enquo_colour <- rlang::enquo(colour)
+  enquo_x <- enquo(x)
+  enquo_y <- enquo(y)
+  enquo_id_col <- enquo(id_col)
+  enquo_colour <- enquo(colour)
   
-  is_colour <- isFALSE(rlang::quo_is_null(enquo_colour))
-  is_id_col <- isFALSE(rlang::quo_is_null(enquo_id_col))
+  is_colour <- isFALSE(quo_is_null(enquo_colour))
+  is_id_col <- isFALSE(quo_is_null(enquo_id_col))
   is_paired <- isFALSE(is.null(paired))
   
-  name_x <- rlang::as_name(enquo_x)
-  name_y <- rlang::as_name(enquo_y)
+  name_x <- as_name(enquo_x)
+  name_y <- as_name(enquo_y)
   
   #### Checking Validity of params ####
   if (isFALSE(name_x %in% colnames(data))) {
@@ -181,22 +184,19 @@ load <- function(
                      "x" = "Please enter a valid entry for {.field y} in {.fun load}."))
   }
   if (isTRUE(is_id_col)) {
-    if (isFALSE(rlang::as_name(enquo_id_col) %in% colnames(data))) {
+    if (isFALSE(as_name(enquo_id_col) %in% colnames(data))) {
       cli::cli_abort(c("Column {.field id_col} is {.strong not} in {.field data}.", 
                        "x" = "Please enter a valid entry for {.field id_col} in {.fun load}."))
     }
   }
   if (isTRUE(is_colour)) {
-    if (isFALSE(rlang::as_name(enquo_colour) %in% colnames(data))) {
+    if (isFALSE(as_name(enquo_colour) %in% colnames(data))) {
       cli::cli_abort(c("Column {.field colour} is {.strong not} in {.field data}.", 
                        "x" = "Please enter a valid entry for {.field colour} in {.fun load}."))
     }
   }
+  
   if (isFALSE(delta2)) {
-    if (is.null(idx)) {
-      cli::cli_abort(c("Column {.field idx} is currently NULL.", 
-                       "x" = "Please enter a valid entry for {.field idx} in {.fun load}."))
-    }
     if (is.list(idx)) {
       general_idx_lengths <- sapply(idx,length)
       if (any(general_idx_lengths<2)==TRUE) {
@@ -236,11 +236,6 @@ load <- function(
     }
   }
   
-  ## Make idx into a list if it is a vector
-  if (typeof(idx) != "list") {
-    idx <- list(idx)
-  }
-  
   ## Check for valid mini-meta 
   if (isTRUE(minimeta)) {
     if (isTRUE(proportional)) {
@@ -251,7 +246,7 @@ load <- function(
                        "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
     }
     
-    minimeta_idx_lengths <- sapply(idx, length)
+    minimeta_idx_lengths <- sapply(idx,length)
     if (any(minimeta_idx_lengths!=2)==TRUE) {
       cli::cli_abort(c("{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
                        "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."))
@@ -264,8 +259,8 @@ load <- function(
                        "x" = "{.field delta2} and {.field proportional} cannot be {.strong TRUE} at the same time."))
     }
     
-    enquo_experiment <- rlang::enquo(experiment)
-    name_experiment <- rlang::as_name(enquo_experiment)
+    enquo_experiment <- enquo(experiment)
+    name_experiment <- as_name(enquo_experiment)
     
     # Make sure that data is a 2x2 ANOVA case
     if (length(unique(data[[name_experiment]]))!=2) {
@@ -286,17 +281,17 @@ load <- function(
         data[[name_x]] = factor(x = data[[name_x]], levels = x1_level)
       }
       data <- data %>%
-        dplyr::arrange(!!enquo_experiment, !!enquo_x)
+        arrange(!!enquo_experiment, !!enquo_x)
     }
     
     data <- data %>%
-      dplyr::mutate(grouping = !!enquo_x) %>%
-      tidyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
-    if (dplyr::as_label(enquo_colour) == "NULL") {
+      mutate(grouping = !!enquo_x) %>%
+      unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    if (as_label(enquo_colour) == "NULL") {
       enquo_colour <- enquo_x
     }
     enquo_x <- enquo_experiment
-    name_x <- rlang::as_name(enquo_x)
+    name_x <- as_name(enquo_x)
     is_colour <- TRUE
     
     # Obtain idx if is null
@@ -321,78 +316,82 @@ load <- function(
   
   unlist_idx <- unlist(idx)
   
-  raw_data <- data %>%
-    dplyr::filter(!!enquo_x %in% unlist_idx) %>%
-    dplyr::mutate(x_axis_raw = 0)
-  
-  raw_data[[name_x]] = factor(x = raw_data[[name_x]], levels = unlist_idx)
-  
-  for (i in 1:length(unlist_idx)) {
-    raw_data <- raw_data %>%
-      dplyr::mutate(x_axis_raw = ifelse(
-        !!enquo_x == unlist_idx[i], i, x_axis_raw 
-      ))
-  }
-  
-  # Obtain raw_y_range_vector
-  ylim <- range(raw_data[[name_y]])
-  
-  # Creation of x-axis label
-  Ns <- raw_data %>%
-    dplyr::group_by(!!enquo_x) %>%
-    dplyr::count()
-  Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
-  
-  # Extending ylim for plotting
-  ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
-  ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
-  
-  if(isTRUE(proportional)){
-    proportional_data <- raw_data %>%
-      dplyr::select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
+  if (!is.null(idx)){
+    raw_data <- data %>%
+      filter(!!enquo_x %in% unlist_idx) %>%
+      mutate(x_axis_raw = 0)
+    
+    raw_data[[name_x]] = factor(x = raw_data[[name_x]], levels = unlist_idx)
+    
+    for (i in 1:length(unlist_idx)) {
+      raw_data <- raw_data %>%
+        mutate(x_axis_raw = ifelse(
+          !!enquo_x == unlist_idx[i], i, x_axis_raw 
+        ))
+    }
+    
+    # Obtain raw_y_range_vector
+    ylim <- range(raw_data[[name_y]])
+    
+    # Creation of x-axis label
+    Ns <- raw_data %>%
       dplyr::group_by(!!enquo_x) %>%
-      dplyr::summarise(proportion_success = mean(!!enquo_y),
-                       y_success = proportion_success/2,
-                       y_failure = (1+proportion_success)/2)
+      dplyr::count()
+    Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
     
-    control_summary <- proportional_data$proportion_success[1]
-    test_summary <- proportional_data$proportion_success[2]
+    # Extending ylim for plotting
+    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
     
-  } else {
-    # Calculation of summary lines
-    summaries <- raw_data %>%
-      dplyr::group_by(!!enquo_x) %>%
-      dplyr::summarise(summary_stats = mean(!!enquo_y))
+    if(isTRUE(proportional)){
+      ## include checks here for data to see if it is proportional data
+      proportional_data <- raw_data %>%
+        select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
+        group_by(!!enquo_x) %>%
+        summarise(proportion_success = mean(!!enquo_y),
+                  y_success = proportion_success/2,
+                  y_failure = (1+proportion_success)/2)
+      
+      control_summary <- proportional_data$proportion_success[1]
+      test_summary <- proportional_data$proportion_success[2]
+      
+    } else {
+      # Calculation of summary lines
+      summaries <- raw_data %>%
+        group_by(!!enquo_x) %>%
+        summarise(summary_stats = mean(!!enquo_y))
+      
+      # Only currently works for two-groups, if needed for extended features in future, to be changed
+      control_summary <- summaries$summary_stats[1]
+      test_summary <- summaries$summary_stats[2]
+      
+      proportional_data <- NULL
+    }
     
-    # Only currently works for two-groups, if needed for extended features in future, to be changed
-    control_summary <- summaries$summary_stats[1]
-    test_summary <- summaries$summary_stats[2]
+    dabest_object <- list(
+      raw_data = raw_data,
+      proportional_data = proportional_data,
+      enquo_x = enquo_x,
+      enquo_y = enquo_y,
+      enquo_id_col = enquo_id_col,
+      enquo_colour = enquo_colour,
+      proportional = proportional,
+      minimeta = minimeta,
+      delta2 = delta2,
+      idx = idx,
+      is_paired = is_paired,
+      is_colour = is_colour,
+      paired = paired,
+      ci = ci,
+      Ns = Ns,
+      control_summary = control_summary,
+      test_summary = test_summary,
+      ylim = ylim
+    )
     
-    proportional_data <- NULL
+    class(dabest_object) <- c("dabest")
+    
+    return(dabest_object)
   }
-  
-  dabest_object <- list(
-    raw_data = raw_data,
-    proportional_data = proportional_data,
-    enquo_x = enquo_x,
-    enquo_y = enquo_y,
-    enquo_id_col = enquo_id_col,
-    enquo_colour = enquo_colour,
-    proportional = proportional,
-    minimeta = minimeta,
-    delta2 = delta2,
-    idx = idx,
-    is_paired = is_paired,
-    is_colour = is_colour,
-    paired = paired,
-    ci = ci,
-    Ns = Ns,
-    control_summary = control_summary,
-    test_summary = test_summary,
-    ylim = ylim
-  )
-  
-  class(dabest_object) <- c("dabest")
-  
-  return(dabest_object)
+  stop()
 }
