@@ -4,7 +4,7 @@ Title: Data Analysis using Bootstrap-Coupled Estimation
 Version: 0.0.0.9000
 Authors@R: c(
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
-  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("cre", "aut")),
+  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("aut")),
   person("First Name", "Last Name", email = "name@example.com", role = c("aut")),
   person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = c("aut")),
   person("Tayfun", "Tumkaya", role = c("aut")))
@@ -24,6 +24,8 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation.
   The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
 License: file LICENSE
 Encoding: UTF-8
+Depends:
+  R (>= 2.10)
 Imports: 
   ggplot2, 
   cowplot, 
@@ -51,5 +53,6 @@ Imports:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    vdiffr
 Config/testthat/edition: 3

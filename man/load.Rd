@@ -79,66 +79,66 @@ a 2 by 2 experimental design (corresponding to \code{delta2} parameter.}
 \value{
 A dabest object with 18 elements
 \itemize{
-\item raw_data    \link{tibble} The dataset passed to \code{\link{dabest}},
+\item raw_data    tibble, The dataset passed to \code{\link{dabest}},
 stored here as a \code{\link[tibble]{tibble}}.
-\item proportional_data     \link{tibble} The proportional data passed to
+\item proportional_data     tibble, The proportional data passed to
 \code{\link{load}()} or calculated based on the \code{proportional},
 stored here as a \code{\link[tibble]{tibble}}.
-\item enquo_x     \link{quoted variable} The columns in \code{data}
+\item enquo_x     quoted variable, The columns in \code{data}
 used to plot the x axis, respectively, as supplied to \code{\link{load}()},
 this will be the treatment group column names. These are
 \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
 \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_y     \link{quoted variable} The columns in \code{data}
+\item enquo_y     quoted variable, The columns in \code{data}
 used to plot the y axis, respectively, as supplied to \code{\link{load}()},
 it is the column name for measurement values. These are
 \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
 \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_id_col    \link{quoted variable} The columns in \code{.data}
+\item enquo_id_col    quoted variable, The columns in \code{.data}
 used to distinguish subjects in repeated measures (i.e enquo_id_col).
 This is \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable}
 for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
 computation of effect sizes.
-\item enquo_colour    \link{Boolean} Whether to plot colour aesthetics
+\item enquo_colour    Boolean, Whether to plot colour aesthetics
 where the column name enquo_colour is supplied. This is
 \href{https://adv-r.hadley.nz/quasiquotation.html}{a quoted variable}
 for \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during
 the computation of effect sizes.
-\item proportional    \link{Boolean} Whether the .data provided
+\item proportional    Boolean, Whether the .data provided
 is proportional (i.e proportional) for
 plotting the proportional bars or sankey diagrams.
-\item minimeta    \link{Boolean} Whether mini meta analysis is
+\item minimeta    Boolean, Whether mini meta analysis is
 conducted and plotted.
-\item delta2    \link{Boolean} Whether delta-delta analysis for
+\item delta2    Boolean, Whether delta-delta analysis for
 2 by 2 experimental designs are conducted.
-\item idx     \link{Vector} The vector of control-test groupings.
+\item idx     Vector, The vector of control-test groupings.
 For each pair in idx, an effect size will be computed by downstream
 dabestr functions used to compute \link[=mean_diff]{effect sizes}
 (such as mean_diff()).
-\item is_paired     \link{Boolean} Whether or not the experiment consists
+\item is_paired     Boolean, Whether or not the experiment consists
 of paired (aka repeated) observations.
-\item is_colour     \link{Boolean} Whether or not the plots produced
+\item is_colour     Boolean, Whether or not the plots produced
 later will have/implement colour aesthetics to distinguish between
 experimental factor levels or treatment groups.
-\item paired     \link{Character} {paired: Whether or not the
+\item paired     Character, {paired: Whether or not the
 experiment consists of paired (aka repeated) observations. Whether
 they are compared with "baseline": all other groups compared with
 one control group; or "sequential": paired-wise comparison and calculations
 based on the order of consecutive pairs.}
-\item ci     \link{Numeric} The width of the confidence interval
+\item ci     Numeric, The width of the confidence interval
 specified at the beginning for the effect size, and bootstrap calculations.
-\item Ns     \link{tibble} A tibble that contains Group (group names),
+\item Ns     A tibble that contains Group (group names),
 n (number of data points in the group), and swarmtick labels
 for plotting (swarmticklabs).
-\item control_summary    \link{List} Summary values
+\item control_summary    List, Summary values
 (mean values are calculated as default), for each control group,
 stored in a list respectively.
-\item test_summary     \link{List} Summary values
+\item test_summary     List, Summary values
 (mean values are calculated as default), for each test group,
 stored in a list respectively.
-\item ylim     \link{Numeric} A vector of 2 doubles that
+\item ylim     Numeric, A vector of 2 doubles that
 specifies min and max values of the data. This will also
 be used for plotting in producing the plots.
 }

@@ -1,7 +1,6 @@
 #' Data to produce the basic 2-group Dabest plot
 #'
 #' Contains 2 control groups and 4 test groups.
-#' @noRd
 #' 
 #' @format A data frame with 240 rows and 5 variables:
 #'  \describe{
@@ -22,7 +21,6 @@
 #' Data to proudce multi-group Dabest plot
 #' 
 #' Contains 3 control groups and 3 test groups.
-#' @noRd
 #' 
 #' @format A data frame with 240 rows and 5 variables:
 #'  \describe{
@@ -43,7 +41,6 @@
 #' Data to proudce proportional or sankey Dabest plot (Can also be used multi-sankey)
 #' 
 #' Contains 2 control groups and 4 test groups.
-#' @noRd
 #' 
 #' @format A data frame with 240 rows and 3 variables:
 #'  \describe{
@@ -62,7 +59,6 @@
 #' Data to produce a mini-meta Dabest plot
 #' 
 #' Contains 3 control groups and 3 test groups.
-#' @noRd
 #' 
 #' @format A data frame with 120 rows and 5 variables:
 #'  \describe{
@@ -83,7 +79,6 @@
 #' Data to produce a delta2 Dabest plot
 #' 
 #' Contains 2 genotype groups and 2 treatment groups.
-#' @noRd
 #' 
 #' @format A data frame with 80 rows and 6 variables:
 #'  \describe{

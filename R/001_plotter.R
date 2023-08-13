@@ -38,7 +38,7 @@
 #' ## Plotting of dabest_obj.mean_diff
 #' dabest_plot(dabest_obj.mean_diff, TRUE) 
 #' 
-#' To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
+#' ## To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
 #' 
 #' @export
 
@@ -74,9 +74,9 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     raw_plot <- apply_palette(raw_plot, custom_palette)
     delta_plot <- apply_palette(delta_plot, custom_palette)
     
-    raw_legend <- get_legend(raw_plot + 
-                               guides(alpha = "none") +
-                               theme(legend.box.margin = margin(0, 0, 0, 0)))
+    raw_legend <- cowplot::get_legend(raw_plot + 
+                               ggplot2::guides(alpha = "none") +
+                               ggplot2::theme(legend.box.margin = ggplot2::margin(0, 0, 0, 0)))
     
     plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
     
@@ -85,9 +85,9 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     }
     
     final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none",
+      plotlist   = list(raw_plot + ggplot2::theme(legend.position="none",
                                          plot.margin = plot_margin),
-                        delta_plot + theme(legend.position="none",
+                        delta_plot + ggplot2::theme(legend.position="none",
                                            plot.margin = plot_margin)),
       nrow       = 2,
       ncol       = 1,
@@ -120,8 +120,8 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     delta_plot <- apply_palette(delta_plot, custom_palette)
     
     final_plot <- cowplot::plot_grid(
-      plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        delta_plot + theme(legend.position="none")),
+      plotlist   = list(raw_plot + ggplot2::theme(legend.position="none"), 
+                        delta_plot + ggplot2::theme(legend.position="none")),
       nrow       = 1,
       ncol       = 2,
       rel_widths = c(0.75, 0.25),
@@ -130,10 +130,10 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     )
     
     if(isTRUE(is_colour)) {
-      raw_legend <- get_legend(raw_plot + 
-                                 guides(color = guide_legend(nrow = 1),
+      raw_legend <- cowplot::get_legend(raw_plot + 
+                                 ggplot2::guides(color = ggplot2::guide_legend(nrow = 1),
                                         alpha = "none") + 
-                                 theme(legend.position = "bottom"))
+                                 ggplot2::theme(legend.position = "bottom"))
       
       final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
     }
