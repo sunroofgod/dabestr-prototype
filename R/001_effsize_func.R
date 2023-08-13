@@ -82,7 +82,8 @@ mean_diff <- function(dabest_obj) {
   output <- c(main_results, permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  
+
+  print_dabest(output,"mean_diff")
   return(output)
 }
 
@@ -116,6 +117,7 @@ median_diff <- function(dabest_obj) {
   output <- c(main_results, permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
+  print_dabest(output,"median_diff")
   return(output)
 }
 
@@ -141,6 +143,7 @@ cohens_d <- function(dabest_obj) {
                                              effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
   class(output) <- c("dabest_effectsize")
+  print_dabest(output,"cohens_d")
   return(output)
 }
 
@@ -171,6 +174,7 @@ hedges_g <- function(dabest_obj) {
                                              effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
   class(output) <- c("dabest_effectsize")
+  print_dabest(output,"hedges_g")
   return(output)
 }
 
@@ -195,6 +199,7 @@ cliffs_delta <- function(dabest_obj) {
                                              effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
   class(output) <- c("dabest_effectsize")
+  print_dabest(output,"cliffs_delta")
   return(output)
 }
 
@@ -227,6 +232,7 @@ cohens_h <- function(dabest_obj){
                                              effect_size_type = effect_size_type)
   output <- c(main_results, permtest_and_pvalues)
   class(output) <- c("dabest_effectsize")
+  print_dabest(output,"cohens_h")
   return(output)
 }
 
