@@ -127,7 +127,7 @@ create_violinplot_components <- function(boots,
       curr_x_idx <- curr_x_idx + 1
       x_axis_breaks <- append(x_axis_breaks, curr_x_idx)
       
-      ci_coords <- density(boots[[curr_boot_idx]])
+      ci_coords <- stats::density(boots[[curr_boot_idx]])
       
       x_coords_ci <- ci_coords$x
       y_coords_ci <- ci_coords$y
@@ -163,7 +163,7 @@ create_violinplot_components <- function(boots,
     }
   }
   df_for_violin <- df_for_violin %>%
-    arrange(tag, x , y)
+    dplyr::arrange(tag, x , y)
   
   plot_component <- list(
     df_for_violin = df_for_violin,

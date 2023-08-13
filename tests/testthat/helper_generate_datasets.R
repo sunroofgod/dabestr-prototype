@@ -14,7 +14,7 @@ generate_non_proportional_dataset <- function(N = 40, seed = 12345) {
   
   wide_data <- tibble::tibble(
     Control1 = c1, Control2 = c2, Control3 = c3,
-    Test1 = g1, Test2 = g2, Test3 = g3, 
+    Test1 = t1, Test2 = t2, Test3 = t3, 
     Gender = gender, ID = id)
   
   sample_tidy_dabestr_dataset <- wide_data %>%

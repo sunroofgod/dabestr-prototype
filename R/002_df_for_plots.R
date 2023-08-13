@@ -27,7 +27,7 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
 create_dfs_for_nonflow_tufte_lines <- function(idx,
                                                tufte_lines_df,
                                                enquo_x){
-  new_tufte_lines_df <- tibble()
+  new_tufte_lines_df <- tibble::tibble()
   total_length <- length(unlist(idx))
   temp_idx <- unlist(idx)
   for (i in (1: total_length)){
@@ -120,8 +120,8 @@ create_dfs_for_sankey <-  function(
                       any(!!enquo_y == 1 &
                             !!enquo_x == group[i + 1])) %>%
           dplyr::filter(success_change) %>%
-          dplyr::summarise(SS = n() / N)
-        
+          dplyr::summarise(SS = dplyr::n() / N)
+      
         success_failure <- raw_data %>%
           dplyr::group_by(!!enquo_id_col) %>%
           dplyr::summarise(sf_change =
@@ -129,7 +129,7 @@ create_dfs_for_sankey <-  function(
                       any(!!enquo_y == 0 &
                             !!enquo_x == group[i + 1])) %>%
           dplyr::filter(sf_change) %>%
-          dplyr::summarise(SF = n() / N)
+          dplyr::summarise(SF = dplyr::n() / N)
         
         failure_failire <- raw_data %>%
           dplyr::group_by(!!enquo_id_col) %>%
@@ -138,7 +138,7 @@ create_dfs_for_sankey <-  function(
                       any(!!enquo_y == 0 &
                             !!enquo_x == group[i + 1])) %>%
           dplyr::filter(failure_change) %>%
-          dplyr::summarise(FF = n() / N)
+          dplyr::summarise(FF = dplyr::n() / N)
         
         failure_success <- raw_data %>%
           dplyr::group_by(!!enquo_id_col) %>%
@@ -147,7 +147,7 @@ create_dfs_for_sankey <-  function(
                       any(!!enquo_y == 1 &
                             !!enquo_x == group[i + 1])) %>%
           dplyr::filter(failure_change) %>%
-          dplyr::summarise(FS = n() / N)
+          dplyr::summarise(FS = dplyr::n() / N)
         # find values for lower flow success to failure flow
         ss <- success_success$SS[1]
         ff <- failure_failire$FF[1]
@@ -312,7 +312,7 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
   curr_boot_idx <- 1
   
   for (i in x_idx_position) {
-    ci_coords <- density(boots[[curr_boot_idx]])
+    ci_coords <- stats::density(boots[[curr_boot_idx]])
     
     x_coords_ci <- ci_coords$x
     y_coords_ci <- ci_coords$y
@@ -336,7 +336,7 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
     curr_boot_idx <- curr_boot_idx + 1
   }
   df_for_violin <- df_for_violin %>%
-    arrange(tag, x , y)
+    dplyr::arrange(tag, x , y)
   
   return(df_for_violin)
 }
