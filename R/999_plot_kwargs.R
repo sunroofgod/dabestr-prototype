@@ -2,7 +2,76 @@
 # 
 # Contains function `assign_plot_kwargs`.
 
-# Function that handles plot_kwargs for final plotting
+#' Controlling Plot Aesthetics
+#' @name plot_kwargs
+#' 
+#' @usage dabest_plot(
+#' dabest_effectsize_obj,
+#' float_contrast = TRUE,
+#' swarm_label = "value",
+#' contast_label = "effect size",
+#' swarm_x_text = 11,
+#' swarm_y_text = 15,
+#' contrast_x_text = 11,
+#' contrast_y_text = 15,
+#' contrast_ylim = NULL,
+#' swarm_ylim = NULL,
+#' raw_marker_size = 1.5,
+#' tufte_size = 0.8,
+#' es_marker_size = 0.5,
+#' es_line_size = 0.8,
+#' raw_marker_spread = 2,
+#' show_delta2 = FALSE,
+#' show_mini_meta = FALSE,
+#' delta2_ylim = NULL,
+#' delta2_label = NULL,
+#' raw_marker_alpha = 1,
+#' raw_bar_width = 0.3,
+#' asymmetric_side = "right",
+#' raw_marker_side_shift = 0,
+#' sankey= TRUE,
+#' flow= TRUE,
+#' show_zero_dot= TRUE,
+#' show_baseline_ec = FALSE,
+#' custom_palette = "d3"
+#' )
+#' 
+#' @description 
+#' Various formats and arguments which can be specified to change the aesthetics of the dabest plot.
+#' 
+#' @details 
+#' Here are a list of the available plot_kwargs:
+#' 
+#' - `swarm_label` Label for the y-axis of the swarm plot.
+#' - `contrast_label` Label for the y-axis of the delta plot.
+#' - `swarm_x_text` Numeric value determining the font size of the x-axis of the swarm plot.
+#' - `swarm_y_text` Numeric value determining the font size of the y-axis of the swarm plot. 
+#' - `contrast_x_text` Numeric value determining the font size of the x-axis of the delta plot.
+#' - `contrast_y_text` Numeric value determining the font size of the y-axis of the delta plot.
+#' - `contrast_ylim` Vector containing the y limits for the delta plot.
+#' - `swarm_ylim` Vector containing the y limits for the swarm plot.
+#' - `raw_marker_size` Numeric value determining the size of the points used in the swarm plot. 
+#' - `tufte_size` Numeric value determining the size of the tufte line in the swarm plot.
+#' - `es_marker_size` Numeric value determining the size of the points used in the delta plot.
+#' - `es_line_size` Numeric value determining the size of the tufte line in the delta plot.
+#' - `raw_marker_spread` The distance between the points if it is a swarm plot.
+#' - `raw_marker_side_shift` The horizontal distance that the swarm plot points are moved.
+#' - `asymmetric_side` Can be either "right" or "left". Controls which side the swarm points are shown.
+#' - `show_delta2` Boolean value determining if the delta-delta plot is shown.
+#' - `show_mini_meta` Boolean value determining if the weighted average plot is shown. If False, the resulting graph would be identical
+#' to a multiple two-groups plot.
+#' - `delta2_ylim` Vector containing the y limits for the delta-delta plot.
+#' - `delta2_label` Label for the y-label for the delta-delta plot. 
+#' - `raw_marker_alpha` Numeric value determining the transparency of the points in the swarm plot.
+#' - `raw_bar_width` Numeric value determining the width of the bar in the sankey diagram.
+#' - `sankey` Boolean value determining if its a sankey diagram.
+#' - `flow` Boolean value determining 
+#' - `show_zero_dot` Boolean value determining if there is a dot on the zero line for easier comparism.
+#' - `show_baseline_ec` Boolean value determining whether the baseline curve is shown.
+#' - `custom_palette` The following palettes are available for use:
+#' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
+#' 
+#' @export
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   custom_palette <- "d3"
   
