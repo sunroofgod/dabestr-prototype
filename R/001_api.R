@@ -396,6 +396,7 @@ load <- function(
   )
   
   class(dabest_object) <- c("dabest")
-  
+
+  print_dabest(dabest_object)
   return(dabest_object)
 }
