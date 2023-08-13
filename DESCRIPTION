@@ -22,7 +22,7 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation.
   Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
   <doi:10.1038/s41592-019-0470-3>.
   The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
-License: file LICENSE
+License: Apache License (>= 2)
 Encoding: UTF-8
 Depends:
   R (>= 2.10)
@@ -32,11 +32,9 @@ Imports:
   tidyr, 
   dplyr, 
   tibble,
-  stringr, 
   rlang, 
   magrittr, 
   ggbeeswarm,
-  boot, 
   effsize,
   grid,
   scales,
@@ -45,14 +43,15 @@ Imports:
   cli,
   boot,
   stats,
-  scales,
   stringr,
   coin,
   mvtnorm,
-  multcomp
+  multcomp,
+  brunnermunzel
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3
+LazyData: true

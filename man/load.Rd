@@ -79,7 +79,7 @@ a 2 by 2 experimental design (corresponding to \code{delta2} parameter.}
 \value{
 A dabest object with 18 elements
 \itemize{
-\item raw_data    tibble, The dataset passed to \code{\link{dabest}},
+\item raw_data    tibble, The dataset passed to \code{\link{load}()},
 stored here as a \code{\link[tibble]{tibble}}.
 \item proportional_data     tibble, The proportional data passed to
 \code{\link{load}()} or calculated based on the \code{proportional},

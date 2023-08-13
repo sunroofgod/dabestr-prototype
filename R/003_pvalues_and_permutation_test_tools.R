@@ -123,7 +123,7 @@ pvals_statistics <- function(control,
                         statistic_mcnemar = statistic_mcnemar)
   } else if (effect_size == "cliffs_delta") {
     # Brunner-Munzel test
-    brunner_munzel <- coin::brunnermunzel.test(control, test, na.rm = TRUE)
+    brunner_munzel <- brunnermunzel::brunnermunzel.test(control, test, na.rm = TRUE)
     pvalue_brunner_munzel <- brunner_munzel$p.value
     statistic_brunner_munzel <- brunner_munzel$statistic
     pvals_stats <- list(pvalue_brunner_munzel = pvalue_brunner_munzel,

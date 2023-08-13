@@ -4,26 +4,32 @@
 \alias{dabest_plot}
 \title{Plotting function for dabest_effectsize_obj}
 \usage{
-dabest_plot(dabest_effectsize_obj, float_contrast = TRUE)
+dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 }
 \arguments{
-\item{dabest_effectsize_obj}{A dabest_effectsize_obj created by loading in a dabest_obj along with other specified parameters with the \code{\link[=effect_size]{effect_size()}} function.}
+\item{dabest_effectsize_obj}{A dabest_effectsize_obj created by loading in a
+dabest_obj along with other specified parameters with the \code{\link[=effect_size]{effect_size()}} function.}
 
-\item{float_contrast}{Default TRUE. If TRUE, a Gardner-Altman plot will be produced. If FALSE, a Cumming estimation plot will be produced.}
+\item{float_contrast}{Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
+If FALSE, a Cumming estimation plot will be produced.}
 
-\item{...}{Adjustment parameters to control the appearance of the plot can be found under \code{\link[=assign_plot_kwargs]{assign_plot_kwargs()}} function}
+\item{...}{Adjustment parameters to control the appearance of the plot can be
+found under \code{\link[=assign_plot_kwargs]{assign_plot_kwargs()}} function}
 }
 \value{
-A plot which shows the a beeswarm plot of the raw data while having the bootstrap effect sizes beside or below the raw data in the form of a violinplot.
+A plot which shows the a beeswarm plot of the raw data while having the
+bootstrap effect sizes beside or below the raw data in the form of a violinplot.
 }
 \description{
-Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending on whether
-float_contrast is TRUE. The plot presents all datapoints as a swarmplot, which orders each point to
-display the underlying distribution. It also presents the effect size as a bootstrap 95\% confidence interval
-(95\% CI) on a separate but aligned axes.
+Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending
+on whether float_contrast is TRUE. The plot presents all datapoints as a swarmplot,
+which orders each point to display the underlying distribution. It also presents
+the effect size as a bootstrap 95\% confidence interval (95\% CI) on a separate
+but aligned axes.
 }
 \details{
-There are some customizable aesthetics which can be inputted to change the details of the plot. Some common examples include:
+There are some customizable aesthetics which can be inputted to change the details of the plot.
+Some common examples include:
 \itemize{
 \item swarm_label. dabest_plot(dabest_effectsize_obj, swarm_label = "example_label")
 \item contrast_label. dabest_plot(dabest_effectsize_obj, contrast_label = "example_label")
@@ -31,6 +37,8 @@ There are some customizable aesthetics which can be inputted to change the detai
 \item contrast_x_text. dabest_plot(dabest_effectsize_obj, contrast_x_text= "example_text")
 \item swarm_x_text. dabest_plot(dabest_effectsize_obj, swarm_x_text = "example_text")
 }
+
+This is to be used after calculation of effect sizes with the various \code{\link[=effect_size]{effect_size()}} functions.
 }
 \examples{
 
@@ -44,6 +52,5 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 ## Plotting of dabest_obj.mean_diff
 dabest_plot(dabest_obj.mean_diff, TRUE) 
 
-## To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
 
 }
