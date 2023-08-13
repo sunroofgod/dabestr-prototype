@@ -3179,7 +3179,7 @@ twogroup_data <- wide.data %>%
 
 ```{r}
 dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
-dabest_obj.mean_diff <- cohens_d(dabest_obj)
+dabest_obj.mean_diff <- mean_diff(dabest_obj)
 # dabest_obj.hedges_g <- hedges_g(dabest_obj)
 
 # alternative way of plotting is
