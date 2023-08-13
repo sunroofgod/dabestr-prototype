@@ -83,6 +83,7 @@ mean_diff <- function(dabest_obj) {
   
   class(output) <- c("dabest_effectsize")
   print_dabest(output, effect_size_type)
+
   return(output)
 }
 
