@@ -85,7 +85,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        gap = sankey_bar_gap,
                                        sankey = sankey,
                                        idx = separated_idx,
-                                       flow = flow)
+                                       flow = flow,
+                                       N = Ns$n[1])
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
     flow_success_to_success <- sankey_df$flow_success_to_success
