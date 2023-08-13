@@ -6,8 +6,8 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. 
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param ... Adjustment parameters to control the appearance of the plot can be 
-#' found under [assign_plot_kwargs()] function
+#' @param ... Adjustment parameters to control the appearance of the plot (comprehensive
+#' list can be found under [plot_kwargs].
 #' 
 #' @returns 
 #' A plot which shows the a beeswarm plot of the raw data while having the 
