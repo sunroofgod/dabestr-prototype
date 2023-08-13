@@ -54,7 +54,7 @@
 #'
 #' @return A dabest object with 18 elements
 
-#'  * raw_data    tibble, The dataset passed to \code{\link{dabest}}, 
+#'  * raw_data    tibble, The dataset passed to \code{\link{load}()}, 
 #' stored here as a \code{\link[tibble]{tibble}}.
 
 #'  * proportional_data     tibble, The proportional data passed to 

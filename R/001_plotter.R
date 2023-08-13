@@ -2,29 +2,37 @@
 #' 
 #' @name dabest_plot
 #' 
-#' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a dabest_obj along with other specified parameters with the [effect_size()] function.
-#' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. If FALSE, a Cumming estimation plot will be produced.
-#' @param ... Adjustment parameters to control the appearance of the plot can be found under [assign_plot_kwargs()] function
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a 
+#' dabest_obj along with other specified parameters with the [effect_size()] function.
+#' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. 
+#' If FALSE, a Cumming estimation plot will be produced.
+#' @param ... Adjustment parameters to control the appearance of the plot can be 
+#' found under [assign_plot_kwargs()] function
 #' 
 #' @returns 
-#' A plot which shows the a beeswarm plot of the raw data while having the bootstrap effect sizes beside or below the raw data in the form of a violinplot.
+#' A plot which shows the a beeswarm plot of the raw data while having the 
+#' bootstrap effect sizes beside or below the raw data in the form of a violinplot.
 #'
 #' @description
-#' Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending on whether
-#' float_contrast is TRUE. The plot presents all datapoints as a swarmplot, which orders each point to
-#' display the underlying distribution. It also presents the effect size as a bootstrap 95% confidence interval
-#' (95% CI) on a separate but aligned axes.
+#' Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending 
+#' on whether float_contrast is TRUE. The plot presents all datapoints as a swarmplot, 
+#' which orders each point to display the underlying distribution. It also presents 
+#' the effect size as a bootstrap 95% confidence interval (95% CI) on a separate 
+#' but aligned axes.
 #' 
 #' @usage 
-#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE)
+#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 #' 
 #' @details 
-#' There are some customizable aesthetics which can be inputted to change the details of the plot. Some common examples include:
+#' There are some customizable aesthetics which can be inputted to change the details of the plot. 
+#' Some common examples include:
 #' - swarm_label. dabest_plot(dabest_effectsize_obj, swarm_label = "example_label")
 #' - contrast_label. dabest_plot(dabest_effectsize_obj, contrast_label = "example_label")
 #' - custom_palette ("jama","lancet","nejm"). dabest_plot(dabest_effectsize_obj, custom_palette = "jama")
 #' - contrast_x_text. dabest_plot(dabest_effectsize_obj, contrast_x_text= "example_text")
 #' - swarm_x_text. dabest_plot(dabest_effectsize_obj, swarm_x_text = "example_text")
+#' 
+#' This is to be used after calculation of effect sizes with the various [effect_size()] functions.
 #' 
 #' @examples
 #' 
@@ -38,7 +46,6 @@
 #' ## Plotting of dabest_obj.mean_diff
 #' dabest_plot(dabest_obj.mean_diff, TRUE) 
 #' 
-#' ## To be used after calculation of effect sizes with the various `effect_size` functions in _stat_tools/effsize.R.
 #' 
 #' @export
 
