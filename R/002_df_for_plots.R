@@ -53,7 +53,8 @@ create_dfs_for_sankey <-  function(
     bar_width = 0.15,
     gap,
     sankey = TRUE,
-    flow = TRUE
+    flow = TRUE,
+    N
     ){
   
   type <- ifelse(length(unlist(idx)) <= 2, 
