@@ -6,8 +6,8 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. 
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param ... Adjustment parameters to control and adjust the appearance of the plot (comprehensive
-#' list can be found under [plot_kwargs].)
+#' @param ... Adjustment parameters to control and adjust the appearance of the plot. 
+#' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #' 
 #' @description
 #' Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending 
