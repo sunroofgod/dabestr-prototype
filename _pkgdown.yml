@@ -1,4 +1,19 @@
 url: ~
 template:
   bootstrap: 5
+  bslib:
+    primary: "#0054AD"
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
 
+authors:
+  Kah Seng Lian:
+    href: https://github.com/sunroofgod
+  Zhouyu Wang:
+    href:
+  Jun Yang Liao:
+    href:
+  Joses W. Ho:
+    href:
+  Tayfun Tumkaya:
+    href:
