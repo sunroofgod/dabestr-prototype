@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# DABEST
+# dabestr
 
 <!-- badges: start -->
 
@@ -14,10 +14,9 @@ Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)]
 [![Free-to-view
 citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
-
 <!-- badges: end -->
 
-## Overview
+<!-- ## Overview -->
 
 dabestr is a package for **D**ata **A**nalysis using
 **B**ootstrap-Coupled **EST**imation.
@@ -40,10 +39,6 @@ An estimation plot has two key features.
 
 2.  It presents the **effect size** as a **bootstrap 95% confidence
     interval** on a **separate but aligned axes**.
-
-## Requirements
-
-Your version of R must be 2.10 or higher.
 
 ## Installation
 
@@ -68,7 +63,7 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 #> ===================
 #> 
 #> Good evening!
-#> The current time is 19:56 PM on Monday August 14, 2023.
+#> The current time is 23:39 PM on Monday August 14, 2023.
 #> 
 #> Effect size(s) with 95% confidence intervals will be computed for:
 #> 1. Group1 minus Control1
@@ -79,7 +74,7 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 #> ===================
 #> 
 #> Good evening!
-#> The current time is 19:56 PM on Monday August 14, 2023.
+#> The current time is 23:39 PM on Monday August 14, 2023.
 #> 
 #> The unpaired mean difference between Group1 and Control1 is 19.734 [95%CI 8.099, 31.045].
 #> The p-value of the two-sided permutation t-test is , calculated for legacy purposes only.
@@ -96,9 +91,7 @@ dabest_plot(dabest_obj.mean_diff, TRUE)
 
 ![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
 
-<!-- <img src="figures/2group/2group_float_true.png" position="center" width="550" height="550"/> -->
-
-## How to cite
+## Citation
 
 **Moving beyond P values: Everyday data analysis with estimation plots**
 
@@ -111,13 +104,6 @@ Nature Methods 2019, 1548-7105.
 [Paywalled publisher
 site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view
 PDF](https://rdcu.be/bHhJ4)
-
-## Bugs
-
-Please open a [new issue](https://github.com/ACCLAB/dabestr/issues/new).
-Include a reproducible example (aka
-[reprex](https://www.tidyverse.org/help/)) so anyone can copy-paste your
-code and move quickly towards helping you out!
 
 ## Contributing
 
