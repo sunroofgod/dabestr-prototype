@@ -13,8 +13,8 @@ dabest_obj along with other specified parameters with the \code{\link[=effect_si
 \item{float_contrast}{Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
 If FALSE, a Cumming estimation plot will be produced.}
 
-\item{...}{Adjustment parameters to control and adjust the appearance of the plot (comprehensive
-list can be found under \link{plot_kwargs}.)}
+\item{...}{Adjustment parameters to control and adjust the appearance of the plot.
+(list of all possible adjustment parameters can be found under \link{plot_kwargs})}
 }
 \description{
 Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending
