@@ -5,7 +5,7 @@ Version: 0.0.0.9000
 Authors@R: c(
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
   person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("aut")),
-  person("First Name", "Last Name", email = "name@example.com", role = c("aut")),
+  person("Jun Yang", "Liao", email = "name@example.com", role = c("aut")),
   person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = c("aut")),
   person("Tayfun", "Tumkaya", role = c("aut")))
 Description: Data Analysis using Bootstrap-Coupled ESTimation.
