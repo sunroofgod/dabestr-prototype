@@ -2,7 +2,7 @@
 % Please edit documentation in R/001_api.R
 \name{load}
 \alias{load}
-\title{Prepare Data for Analysis with dabestr}
+\title{Loading data with dabestr}
 \usage{
 load(
   data,
@@ -50,7 +50,7 @@ the plotting of proportional bars or sankey diagrams.}
 \item{delta2}{Boolean value determining Whether delta-delta analysis for
 2 by 2 experimental designs are conducted.}
 
-\item{experiment}{EExperiment column name for delta2 analysis.}
+\item{experiment}{Experiment column name for delta2 analysis.}
 
 \item{experiment_label}{String specifying the experiment label that is used to distinguish
 the experiment and the factors (being used in the plotting labels).}
@@ -59,7 +59,7 @@ the experiment and the factors (being used in the plotting labels).}
 a 2 by 2 experimental design.}
 }
 \value{
-A dabest_object list with 18 elements. The following are the elements contained within:
+Returns a dabest_object list with 18 elements. The following are the elements contained within:
 \itemize{
 \item \code{raw_data} The tidy dataframe that was passed into \code{\link[=load]{load()}}.
 \item \code{proportional_data} List of calculations related to the plotting of proportion plots.
@@ -78,27 +78,24 @@ distinguish subjects in repeated measures.
 \item \code{ci} Numeric value which determines the confidence interval
 specified for the effect size and bootstrap calculations.
 \item \code{Ns} List of labels for x-axis of the raw plot.
-\item \code{control_summary} Value for plotting of control summary lines for float_contrast= TRUE.
-\item \code{test_summary} Value for plotting of test summary lines for float_contrast = TRUE.
+\item \code{control_summary} Numeric value for plotting of control summary lines for float_contrast= TRUE.
+\item \code{test_summary} Numeric value for plotting of test summary lines for float_contrast = TRUE.
 }
 \itemize{
 \item \code{ylim} Vector containing the y limits for the raw plot.
 }
 }
 \description{
-Estimation statistics is a statistical framework that focuses on effect sizes
-and confidence intervals around them, rather than p-values and
-associated dichotomous hypothesis testing. {load}() collates the data in
-preparation for the computation of {effect sizes}. Bootstrap resampling is
-used to compute non-parametric assumption-free confidence intervals.
+\code{load()} collates the data in preparation for the computation of specified \link{effect_size}.
+Bootstrap resampling is used to compute non-parametric assumption-free confidence intervals.
 Visualization of the effect sizes and their confidence intervals using
 estimation plots is then performed with a specialized {plotting} function.
 }
 \examples{
-## Loading in of the dataset
+# Loading in of the dataset
 data(twogroup_data)
 
-## Creating a dabest object
+# Creating a dabest object
 dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, 
 idx = c("Control1", "Group1"))
 

@@ -34,9 +34,9 @@
 #' - `delta2_label` Default NULL. Label for the y-label for the delta-delta plot. 
 #' - `raw_marker_alpha` Default 1. Numeric value determining the transparency of the points in the swarm plot.
 #' - `raw_bar_width` Default 0.3. Numeric value determining the width of the bar in the sankey diagram.
-#' - `sankey` Default TRUE. Boolean value determining if its a sankey diagram.
-#' - `flow` Default TRUE. Boolean value determining 
-#' - `show_zero_dot` Default TRUE. Boolean value determining if there is a dot on the zero line for easier comparism.
+#' - `sankey` Default TRUE. Boolean value determining if the flows between the bar charts will be plotted.
+#' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
+#' - `show_zero_dot` Default TRUE. Boolean value determining if there is a dot on the zero line for easier comparison.
 #' - `show_baseline_ec` Default FALSE. Boolean value determining whether the baseline curve is shown.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
 #' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.

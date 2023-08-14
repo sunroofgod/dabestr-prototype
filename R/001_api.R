@@ -1,12 +1,9 @@
 #' 
-#' Prepare Data for Analysis with dabestr
+#' Loading data with dabestr 
 #' 
 #' @description 
-#' Estimation statistics is a statistical framework that focuses on effect sizes
-#' and confidence intervals around them, rather than p-values and
-#' associated dichotomous hypothesis testing. {load}() collates the data in 
-#' preparation for the computation of {effect sizes}. Bootstrap resampling is 
-#' used to compute non-parametric assumption-free confidence intervals. 
+#' `load()` collates the data in preparation for the computation of specified [effect_size]. 
+#' Bootstrap resampling is used to compute non-parametric assumption-free confidence intervals. 
 #' Visualization of the effect sizes and their confidence intervals using 
 #' estimation plots is then performed with a specialized {plotting} function.
 #' 
@@ -27,13 +24,14 @@
 #' @param minimeta Boolean value determining if mini-meta analysis is conducted.
 #' @param delta2 Boolean value determining Whether delta-delta analysis for 
 #' 2 by 2 experimental designs are conducted.
-#' @param experiment EExperiment column name for delta2 analysis.
+#' @param experiment Experiment column name for delta2 analysis.
 #' @param experiment_label String specifying the experiment label that is used to distinguish 
 #' the experiment and the factors (being used in the plotting labels).
 #' @param x1_level String setting the first factor level in 
 #' a 2 by 2 experimental design.
 #'
-#' @return A dabest_object list with 18 elements. The following are the elements contained within:
+#' @return 
+#' Returns a dabest_object list with 18 elements. The following are the elements contained within:
 #'
 #' - `raw_data` The tidy dataframe that was passed into [load()].
 #' - `proportional_data` List of calculations related to the plotting of proportion plots.
@@ -52,15 +50,15 @@
 #' - `ci` Numeric value which determines the confidence interval 
 #' specified for the effect size and bootstrap calculations.
 #' - `Ns` List of labels for x-axis of the raw plot.
-#' - `control_summary` Value for plotting of control summary lines for float_contrast= TRUE.
-#' - `test_summary` Value for plotting of test summary lines for float_contrast = TRUE.
+#' - `control_summary` Numeric value for plotting of control summary lines for float_contrast= TRUE.
+#' - `test_summary` Numeric value for plotting of test summary lines for float_contrast = TRUE.
 #'  * `ylim` Vector containing the y limits for the raw plot.
 #' 
 #' @examples 
-#' ## Loading in of the dataset
+#' # Loading in of the dataset
 #' data(twogroup_data)
 #' 
-#' ## Creating a dabest object
+#' # Creating a dabest object
 #' dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, 
 #' idx = c("Control1", "Group1"))
 #' 

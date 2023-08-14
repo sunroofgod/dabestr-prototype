@@ -24,4 +24,4 @@ Contains 2 genotype groups and 2 treatment groups.
 \examples{
 data(deltadelta_data) # Lazy loading. Data becomes visible as soon as it is loaded
 }
-\keyword{datasets}
+\keyword{internal}

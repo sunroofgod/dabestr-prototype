@@ -23,4 +23,4 @@ Contains 3 control groups and 3 test groups.
 \examples{
 data(multigroup_data) # Lazy loading. Data becomes visible as soon as it is loaded
 }
-\keyword{datasets}
+\keyword{internal}
