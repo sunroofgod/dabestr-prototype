@@ -1,7 +1,6 @@
 #' 
 #' Prepare Data for Analysis with dabestr
 #' 
-#' 
 #' @description 
 #' Estimation statistics is a statistical framework that focuses on effect sizes
 #' and confidence intervals around them, rather than p-values and
@@ -163,7 +162,7 @@ load <- function(
   }
   
   ## Make idx into a list if it is a vector
-  if (typeof(idx) != "list") {
+  if (typeof(idx) != "list" && isFALSE(is.null(idx))) {
     idx <- list(idx)
   }
   
@@ -217,7 +216,7 @@ load <- function(
     
     data <- data %>%
       dplyr::mutate(grouping = !!enquo_x) %>%
-      tidyr::unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+      tidyr::unite(!!enquo_experiment, c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
     if (dplyr::as_label(enquo_colour) == "NULL") {
       enquo_colour <- enquo_x
     }
