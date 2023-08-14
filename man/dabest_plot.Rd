@@ -2,7 +2,7 @@
 % Please edit documentation in R/001_plotter.R
 \name{dabest_plot}
 \alias{dabest_plot}
-\title{Plotting function for dabest_effectsize_obj}
+\title{Producing an estimation plot}
 \usage{
 dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 }
@@ -13,12 +13,8 @@ dabest_obj along with other specified parameters with the \code{\link[=effect_si
 \item{float_contrast}{Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
 If FALSE, a Cumming estimation plot will be produced.}
 
-\item{...}{Adjustment parameters to control the appearance of the plot (comprehensive
-list can be found under \link{plot_kwargs}.}
-}
-\value{
-A plot which shows the a beeswarm plot of the raw data while having the
-bootstrap effect sizes beside or below the raw data in the form of a violinplot.
+\item{...}{Adjustment parameters to control and adjust the appearance of the plot (comprehensive
+list can be found under \link{plot_kwargs}.)}
 }
 \description{
 Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending
@@ -28,29 +24,27 @@ the effect size as a bootstrap 95\% confidence interval (95\% CI) on a separate
 but aligned axes.
 }
 \details{
-There are some customizable aesthetics which can be inputted to change the details of the plot.
-Some common examples include:
+This is the final step to producing an estimation plot, where \code{dabest_plot} is
+used to construct the plot object.
+
+There are two ways of invoking the \code{dabest_plot} function on your \code{dabest_effectsize_obj}.
 \itemize{
-\item swarm_label. dabest_plot(dabest_effectsize_obj, swarm_label = "example_label")
-\item contrast_label. dabest_plot(dabest_effectsize_obj, contrast_label = "example_label")
-\item custom_palette ("jama","lancet","nejm"). dabest_plot(dabest_effectsize_obj, custom_palette = "jama")
-\item contrast_x_text. dabest_plot(dabest_effectsize_obj, contrast_x_text= "example_text")
-\item swarm_x_text. dabest_plot(dabest_effectsize_obj, swarm_x_text = "example_text")
+\item \code{dabest_plot(dabest_effectsize_obj, ...)}
+\item \code{dabest_effectsize_obj \%>\% dabest_plot(...) }
 }
 
-This is to be used after calculation of effect sizes with the various \code{\link[=effect_size]{effect_size()}} functions.
+The function also features a large number of optional plot aesthetic adjustment arguments.
+The entire list of available adjustable plot aesthetics can be found under \link{plot_kwargs}.
 }
 \examples{
-
-## Loading of the dataset
+# Loading of the dataset
 data(twogroup_data)
 
-## Preparing the data to be plotted
+# Preparing the data to be plotted
 dabest_obj <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 
-## Plotting of dabest_obj.mean_diff
+# Plotting of dabest_obj.mean_diff
 dabest_plot(dabest_obj.mean_diff, TRUE) 
-
 
 }

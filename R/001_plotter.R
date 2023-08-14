@@ -1,4 +1,4 @@
-#' Plotting function for dabest_effectsize_obj
+#' Producing an estimation plot
 #' 
 #' @name dabest_plot
 #' 
@@ -6,13 +6,9 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. 
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param ... Adjustment parameters to control the appearance of the plot (comprehensive
-#' list can be found under [plot_kwargs].
+#' @param ... Adjustment parameters to control and adjust the appearance of the plot (comprehensive
+#' list can be found under [plot_kwargs].)
 #' 
-#' @returns 
-#' A plot which shows the a beeswarm plot of the raw data while having the 
-#' bootstrap effect sizes beside or below the raw data in the form of a violinplot.
-#'
 #' @description
 #' Produces a Gardner-Altman estimation plot or a Cumming estimation plot depending 
 #' on whether float_contrast is TRUE. The plot presents all datapoints as a swarmplot, 
@@ -24,28 +20,26 @@
 #' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 #' 
 #' @details 
-#' There are some customizable aesthetics which can be inputted to change the details of the plot. 
-#' Some common examples include:
-#' - swarm_label. dabest_plot(dabest_effectsize_obj, swarm_label = "example_label")
-#' - contrast_label. dabest_plot(dabest_effectsize_obj, contrast_label = "example_label")
-#' - custom_palette ("jama","lancet","nejm"). dabest_plot(dabest_effectsize_obj, custom_palette = "jama")
-#' - contrast_x_text. dabest_plot(dabest_effectsize_obj, contrast_x_text= "example_text")
-#' - swarm_x_text. dabest_plot(dabest_effectsize_obj, swarm_x_text = "example_text")
+#' This is the final step to producing an estimation plot, where `dabest_plot` is 
+#' used to construct the plot object.  
 #' 
-#' This is to be used after calculation of effect sizes with the various [effect_size()] functions.
+#' There are two ways of invoking the `dabest_plot` function on your `dabest_effectsize_obj`.
+#' - `dabest_plot(dabest_effectsize_obj, ...)`
+#' - `dabest_effectsize_obj %>% dabest_plot(...) `
+#' 
+#' The function also features a large number of optional plot aesthetic adjustment arguments.
+#' The entire list of available adjustable plot aesthetics can be found under [plot_kwargs].
 #' 
 #' @examples
-#' 
-#' ## Loading of the dataset
+#' # Loading of the dataset
 #' data(twogroup_data)
 #' 
-#' ## Preparing the data to be plotted
+#' # Preparing the data to be plotted
 #' dabest_obj <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #' 
-#' ## Plotting of dabest_obj.mean_diff
+#' # Plotting of dabest_obj.mean_diff
 #' dabest_plot(dabest_obj.mean_diff, TRUE) 
-#' 
 #' 
 #' @export
 

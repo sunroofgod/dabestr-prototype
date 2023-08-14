@@ -8,7 +8,7 @@
 \alias{hedges_g}
 \alias{cliffs_delta}
 \alias{cohens_h}
-\title{Effect Size function for dabest_obj}
+\title{Effect sizes}
 \usage{
 mean_diff(dabest_obj)
 
@@ -23,31 +23,32 @@ cliffs_delta(dabest_obj)
 cohens_h(dabest_obj)
 }
 \arguments{
-\item{dabest_obj}{dabest_obj created by loading in dataset along with other specified parameters with the \code{\link[=load]{load()}} function.}
+\item{dabest_obj}{A dabest_obj created by loading in dataset along with other
+specified parameters with the \code{\link[=load]{load()}} function.}
 }
 \value{
-A \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
+Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
 \itemize{
-\item \code{raw_data} The dataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
+\item \code{raw_data} The tidydataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
 \item \code{idx} The list of control-test groupings as initially passed to \code{\link[=load]{load()}}.
-\item \code{delta_x_labels} labels for the x-axis of the delta plot.
-\item \code{delta_y_labels} labels for the y-axis of the delta plot.
-\item \code{Ns} list of labels for x-axis of the raw plot.
-\item \code{raw_y_labels} labels for the y-axis of the raw plot.
-\item \code{is_paired} boolean value determining if it is a paired plot.
-\item \code{is_colour} boolean value determining if there is a colour column for the plot.
-\item \code{paired} paired ("sequential" or "baseline") as initially passed to \code{\link[=load]{load()}}.
-\item \code{control_summary} value for plotting of control summary lines for float_contrast = \code{TRUE}.
-\item \code{test_summary} value for plotting of control summary lines for float_contrast = \code{TRUE}.
-\item \code{ylim} vector containing the y limits for the raw plot.
-\item \code{enquo_x} quosure of x as initially passed to \code{\link[=load]{load()}}.
-\item \code{enquo_y} quosure of y as initially passed to \code{\link[=load]{load()}}.
-\item \code{enquo_id_col} quosure of id_col as initially passed to \code{\link[=load]{load()}}.
-\item \code{enquo_colour} quosure of colour as initially passed to \code{\link[=load]{load()}}.
-\item \code{proportional} boolean value as initially passed to \code{\link[=load]{load()}}.
-\item \code{minimeta} boolean value as initially passed to \code{\link[=load]{load()}}.
-\item \code{delta} boolean value as initially passed to \code{\link[=load]{load()}}.
-\item \code{proportional_data} list of calculations related to the plotting of proportion plots.
+\item \code{delta_x_labels} Vector containing labels for the x-axis of the delta plot.
+\item \code{delta_y_labels} String label for the y-axis of the delta plot.
+\item \code{Ns} List of labels for x-axis of the raw plot.
+\item \code{raw_y_labels} Vector containing labels for the y-axis of the raw plot.
+\item \code{is_paired} Boolean value determining if it is a paired plot.
+\item \code{is_colour} Boolean value determining if there is a colour column for the plot.
+\item \code{paired} Paired ("sequential" or "baseline") as initially passed to \code{\link[=load]{load()}}.
+\item \code{control_summary} Numeric value for plotting of control summary lines for float_contrast = \code{TRUE}.
+\item \code{test_summary} Numeric value for plotting of control summary lines for float_contrast = \code{TRUE}.
+\item \code{ylim} Vector containing the y limits for the raw plot.
+\item \code{enquo_x} Quosure of x as initially passed to \code{\link[=load]{load()}}.
+\item \code{enquo_y} Quosure of y as initially passed to \code{\link[=load]{load()}}.
+\item \code{enquo_id_col} Quosure of id_col as initially passed to \code{\link[=load]{load()}}.
+\item \code{enquo_colour} Quosure of colour as initially passed to \code{\link[=load]{load()}}.
+\item \code{proportional} Boolean value as initially passed to \code{\link[=load]{load()}}.
+\item \code{minimeta} Boolean value as initially passed to \code{\link[=load]{load()}}.
+\item \code{delta} Boolean value as initially passed to \code{\link[=load]{load()}}.
+\item \code{proportional_data} List of calculations related to the plotting of proportion plots.
 \item \code{boot_result} list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
 \item \code{permtest_pvals} list containing values related to the calculations of permutation t tests and the corresponding p values,
 and p values for different types of effect sizes and different statistical tests.
@@ -55,29 +56,27 @@ and p values for different types of effect sizes and different statistical tests
 }
 \description{
 Calculates the effect size for each pairing of control and test group in \code{dabest_obj$idx}.
+Bias-corrected and accelerated bootstrap (BCa) correction is
+then applied to the resampling bootstrap distribution of the effect size.
+
 These five effect sizes \code{mean_diff}, \code{median_diff}, \code{cohens_d}, \code{hedges_g} and \code{cliffs_delta}
 are used for most plot types.
 }
 \details{
-The plot types listed under here are only able to use the following effect sizes.
+The plot types listed under here are limited to use only the following effect sizes.
 \itemize{
-\item Proportion plots offers only \code{mean_diff} and \code{cohens_h}
-\item Mini-Meta Delta plots offers only \code{mean_diff}
+\item Proportion plots offers only \code{mean_diff} and \code{cohens_h}.
+\item Mini-Meta Delta plots offers only \code{mean_diff}.
 }
 
 The other plots are able to use all given basic effect sizes as listed in the Description.
 }
 \examples{
-data <- data.frame(Group = c("Control1", "Control1", "Test1", "Test1"),
-                   Measurement = c(100, 80, 50, 40)) 
+# Loading of the dataset
+data(twogroup_data)
 
-dabest_obj <- load(data, x = Group, y = Measurement, idx = c("Control1", "Test1"))
+# Preparing the data to be plotted
+dabest_obj <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
-dabest_obj.mean_diff
-
-# Alternatively, you can pipe it using the `\%>\%` operator from the magrittr library like so
-dabest_obj.mean_diff <- load(data, x = Group, y = Measurement, idx = c("Control1", "Test1")) \%>\% 
-                          mean_diff()
-dabest_obj.mean_diff
 
 }

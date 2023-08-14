@@ -2,6 +2,7 @@
 #'
 #' Contains 2 control groups and 4 test groups.
 #' 
+#' @keywords internal
 #' @format A data frame with 240 rows and 5 variables:
 #'  \describe{
 #'       \item{Dummy}{Dummy}
@@ -22,6 +23,7 @@
 #' 
 #' Contains 3 control groups and 3 test groups.
 #' 
+#' @keywords internal
 #' @format A data frame with 240 rows and 5 variables:
 #'  \describe{
 #'       \item{Dummy}{Dummy}
@@ -42,6 +44,7 @@
 #' 
 #' Contains 2 control groups and 4 test groups.
 #' 
+#' @keywords internal
 #' @format A data frame with 240 rows and 3 variables:
 #'  \describe{
 #'       \item{Group}{Which control group or test it is}
@@ -60,6 +63,7 @@
 #' 
 #' Contains 3 control groups and 3 test groups.
 #' 
+#' @keywords internal
 #' @format A data frame with 120 rows and 5 variables:
 #'  \describe{
 #'       \item{Dummy}{Dummy}
@@ -80,6 +84,7 @@
 #' 
 #' Contains 2 genotype groups and 2 treatment groups.
 #' 
+#' @keywords internal
 #' @format A data frame with 80 rows and 6 variables:
 #'  \describe{
 #'       \item{Dummy}{Dummy}

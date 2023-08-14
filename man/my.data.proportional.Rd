@@ -21,4 +21,4 @@ Contains 2 control groups and 4 test groups.
 \examples{
 data(my.data.proportional) # Lazy loading. Data becomes visible as soon as it is loaded
 }
-\keyword{datasets}
+\keyword{internal}

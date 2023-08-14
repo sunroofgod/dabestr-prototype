@@ -6,6 +6,10 @@ template:
     border-radius: 0.5rem
     btn-border-radius: 0.25rem
 
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors]
+
 authors:
   Kah Seng Lian:
     href: https://github.com/sunroofgod
@@ -13,7 +17,7 @@ authors:
     href:
   Jun Yang Liao:
     href:
-  Joses W. Ho:
-    href:
-  Tayfun Tumkaya:
-    href:
+  footer:
+    roles: [cre, aut, ctb]
+  sidebars:
+    roles: [aut, cre, fnd]

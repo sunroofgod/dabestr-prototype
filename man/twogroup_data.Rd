@@ -23,4 +23,4 @@ Contains 2 control groups and 4 test groups.
 \examples{
 data(twogroup_data) # Lazy loading. Data becomes visible as soon as it is loaded.
 }
-\keyword{datasets}
+\keyword{internal}
