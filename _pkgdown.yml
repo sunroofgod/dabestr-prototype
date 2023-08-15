@@ -10,10 +10,29 @@ home:
   sidebar:
     structure: [links, license, community, citation, authors]
 
+navbar:
+  structure:
+    left: [intro, reference, articles, tutorials, news]
+    right: [search, github]
+
+reference:
+- subtitle: Main API 
+  desc: >
+    Functions responsible for producing an estimation plot. They have been 
+    sequentially organised for their intended procedural utilisation. 
+- contents: 
+  - load
+  - effect_size
+  - dabest_plot
+
+- subtitle: Adjusting plot aesthetics
+- contents:
+  - plot_kwargs
+
 authors:
   Kah Seng Lian:
     href: https://github.com/sunroofgod
-  Zhouyu Wang:
+  Zhuoyu Wang:
     href:
   Jun Yang Liao:
     href:

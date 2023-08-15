@@ -8,7 +8,7 @@
 \alias{hedges_g}
 \alias{cliffs_delta}
 \alias{cohens_h}
-\title{Effect sizes}
+\title{Calculating effect sizes}
 \usage{
 mean_diff(dabest_obj)
 
@@ -55,11 +55,11 @@ and p values for different types of effect sizes and different statistical tests
 }
 }
 \description{
-Calculates the effect size for each pairing of control and test group in \code{dabest_obj$idx}.
-Bias-corrected and accelerated bootstrap (BCa) correction is
-then applied to the resampling bootstrap distribution of the effect size.
+Computes the effect size for each control-test group pairing in \code{idx}.
+The resampling bootstrap distribution of the effect size is then subjected
+to Bias-corrected and accelerated bootstrap (BCa) correction.
 
-These five effect sizes \code{mean_diff}, \code{median_diff}, \code{cohens_d}, \code{hedges_g} and \code{cliffs_delta}
+The following effect sizes \code{mean_diff}, \code{median_diff}, \code{cohens_d}, \code{hedges_g} and \code{cliffs_delta}
 are used for most plot types.
 }
 \details{

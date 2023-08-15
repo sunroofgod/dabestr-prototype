@@ -2,18 +2,17 @@
 # 
 # Contains function `assign_plot_kwargs`.
 
-#' Controlling Plot Aesthetics
+#' Adjustable Plot Aesthetics
 #' @name plot_kwargs
 #' 
 #' @description 
-#' Various formats and arguments which can be specified to change the aesthetics of the dabest plot.
-#' 
-#' @details 
-#' Here are a list of the available plot_kwargs:
+#' These are the available plot kwargs for adjusting the plot aesthetics of your
+#' estimation plot:
 #' 
 #' - `swarm_label` Default "value" or "proportion of success" for proportion plots. 
 #' Label for the y-axis of the swarm plot.
-#' - `contrast_label` Default "effect size", based on the effect sizes as given in [effect_size()]. Label for the y-axis of the delta plot.
+#' - `contrast_label` Default "effect size", based on the effect sizes as given in [effect_size()]. 
+#' Label for the y-axis of the contrast plot.
 #' - `swarm_x_text` Default 11. Numeric value determining the font size of the x-axis of the swarm plot.
 #' - `swarm_y_text` Default 15. Numeric value determining the font size of the y-axis of the swarm plot. 
 #' - `contrast_x_text` Default 11. Numeric value determining the font size of the x-axis of the delta plot.

@@ -2,7 +2,7 @@
 #' Loading data with dabestr 
 #' 
 #' @description 
-#' Loads and converts a dataset into the dabestr format. 
+#' Processes and converts a tidy dataset into the dabestr format. 
 #' The output of this function is then used as an input for various procedural
 #' functions within dabestr to create estimation plots. 
 #' 
@@ -52,13 +52,6 @@
 #' - `control_summary` Numeric value for plotting of control summary lines for float_contrast= TRUE.
 #' - `test_summary` Numeric value for plotting of test summary lines for float_contrast = TRUE.
 #'  * `ylim` Vector containing the y limits for the raw plot.
-#' 
-#' @details
-#' The steps of producing an estimation plot with dabestr is as follows
-#' 
-#' 1. Loading in tidy dataset with [load()].
-#' 2. Calculate effect sizes using [effect_size()].
-#' 3. Construct plot object using [dabest_plot()]
 #' 
 #' 
 #' @examples 
