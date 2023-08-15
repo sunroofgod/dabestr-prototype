@@ -2,16 +2,15 @@
 % Please edit documentation in R/999_plot_kwargs.R
 \name{plot_kwargs}
 \alias{plot_kwargs}
-\title{Controlling Plot Aesthetics}
+\title{Adjustable Plot Aesthetics}
 \description{
-Various formats and arguments which can be specified to change the aesthetics of the dabest plot.
-}
-\details{
-Here are a list of the available plot_kwargs:
+These are the available plot kwargs for adjusting the plot aesthetics of your
+estimation plot:
 \itemize{
 \item \code{swarm_label} Default "value" or "proportion of success" for proportion plots.
 Label for the y-axis of the swarm plot.
-\item \code{contrast_label} Default "effect size", based on the effect sizes as given in \code{\link[=effect_size]{effect_size()}}. Label for the y-axis of the delta plot.
+\item \code{contrast_label} Default "effect size", based on the effect sizes as given in \code{\link[=effect_size]{effect_size()}}.
+Label for the y-axis of the contrast plot.
 \item \code{swarm_x_text} Default 11. Numeric value determining the font size of the x-axis of the swarm plot.
 \item \code{swarm_y_text} Default 15. Numeric value determining the font size of the y-axis of the swarm plot.
 \item \code{contrast_x_text} Default 11. Numeric value determining the font size of the x-axis of the delta plot.

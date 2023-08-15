@@ -86,17 +86,9 @@ specified for the effect size and bootstrap calculations.
 }
 }
 \description{
-Loads and converts a dataset into the dabestr format.
+Processes and converts a tidy dataset into the dabestr format.
 The output of this function is then used as an input for various procedural
 functions within dabestr to create estimation plots.
-}
-\details{
-The steps of producing an estimation plot with dabestr is as follows
-\enumerate{
-\item Loading in tidy dataset with \code{\link[=load]{load()}}.
-\item Calculate effect sizes using \code{\link[=effect_size]{effect_size()}}.
-\item Construct plot object using \code{\link[=dabest_plot]{dabest_plot()}}
-}
 }
 \examples{
 # Loading in of the dataset

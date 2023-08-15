@@ -175,7 +175,8 @@ png(file = "figures/multigroup/multigroup_unpaired.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, es_marker_size = 1, raw_marker_spread = 1.5, raw_marker_size = 1.2)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, raw_marker_side_shift = 0.2, raw_marker_spread = 2,
+            raw_marker_size = 1.6, raw_marker_alpha = 0.8)
 dev.off()
 
 jpeg(file = "figures/multigroup/multigroup_unpaired_colour.jpeg",
@@ -220,7 +221,7 @@ dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco"
 ## export
 ```{r}
 png(file = "figures/multigroup/multigroup_sequential.png",
-    width = 7,
+    width = 8,
     height = 5.5,
     units = "in",
     pointsize = 12,
@@ -229,13 +230,12 @@ png(file = "figures/multigroup/multigroup_sequential.png",
 dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 
-jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
-    width = 7,
+png(file = "figures/multigroup/multigroup_baseline_colour.png",
+    width = 8,
     height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
-    quality = 100,
     bg = "white")
 dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
@@ -340,13 +340,12 @@ png(file = "figures/proportion/2group_proportion_float_true.png",
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE)
 dev.off()
 
-jpeg(file = "figures/proportion/multigroup_proportion.jpeg",
+png(file = "figures/proportion/multigroup_proportion.png",
     width = 5.5,
     height = 5.5,
     units = "in",
     pointsize = 12,
     res = 1200,
-    quality = 100,
     bg = "white")
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.4)
 dev.off()
@@ -516,7 +515,7 @@ deltadelta_data <- wide.data %>%
 dabest_obj_multigroup_deltadelta <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), colour = Genotype)
 dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
 
-dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE, raw_marker_spread = 2.5)
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE, show_delta2 = FALSE)
 ```
 
@@ -555,7 +554,7 @@ png(file = "figures/deltadelta/multigroup_deltadelta_unpaired.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, FALSE, raw_marker_spread = 2.5)
 dev.off()
 
 png(file = "figures/deltadelta/multigroup_deltadelta_paired.png",

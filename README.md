@@ -8,7 +8,7 @@
 [![Travis CI build
 status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 [![minimal R
-version](https://img.shields.io/badge/R%3E%3D-2.10-6666ff.svg)](https://cran.r-project.org/)  
+version](https://img.shields.io/badge/R%3E%3D-2.10-6666ff.svg)](https://cran.r-project.org/)
 [![CRAN Download
 Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)](https://cran.r-project.org/package=dabestr)
 [![Free-to-view
@@ -42,16 +42,13 @@ An estimation plot has two key features.
 
 ## Installation
 
-    git clone https://github.com/ACCLAB/dabestr
+``` bash
+git clone https://github.com/ACCLAB/dabestr
+```
 
 ## Usage
 
 ``` r
-devtools::load_all(".")
-#> ℹ Loading dabestr
-#> Warning: package 'testthat' was built under R version 4.1.2
-
-## Loading in data
 data(twogroup_data)
 
 dabest_obj.mean_diff <- dabestr::load(data = twogroup_data, 
@@ -62,8 +59,8 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 #> DABESTR v0.0.0.9000
 #> ===================
 #> 
-#> Good evening!
-#> The current time is 23:39 PM on Monday August 14, 2023.
+#> Good afternoon!
+#> The current time is 17:12 PM on Tuesday August 15, 2023.
 #> 
 #> Effect size(s) with 95% confidence intervals will be computed for:
 #> 1. Group1 minus Control1
@@ -73,8 +70,8 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 #> DABESTR v0.0.0.9000
 #> ===================
 #> 
-#> Good evening!
-#> The current time is 23:39 PM on Monday August 14, 2023.
+#> Good afternoon!
+#> The current time is 17:12 PM on Tuesday August 15, 2023.
 #> 
 #> The unpaired mean difference between Group1 and Control1 is 19.734 [95%CI 8.099, 31.045].
 #> The p-value of the two-sided permutation t-test is , calculated for legacy purposes only.
@@ -89,7 +86,7 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ## Citation
 
@@ -114,42 +111,6 @@ first.
 We also have a [Code of
 Conduct](https://github.com/ACCLAB/dabestr/blob/master/CODE_OF_CONDUCT.md)
 to foster an inclusive and productive space.
-
-### A wish list for new features
-
-Currently, DABEST offers functions to handle data traditionally analyzed
-with Student’s paired and unpaired t-tests. It also offers plots for
-multiplexed versions of these, and the estimation counterpart to a 1-way
-analysis of variance (ANOVA), the shared-control design. While these
-five functions execute a large fraction of common biomedical data
-analyses, there remain three others: 2-way data, time-series group data,
-and proportional data. We aim to add these new functions to both the R
-and Python libraries.
-
-● In many experiments, four groups are investigate to isolate an
-interaction, for example: a genotype × drug effect. Here, wild-type and
-mutant animals are each subjected to drug or sham treatments; the data
-are traditionally analysed with a 2×2 ANOVA. We have received requests
-by email, Twitter, and GitHub to implement an estimation counterpart to
-the 2-way ANOVA. To do this, we will implement ∆∆ plots, in which the
-difference of means (∆) of two groups is subtracted from a second
-two-group ∆.
-
-● Currently, DABEST can analyse multiple paired data in a single plot,
-and multiple groups with a common, shared control. However, a common
-design in biomedical science is to follow the same group of subjects
-over multiple, successive time points. An estimation plot for this would
-combine elements of the two other designs, and could be used in place of
-a repeated-measures ANOVA.
-
-● We have observed that proportional data are often analyzed in
-neuroscience and other areas of biomedical research. However, compared
-to other data types, the charts are frequently impoverished: often, they
-omit error bars, sample sizes, and even P values—let alone effect sizes.
-We would like DABEST to feature proportion charts, with error bars and a
-curve for the distribution of the proportional differences.
-
-We encourage contributions for the above features.
 
 ## Dabestr in other languages
 

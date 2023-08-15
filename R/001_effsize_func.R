@@ -1,13 +1,13 @@
-#' Effect sizes
+#' Calculating effect sizes
 #' 
 #' @name effect_size
 #' 
 #' @description
-#' Calculates the effect size for each pairing of control and test group in `dabest_obj$idx`.
-#' Bias-corrected and accelerated bootstrap (BCa) correction is
-#' then applied to the resampling bootstrap distribution of the effect size.
+#' Computes the effect size for each control-test group pairing in `idx`.
+#' The resampling bootstrap distribution of the effect size is then subjected
+#' to Bias-corrected and accelerated bootstrap (BCa) correction.
 #' 
-#' These five effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
+#' The following effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
 #' are used for most plot types. 
 #' 
 #' @param dabest_obj A dabest_obj created by loading in dataset along with other 

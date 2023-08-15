@@ -23,19 +23,6 @@ which orders each point to display the underlying distribution. It also presents
 the effect size as a bootstrap 95\% confidence interval (95\% CI) on a separate
 but aligned axes.
 }
-\details{
-This is the final step to producing an estimation plot, where \code{dabest_plot} is
-used to construct the plot object.
-
-There are two ways of invoking the \code{dabest_plot} function on your \code{dabest_effectsize_obj}.
-\itemize{
-\item \code{dabest_plot(dabest_effectsize_obj, ...)}
-\item \code{dabest_effectsize_obj \%>\% dabest_plot(...) }
-}
-
-The function also features a large number of optional plot aesthetic adjustment arguments.
-The entire list of available adjustable plot aesthetics can be found under \link{plot_kwargs}.
-}
 \examples{
 # Loading of the dataset
 data(twogroup_data)

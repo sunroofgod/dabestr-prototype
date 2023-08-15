@@ -1,0 +1,109 @@
+---
+title: "Controlling Plot Aesthetics"
+output: rmarkdown::html_vignette
+description: |
+  Loading in of sample datasets for dabestr.
+vignette: >
+  %\VignetteIndexEntry{Controlling Plot Aesthetics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+Controlling plot aesthetics is very simple in dabestr. An integral part to the 
+design of dabestr is to allow its users to freely adjust the various components
+of a DABEST estimation plot, allowing for the most ideal looking plot to be
+produced.
+
+## Getting started
+At this point, we assume that you have already obtained the `dabest_effectsize_obj`.
+To add and adjust specific plot components, simply add it as a argument into the 
+`dabest_plot()` function. If you're missing a step, start from `load()`.
+
+```{r, eval = FALSE}
+dabest_plot(
+  dabest_effectsize_obj,
+  float_contrast = TRUE,
+  swarm_label = "value",
+  contast_label = "effect size",
+  swarm_x_text = 11,
+  swarm_y_text = 15,
+  contrast_x_text = 11,
+  contrast_y_text = 15,
+  contrast_ylim = NULL,
+  swarm_ylim = NULL,
+  raw_marker_size = 1.5,
+  tufte_size = 0.8,
+  es_marker_size = 0.5,
+  es_line_size = 0.8,
+  raw_marker_spread = 2,
+  show_delta2 = FALSE,
+  show_mini_meta = FALSE,
+  delta2_ylim = NULL,
+  delta2_label = NULL,
+  raw_marker_alpha = 1,
+  raw_bar_width = 0.3,
+  asymmetric_side = "right",
+  raw_marker_side_shift = 0,
+  sankey= TRUE,
+  flow= TRUE,
+  show_zero_dot= TRUE,
+  show_baseline_ec = FALSE,
+  custom_palette = "d3"
+)
+```
+
+
+## Adjusting Text
+All text elements in the estimation plot can be adjusted. This includes the value,
+the size and even removal of the text elements completely.
+
+### Size
+This is the list of parameters for adjusting the size of the text elements.
+
+- `swarm_x_text`: Default 11. Numeric value determining the font size of the x-axis of the swarm plot.
+- `swarm_y_text`: Default 15. Numeric value determining the font size of the y-axis of the swarm plot.
+- `contrast_x_text`: Default 11. Numeric value determining the font size of the x-axis of the contrast plot.
+- `contrast_y_text`: Default 15. Numeric value determining the font size of the y-axis of the contrast plot.
+
+```{r, include = FALSE}
+devtools::load_all(".")
+data(twogroup_data)
+dabest_twogroup_obj.mean_diff <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1")) %>% 
+  mean_diff()
+```
+
+```{r}
+dabest_plot(
+  dabest_twogroup_obj.mean_diff, 
+  float_contrast = TRUE, 
+  swarm_x_text = 30, 
+  swarm_y_text = 1, 
+  contrast_x_text = 30, 
+  contrast_y_text = 5
+)
+```
+
+### Labels
+This is the list of parameters for adjusting the label of the text elements.
+
+- `swarm_label`: Default "value" or "proportion of success" for proportion plots. Label for the y-axis of the swarm plot.
+- `contrast_label`: Default "effect size", based on the effect sizes as given in [effect_size()]. Label for the y-axis of the contrast plot.
+- `delta2_label`: Default NULL. Label for the y-label for the delta-delta plot. 
+
+```{r}
+dabest_plot(
+  dabest_twogroup_obj.mean_diff, 
+  float_contrast = TRUE, 
+  swarm_label = "I love estimation statistics.",
+  contrast_label = "I love it more than you do!"
+)
+```

@@ -19,17 +19,6 @@
 #' @usage 
 #' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 #' 
-#' @details 
-#' This is the final step to producing an estimation plot, where `dabest_plot` is 
-#' used to construct the plot object.  
-#' 
-#' There are two ways of invoking the `dabest_plot` function on your `dabest_effectsize_obj`.
-#' - `dabest_plot(dabest_effectsize_obj, ...)`
-#' - `dabest_effectsize_obj %>% dabest_plot(...) `
-#' 
-#' The function also features a large number of optional plot aesthetic adjustment arguments.
-#' The entire list of available adjustable plot aesthetics can be found under [plot_kwargs].
-#' 
 #' @examples
 #' # Loading of the dataset
 #' data(twogroup_data)
