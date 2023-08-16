@@ -15,7 +15,8 @@
 #' @param id_col Column name indicating the identity of the
 #'  datapoint if the data is paired. Must be supplied if paired is TRUE.
 #' @param ci Double ranging from 0 to 100 which determines the bca_low and 
-#' bca_high confidence interval calculations
+#' bca_high confidence interval calculations.
+#' @param resamples The number of resamples to be used to generate the effect size bootstraps.
 #' @param colour Column name indicating the column to implement colour aesthetics 
 #' in plotting functions.
 #' @param proportional Boolean value determining whether the data provided is for
@@ -72,6 +73,7 @@ load <- function(
     paired = NULL,
     id_col = NULL,
     ci = 95,
+    resamples =5000,
     colour = NULL,
     proportional = FALSE,
     minimeta = FALSE,
@@ -305,6 +307,7 @@ load <- function(
     minimeta = minimeta,
     delta2 = delta2,
     idx = idx,
+    resamples = resamples,
     is_paired = is_paired,
     is_colour = is_colour,
     paired = paired,
@@ -317,6 +320,5 @@ load <- function(
   
   class(dabest_object) <- c("dabest")
 
-  print_dabest(dabest_object)
   return(dabest_object)
 }
