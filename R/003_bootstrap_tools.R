@@ -44,6 +44,7 @@ bootstrap <- function(
   
   raw_data <- dabest_obj$raw_data
   idx <- dabest_obj$idx
+  resamples <- dabest_obj$resamples
   
   if (isFALSE(is.list(idx))) {
     idx <- list(idx)
@@ -280,6 +281,7 @@ bootstrap <- function(
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
+              resamples = resamples,
               Ns = dabest_obj$Ns,
               control_summary = dabest_obj$control_summary,
               test_summary = dabest_obj$test_summary,
