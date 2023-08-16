@@ -214,7 +214,7 @@ cliffs_delta <- function(dabest_obj,perm_count=5000) {
                                              ef_size_fn = effect_size_func,
                                              effect_size_type = effect_size_type,
                                              perm_count = perm_count)
-  output <- c(main_results, elist(effect_size_type = effect_size_type),permtest_and_pvalues)
+  output <- c(main_results, list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
 
