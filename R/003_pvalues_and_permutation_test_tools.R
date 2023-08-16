@@ -5,7 +5,7 @@ PermutationTest <- function(control,
                             test,
                             effect_size,
                             is_paired = NULL,
-                            permutation_count = 5000,
+                            permutation_count,
                             random_seed = 12345,
                             ef_size_fn) {
   
@@ -198,7 +198,7 @@ pvals_statistics <- function(control,
 
 Pvalues_statistics <- function(dabest_object,
                                seed = 12345,
-                               perm_count = 5000,
+                               perm_count,
                                ef_size_fn = NULL,
                                effect_size_type) {
   
@@ -258,7 +258,7 @@ Pvalues_statistics <- function(dabest_object,
                                                   test_measurement, 
                                                   effect_size = effect_size_type, 
                                                   is_paired = is_paired,
-                                                  permutation_count = 5000, 
+                                                  permutation_count = perm_count, 
                                                   random_seed = 12345,
                                                   ef_size_fn = ef_size_fn)
         
@@ -318,7 +318,7 @@ Pvalues_statistics <- function(dabest_object,
                                                   test_measurement, 
                                                   effect_size = effect_size_type,
                                                   is_paired = is_paired,
-                                                  permutation_count = 5000, 
+                                                  permutation_count = perm_count, 
                                                   random_seed = 12345,
                                                   ef_size_fn = ef_size_fn)
         # calculate p values 
