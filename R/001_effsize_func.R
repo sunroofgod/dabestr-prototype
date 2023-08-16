@@ -10,8 +10,9 @@
 #' The following effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
 #' are used for most plot types. 
 #' 
-#' @param dabest_obj A dabest_obj created by loading in dataset along with other 
+#' @param `dabest_obj` A dabest_obj created by loading in dataset along with other 
 #' specified parameters with the [load()] function.
+#' @param `perm_count` The number of reshuffles of control and test labels to be performed for each p-value.
 #' @returns 
 #' Returns a `dabest_effectsize_obj` list with 22 elements. The following are the elements contained within:
 
@@ -24,6 +25,7 @@
 #' * `is_paired` Boolean value determining if it is a paired plot.
 #' * `is_colour` Boolean value determining if there is a colour column for the plot.
 #' * `paired` Paired ("sequential" or "baseline") as initially passed to [load()].
+#' * `resamples` The number of resamples to be used to generate the effect size bootstraps.
 #' * `control_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
 #' * `test_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
 #' * `ylim` Vector containing the y limits for the raw plot.
@@ -57,7 +59,7 @@
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #' 
 #' @export 
-mean_diff <- function(dabest_obj) {
+mean_diff <- function(dabest_obj,perm_count=5000) {
   
   effect_size_type <- "mean_diff"
   if (class(dabest_obj)!="dabest") {
@@ -73,24 +75,24 @@ mean_diff <- function(dabest_obj) {
   }
   
   is_paired <- dabest_obj$is_paired
+  reps <- dabest_obj$resamples
   
   if (is_paired){
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference")
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference",reps = reps)
   } else {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference")
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference",reps = reps)
   }
-  permtest_and_pvalues <- Pvalues_statistics(dabest_obj, ef_size_fn = effect_size_func, effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+  permtest_and_pvalues <- Pvalues_statistics(dabest_obj, ef_size_fn = effect_size_func, effect_size_type = effect_size_type,perm_count = perm_count)
+  output <- c(main_results, list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
 
   return(output)
 }
 
 #' @rdname effect_size
 #' @export
-median_diff <- function(dabest_obj) {
+median_diff <- function(dabest_obj,perm_count=5000) {
   effect_size_type <- "median_diff"
   if (class(dabest_obj)!="dabest") {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -105,27 +107,29 @@ median_diff <- function(dabest_obj) {
   }
   
   is_paired <- dabest_obj$is_paired
+  reps <- dabest_obj$resamples
   
   if (is_paired){
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference")
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference",reps = reps)
   } else {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference")
+    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference",reps = reps)
   }
   
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
-                                             effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+                                             effect_size_type = effect_size_type,
+                                             perm_count = perm_count)
+  output <- c(main_results, list(effect_size_type = effect_size_type), permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
+  
   return(output)
 }
 
 
 #' @rdname effect_size
 #' @export 
-cohens_d <- function(dabest_obj) {
+cohens_d <- function(dabest_obj,perm_count=5000) {
   effect_size_type <- "cohens_d"
   if (class(dabest_obj)!="dabest") {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -136,22 +140,26 @@ cohens_d <- function(dabest_obj) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
   }
   
+  reps <- dabest_obj$resamples
+  
   main_results <- bootstrap(dabest_obj, 
                             effect_size_func, 
-                            boot_labs = "Cohen's d")
+                            boot_labs = "Cohen's d",
+                            reps = reps)
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
-                                             effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+                                             effect_size_type = effect_size_type,
+                                             perm_count = perm_count)
+  output <- c(main_results,list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
+
   return(output)
 }
 
 #' @rdname effect_size
 #' @export 
-hedges_g <- function(dabest_obj) {
+hedges_g <- function(dabest_obj,perm_count=5000) {
   effect_size_type <- "hedges_g"
   if (class(dabest_obj)!="dabest") {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -168,22 +176,26 @@ hedges_g <- function(dabest_obj) {
     return(cd * corr.factor)
   }
   
+  reps <- dabest_obj$resamples
+  
   main_results <- bootstrap(dabest_obj, 
                             effect_size_func, 
-                            boot_labs = "Hedges' g")
+                            boot_labs = "Hedges' g",
+                            reps = reps)
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
-                                             effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+                                             effect_size_type = effect_size_type,
+                                             perm_count = perm_count)
+  output <- c(main_results, list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
+
   return(output)
 }
 
 #' @rdname effect_size
 #' @export 
-cliffs_delta <- function(dabest_obj) {
+cliffs_delta <- function(dabest_obj,perm_count=5000) {
   effect_size_type <- "cliffs_delta"
   if (class(dabest_obj)!="dabest") {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -194,22 +206,26 @@ cliffs_delta <- function(dabest_obj) {
     return(effsize::cliff.delta(test, control)$estimate)
   }
   
+  reps <- dabest_obj$resamples
+  
   main_results <- bootstrap(dabest_obj, 
                             effect_size_func, 
-                            boot_labs = "Cliffs' delta")
+                            boot_labs = "Cliffs' delta",
+                            reps = reps)
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
-                                             effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+                                             effect_size_type = effect_size_type,
+                                             perm_count = perm_count)
+  output <- c(main_results, list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
+
   return(output)
 }
 
 #' @rdname effect_size
 #' @export 
-cohens_h <- function(dabest_obj){
+cohens_h <- function(dabest_obj,perm_count=5000){
   effect_size_type <- "cohens_h"
   if (class(dabest_obj)!="dabest") {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -228,16 +244,20 @@ cohens_h <- function(dabest_obj){
     return(result)
   }
   
+  reps <- dabest_obj$resamples
+  
   main_results <- bootstrap(dabest_obj, 
                             effect_size_func, 
-                            boot_labs = "Cohen's h")
+                            boot_labs = "Cohen's h",
+                            reps = reps)
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj, 
                                              ef_size_fn = effect_size_func,
-                                             effect_size_type = effect_size_type)
-  output <- c(main_results, permtest_and_pvalues)
+                                             effect_size_type = effect_size_type,
+                                             perm_count = perm_count)
+  output <- c(main_results, list(effect_size_type = effect_size_type),permtest_and_pvalues)
   
   class(output) <- c("dabest_effectsize")
-  print_dabest(output, effect_size_type)
+
   return(output)
 }
 
@@ -261,3 +281,4 @@ hedges_correction <- function(x1, x2) {
   
   return(out)
 }
+

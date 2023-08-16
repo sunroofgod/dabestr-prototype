@@ -83,6 +83,7 @@ load <- function(
     paired = NULL,
     id_col = NULL,
     ci = 95,
+    resamples =5000,
     colour = NULL,
     proportional = FALSE,
     minimeta = FALSE,
@@ -316,6 +317,7 @@ load <- function(
     minimeta = minimeta,
     delta2 = delta2,
     idx = idx,
+    resamples = resamples,
     is_paired = is_paired,
     is_colour = is_colour,
     paired = paired,
@@ -328,6 +330,6 @@ load <- function(
   
   class(dabest_object) <- c("dabest")
 
-  print_dabest(dabest_object)
   return(dabest_object)
 }
+
