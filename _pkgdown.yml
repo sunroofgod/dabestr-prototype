@@ -14,6 +14,16 @@ navbar:
   structure:
     left: [intro, reference, articles, tutorials, news]
     right: [search, github]
+    
+articles:
+- title: Misc
+  navbar:
+  contents:
+  - plot_aesthetics
+- title: Getting Started
+  navbar: Getting Started
+  contents:
+  - datasets
 
 reference:
 - subtitle: Main API 

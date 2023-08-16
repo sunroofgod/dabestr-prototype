@@ -53,6 +53,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 LazyData: true
+VignetteBuilder: knitr
+

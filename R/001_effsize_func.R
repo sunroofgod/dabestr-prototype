@@ -16,7 +16,7 @@
 #' @returns 
 #' Returns a `dabest_effectsize_obj` list with 22 elements. The following are the elements contained within:
 
-#' * `raw_data` The tidydataset passed to [load()] that was cleaned and altered for plotting.
+#' * `raw_data` The tidy dataset passed to [load()] that was cleaned and altered for plotting.
 #' * `idx` The list of control-test groupings as initially passed to [load()].
 #' * `delta_x_labels` Vector containing labels for the x-axis of the delta plot.
 #' * `delta_y_labels` String label for the y-axis of the delta plot.
@@ -37,9 +37,11 @@
 #' * `minimeta` Boolean value as initially passed to [load()].
 #' * `delta` Boolean value as initially passed to [load()].
 #' * `proportional_data` List of calculations related to the plotting of proportion plots.
-#' * `boot_result` list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
-#' * `permtest_pvals` list containing values related to the calculations of permutation t tests and the corresponding p values, 
-#' and p values for different types of effect sizes and different statistical tests.
+#' * `boot_result` list containing values related to the calculation of the effect sizes, 
+#' bootstrapping and BCa correction.
+#' * `permtest_pvals` list containing values related to the calculations of permutation 
+#' t tests and the corresponding p values, and p values for different types of effect sizes 
+#' and different statistical tests.
 #'
 #' @details
 #' The plot types listed under here are limited to use only the following effect sizes.

@@ -7,52 +7,62 @@
 #' functions within dabestr to create estimation plots. 
 #' 
 #' @param data A tidy dataframe.
-#' @param x Column name in the dateset that specifies the treatment group. 
-#' @param y Column name in the dataset that specifies the measurement values.
+#' @param x Column in `data` that contains the treatment groups. 
+#' @param y Column in `data` that contains the measurement values.
 #' @param idx List of control-test groupings for which the 
 #' effect size will be computed for.
-#' @param paired Paired ("sequential" or "baseline").
-#' @param id_col Column name indicating the identity of the
-#'  datapoint if the data is paired. Must be supplied if paired is TRUE.
-#' @param ci Double ranging from 0 to 100 which determines the bca_low and 
-#' bca_high confidence interval calculations.
-#' @param resamples The number of resamples to be used to generate the effect size bootstraps.
-#' @param colour Column name indicating the column to implement colour aesthetics 
-#' in plotting functions.
-#' @param proportional Boolean value determining whether the data provided is for
-#' the plotting of proportional bars or sankey diagrams.
+#' @param paired Paired ("sequential" or "baseline"). Used for plots for experiments
+#' with repeated-measures designs.
+#' 
+#' If "sequential", comparison happens between each measurement to the one directly 
+#' preceding it. (control vs group i)
+#' 
+#' If "baseline", comparison happens between each group to a shared control. 
+#' (group i vs group i+1)
+#' 
+#' @param id_col Column in `data` indicating the identity of the
+#'  datapoint if the data is tagged. Compulsory parameter if paired is TRUE.
+#' @param ci Default 95. Determines the range of the confidence interval for effect size
+#' and bootstrap calculations. Only accepts values between 0 to 100 (inclusive).
+#' @param colour Column in `data` that determines the groupings for colour of the
+#' swarmplot as opposed to `x`.
+#' @param proportional Boolean value determining if proportion plots are being
+#' produced. 
 #' @param minimeta Boolean value determining if mini-meta analysis is conducted.
-#' @param delta2 Boolean value determining Whether delta-delta analysis for 
-#' 2 by 2 experimental designs are conducted.
-#' @param experiment Experiment column name for delta2 analysis.
-#' @param experiment_label String specifying the experiment label that is used to distinguish 
-#' the experiment and the factors (being used in the plotting labels).
+#' @param delta2 Boolean value determining if delta-delta analysis for 
+#' 2 by 2 experimental designs is conducted.
+#' @param experiment Experiment column name for delta-delta analysis.
+#' @param experiment_label String specifying the experiment label that is used to 
+#' distinguish the experiment and the factors (being used in the plotting labels).
 #' @param x1_level String setting the first factor level in 
 #' a 2 by 2 experimental design.
 #'
 #' @return 
 #' Returns a dabest_object list with 18 elements. The following are the elements contained within:
 #'
-#' - `raw_data` The tidy dataframe that was passed into [load()].
+#' - `raw_data` The tidy dataset passed to [load()] that was cleaned and altered for plotting.
 #' - `proportional_data` List of calculations related to the plotting of proportion plots.
-#' - `enquo_x`  Quosure of x whose columns in the dataframe will be used to plot the x-axis.
-#' - `enquo_y`  Quosure of y whose columns in the dataframe will be used to plot the y-axis.
-#' - `enquo_id_col` Quosure of id_col whose columns in the dataframe will be used to 
-#' distinguish subjects in repeated measures.
-#' - `enquo_colour` Quosure of colour which will determine the color aesthetics of the plot.
-#' - `proportional` Same as above.
-#' - `minimeta`  Same as above.
-#' - `delta2`  Same as above.
-#' - `idx` Same as above.
+#' - `enquo_x`  Quosure of x as initially passed to [load()].
+#' - `enquo_y`  Quosure of y as initially passed to [load()].
+#' - `enquo_id_col` Quosure of id_col as initially passed to [load()].
+#' - `enquo_colour` Quosure of colour as initially passed to [load()].
+#' - `proportional` Boolean value determining if proportion plots are being
+#' produced. 
+#' - `minimeta` Boolean value determining if mini-meta analysis is conducted.
+#' - `delta2` Boolean value determining if delta-delta analysis for 
+#' 2 by 2 experimental designs is conducted.
+#' - `idx` List of control-test groupings for which the 
+#' effect size will be computed for.
 #' - `is_paired` Boolean value determining if it is a paired plot.
-#' - `is_colour` Boolean value determining if there is a colour column for the plot.
-#' - `paired` Same as above.
-#' - `ci` Numeric value which determines the confidence interval 
-#' specified for the effect size and bootstrap calculations.
-#' - `Ns` List of labels for x-axis of the raw plot.
+#' - `is_colour` Boolean value determining if there is a specified colour column 
+#' for the plot.
+#' - `paired` Paired ("sequential" or "baseline") as initially passed to [load()].
+#' - `ci` Numeric value which determines the range of the confidence interval for effect size
+#' and bootstrap calculations. Only accepts values between 0 to 100 (inclusive).
+#' - `Ns` List of labels for x-axis of the rawdata swarm plot.
 #' - `control_summary` Numeric value for plotting of control summary lines for float_contrast= TRUE.
 #' - `test_summary` Numeric value for plotting of test summary lines for float_contrast = TRUE.
-#'  * `ylim` Vector containing the y limits for the raw plot.
+#'  * `ylim` Vector containing the y limits for the rawdata swarm plot.
 #' 
 #' 
 #' @examples 
