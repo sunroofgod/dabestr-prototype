@@ -1,5 +1,4 @@
-print_dabest <- function(dabest_object,
-                         effectsize = NULL) {
+print_dabest <- function(dabest_object) {
   if (class(dabest_object) != "dabest" & class(dabest_object) != "dabest_effectsize") {
     cli::cli_abort(c("Only dabest class or dabest_effectsize objects can be used.", 
                      "x" = "Please enter a valid entry into the function."))
@@ -9,9 +8,6 @@ print_dabest <- function(dabest_object,
   
   paired <- dabest_object$paired
   ci <- dabest_object$ci
-  if (!is.null(effectsize)) {
-    es <- effectsize
-  }
   
   if (is.null(paired)) {
     rm_status <- ""
@@ -38,6 +34,8 @@ print_dabest <- function(dabest_object,
     print_each_comparism(dabest_object)
     print_ending(dabest_object)
   } else if (class(dabest_object)=="dabest_effectsize") {
+    
+    es <- dabest_object$effect_size_type
     
     print_each_comparism_effectsize(dabest_object,es)
     print_ending(dabest_object)
@@ -135,6 +133,7 @@ print_each_comparism_effectsize <- function(dabest_object,effectsize) {
   bca_low <- round(dabest_object$boot_result$bca_ci_low,3)
   bca_high <- round(dabest_object$boot_result$bca_ci_high,3)
   ci <- dabest_object$boot_result$ci
+  pvalue <- dabest_object$permtest_pvals$pval_permtest
   
   if (is.null(paired)) {
     rm_status <- ""
@@ -170,7 +169,7 @@ print_each_comparism_effectsize <- function(dabest_object,effectsize) {
         current_ci <- ci[i]
         
         cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
-        cat(stringr::str_interp("The p-value of the two-sided permutation t-test is , calculated for legacy purposes only."))
+        cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${pvalue}, calculated for legacy purposes only."))
         cat("\n\n")
         i <- i+1
       }
@@ -181,19 +180,22 @@ print_each_comparism_effectsize <- function(dabest_object,effectsize) {
     
     for (current_test_group in test_groups) {
       cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${difference} [${ci}%CI ${bca_low}, ${bca_high}].\n"))
-      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is , calculated for legacy purposes only.\n"))
+      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${pvalue}, calculated for legacy purposes only.\n"))
     }
   }
 }
 
 print_ending <- function(dabest_object) {
   if (class(dabest_object)=="dabest") {
-    cat(stringr::str_interp("resamples will be used to generate the effect size bootstraps.\n\n"))
+    nboots <- dabest_object$resamples
+    cat(stringr::str_interp("${nboots} resamples will be used to generate the effect size bootstraps.\n\n"))
   } else {
-    cat(stringr::str_interp("bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.\n"))
+    nboots <- dabest_object$resamples
+    nreshuffles <- length(dabest_object$permtest_pvals$permutation_test_results[[1]]$permutations)
+    cat(stringr::str_interp("${nboots} bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.\n"))
     cat("Any p-value reported is the probability of observing the effect size (or greater),\n")
     cat("assuming the null hypothesis of zero difference is true.\n")
-    cat(stringr::str_interp("For each p-value, reshuffles of the control and test labels were performed.\n"))
+    cat(stringr::str_interp("For each p-value, ${nreshuffles} reshuffles of the control and test labels were performed.\n"))
     cat("\n")
     cat("To get the results of all valid statistical tests, use .mean_diff.statistical_tests\n\n")
   }
