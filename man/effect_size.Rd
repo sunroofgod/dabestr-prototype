@@ -29,7 +29,7 @@ specified parameters with the \code{\link[=load]{load()}} function.}
 \value{
 Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
 \itemize{
-\item \code{raw_data} The tidydataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
+\item \code{raw_data} The tidy dataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
 \item \code{idx} The list of control-test groupings as initially passed to \code{\link[=load]{load()}}.
 \item \code{delta_x_labels} Vector containing labels for the x-axis of the delta plot.
 \item \code{delta_y_labels} String label for the y-axis of the delta plot.
@@ -49,9 +49,11 @@ Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are 
 \item \code{minimeta} Boolean value as initially passed to \code{\link[=load]{load()}}.
 \item \code{delta} Boolean value as initially passed to \code{\link[=load]{load()}}.
 \item \code{proportional_data} List of calculations related to the plotting of proportion plots.
-\item \code{boot_result} list containing values related to the calculation of the effect sizes, bootstrapping and BCa correction.
-\item \code{permtest_pvals} list containing values related to the calculations of permutation t tests and the corresponding p values,
-and p values for different types of effect sizes and different statistical tests.
+\item \code{boot_result} list containing values related to the calculation of the effect sizes,
+bootstrapping and BCa correction.
+\item \code{permtest_pvals} list containing values related to the calculations of permutation
+t tests and the corresponding p values, and p values for different types of effect sizes
+and different statistical tests.
 }
 }
 \description{
