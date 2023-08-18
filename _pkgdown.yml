@@ -24,6 +24,8 @@ articles:
   navbar: Tutorials
   contents:
   - tutorial_basics
+  - tutorial_repeated_measures
+  - tutorial_proportion_plots
   - datasets
 
 reference:
