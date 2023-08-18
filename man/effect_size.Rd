@@ -10,21 +10,23 @@
 \alias{cohens_h}
 \title{Calculating effect sizes}
 \usage{
-mean_diff(dabest_obj)
+mean_diff(dabest_obj, perm_count = 5000)
 
-median_diff(dabest_obj)
+median_diff(dabest_obj, perm_count = 5000)
 
-cohens_d(dabest_obj)
+cohens_d(dabest_obj, perm_count = 5000)
 
-hedges_g(dabest_obj)
+hedges_g(dabest_obj, perm_count = 5000)
 
-cliffs_delta(dabest_obj)
+cliffs_delta(dabest_obj, perm_count = 5000)
 
-cohens_h(dabest_obj)
+cohens_h(dabest_obj, perm_count = 5000)
 }
 \arguments{
 \item{`dabest_obj`}{A dabest_obj created by loading in dataset along with other
 specified parameters with the \code{\link[=load]{load()}} function.}
+
+\item{`perm_count`}{The number of reshuffles of control and test labels to be performed for each p-value.}
 }
 \value{
 Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
