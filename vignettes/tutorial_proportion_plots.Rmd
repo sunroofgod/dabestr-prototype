@@ -34,7 +34,7 @@ c1 <- rbinom(N, size, prob = 0.2)
 c2 <- rbinom(N, size, prob = 0.2)
 c3 <- rbinom(N, size, prob = 0.8)
 
-t1 <- rbinom(N, size, prob = 0.5)
+t1 <- rbinom(N, size, prob = 0.35)
 t2 <- rbinom(N, size, prob = 0.2)
 t3 <- rbinom(N, size, prob = 0.3)
 t4 <- rbinom(N, size, prob = 0.4)
@@ -104,8 +104,20 @@ The white part in the bar represents the proportion of observations in the datas
 
 Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function. This will plot the bootstrap effect sizes below the raw data.
 
-```{r}
+```{r, eval = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE)
+```
+
+```{r, echo = FALSE}
+pp_plot <- dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
+                       swarm_y_text = 11, contrast_y_text = 11)
+
+cowplot::plot_grid(
+  plotlist = list(NULL, pp_plot, NULL),
+  nrow = 1,
+  ncol = 3,
+  rel_widths = c(2.5, 5, 2.5)
+)
 ```
 
 You can also modify the width of bars as you expect by setting `bar_width` in the `dabest_plot()` function.
@@ -137,8 +149,21 @@ dabest_plot(two_groups_baseline.mean_diff)
 
 The paired proportional plot also supports the `float_contrast` parameter, which can be set to `FALSE` to produce a **Cumming estimation plot**.
 
-```{r}
+```{r, eval = FALSE}
 dabest_plot(two_groups_baseline.mean_diff, float_contrast = FALSE)
+```
+
+```{r, echo = FALSE}
+pp_plot <- dabest_plot(two_groups_baseline.mean_diff, float_contrast = FALSE,
+                       swarm_y_text = 11, contrast_y_text = 11,
+                       raw_bar_width = 0.2)
+
+cowplot::plot_grid(
+  plotlist = list(NULL, pp_plot, NULL),
+  nrow = 1,
+  ncol = 3,
+  rel_widths = c(2.5, 5, 2.5)
+)
 ```
 
 The upper part (grey part) of the bar represents the proportion of observations in the dataset that do not belong to the category, which is equivalent to the proportion of 0 in the data. The lower part, on the other hand, represents the proportion of observations that belong to the category, which is or **success**, which is equivalent to the proportion of 1 in the data.
@@ -157,7 +182,8 @@ multi_group_baseline.mean_diff <- load(df, x = Group, y = Success,
                                        paired = "baseline", id_col = ID) %>%
   mean_diff()
 
-dabest_plot(multi_group_baseline.mean_diff)
+dabest_plot(multi_group_baseline.mean_diff, 
+            swarm_y_text = 11, contrast_y_text = 11)
 ```
 
 ```{r}
@@ -170,7 +196,8 @@ multi_group_sequential.mean_diff <- load(df, x = Group, y = Success,
                                          paired = "sequential", id_col = ID) %>%
   mean_diff()
 
-dabest_plot(multi_group_sequential.mean_diff)
+dabest_plot(multi_group_sequential.mean_diff,
+            swarm_y_text = 11, contrast_y_text = 11)
 ```
 
 If you want to specify the order of the groups, you can use the `idx` parameter in the `load()` function.
@@ -187,7 +214,8 @@ multi_group_baseline_specify.mean_diff <- load(df, x = Group, y = Success,
                                          paired = "baseline", id_col = ID) %>%
   mean_diff()
 
-dabest_plot(multi_group_baseline_specify.mean_diff)
+dabest_plot(multi_group_baseline_specify.mean_diff,
+            swarm_y_text = 11, contrast_y_text = 11)
 ```
 
 ### Adjustment parameters
@@ -210,6 +238,7 @@ dabest_plot(separate_control.mean_diff, swarm_y_text = 11, contrast_y_text = 11,
 dabest_plot(separate_control.mean_diff, swarm_y_text = 11, contrast_y_text = 11, 
             flow = FALSE)
 ```
+
 Several exclusive parameters can be supplied to the `dabest_plot()` function to customize the paired proportional plot. By adding available `plot_kwargs`, you can customize the Paired Proportions plot. The following parameters are supported:
 
 - `sankey_alpha`: The transparency of each bar. Default is 0.5.
