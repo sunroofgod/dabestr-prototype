@@ -94,13 +94,14 @@ print(two_groups_unpaired_ci90)
 ## Effect sizes (Step 2)
 `dabestr` now features a range of effect sizes:
 
-- the mean difference (`mean_diff`)
-- the median difference (`median_diff`)
-- Cohen’s d (`cohens_d`)
-- Hedges’ g (`hedges_g`)
-- Cliff’s delta (`cliffs_delta`)
+- the mean difference (`mean_diff()`)
+- the median difference (`median_diff()`)
+- Cohen’s d (`cohens_d()`)
+- Hedges’ g (`hedges_g()`)
+- Cliff’s delta (`cliffs_delta()`)
 
-After loading in the data via `load()`, these `effect_size()` functions are then used.
+The output of the `load()` function, a `dabest` object, is then passed into 
+these `effect_size()` functions as a parameter.
 
 ```{r}
 two_groups_unpaired.mean_diff <- mean_diff(two_groups_unpaired)
@@ -128,15 +129,15 @@ print(two_groups_unpaired.hedges_g$permtest_pvals$pvalues)
 ```
 
 ## Producing estimation plots (Step 3)
-To produce a *Gardner-Altman estimation plot*, simply use the `dabest_plot()`. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
+To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()`. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
 
-`dabest_plot` only requires one compulsory parameter to run - the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means you can quickly create plots for different effect sizes easily.
+`dabest_plot()` only requires one compulsory parameter to run: the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means you can quickly create plots for different effect sizes easily.
 ```{r}
 dabest_plot(two_groups_unpaired.mean_diff)
 # dabest_plot(two_groups_unpaired.hedges_g)
 ```
 
-Instead of a Gardner-Altman plot, you can produce a *Cumming estimation plot* by setting `float_contrast = FALSE` in the `dabest_plot()` function This will plot the bootstrap effect sizes below the raw data, and also displays the the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
+Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function This will plot the bootstrap effect sizes below the raw data, and also displays the the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
 
 ```{r}
 dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
@@ -145,7 +146,7 @@ dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
 
 The `dabestr` package also implements a range of estimation plot designs aimed at depicting common experimental designs.
 
-The *multi-two-group estimation plot* tiles two or more Cumming plots horizontally, and is created by passing a _nested list_ to `idx` when `load()` is first invoked.
+The **multi-two-group estimation plot** tiles two or more Cumming plots horizontally, and is created by passing a _nested list_ to `idx` when `load()` is first invoked.
 
 Thus, the lower axes in the Cumming plot is effectively a [forest plot](https://en.wikipedia.org/wiki/Forest_plot), used in meta-analyses to aggregate and compare data from different experiments.
 
@@ -157,7 +158,7 @@ multi_2group <- load(df, x = Group, y = Measurement,
 multi_2group %>% mean_diff() %>% dabest_plot()
 ```
 
-The *shared control plot* displays another common experimental paradigm, where several test samples are compared against a common reference sample.
+The **shared control plot** displays another common experimental paradigm, where several test samples are compared against a common reference sample.
 
 This type of Cumming plot is automatically generated if the vector passed to `idx` has more than two data columns.
 ```{r}
