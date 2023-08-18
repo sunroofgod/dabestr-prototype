@@ -1,4 +1,3 @@
-#' 
 #' Loading data with dabestr 
 #' 
 #' @description 
@@ -24,6 +23,7 @@
 #'  datapoint if the data is tagged. Compulsory parameter if paired is TRUE.
 #' @param ci Default 95. Determines the range of the confidence interval for effect size
 #' and bootstrap calculations. Only accepts values between 0 to 100 (inclusive).
+#' @param resamples The number of resamples to be used to generate the effect size bootstraps.
 #' @param colour Column in `data` that determines the groupings for colour of the
 #' swarmplot as opposed to `x`.
 #' @param proportional Boolean value determining if proportion plots are being
@@ -53,6 +53,7 @@
 #' 2 by 2 experimental designs is conducted.
 #' - `idx` List of control-test groupings for which the 
 #' effect size will be computed for.
+#' - `resamples` The number of resamples to be used to generate the effect size bootstraps.
 #' - `is_paired` Boolean value determining if it is a paired plot.
 #' - `is_colour` Boolean value determining if there is a specified colour column 
 #' for the plot.
@@ -62,8 +63,7 @@
 #' - `Ns` List of labels for x-axis of the rawdata swarm plot.
 #' - `control_summary` Numeric value for plotting of control summary lines for float_contrast= TRUE.
 #' - `test_summary` Numeric value for plotting of test summary lines for float_contrast = TRUE.
-#'  * `ylim` Vector containing the y limits for the rawdata swarm plot.
-#' 
+#' - `ylim` Vector containing the y limits for the rawdata swarm plot.
 #' 
 #' @examples 
 #' # Loading in of the dataset
