@@ -10,21 +10,23 @@
 \alias{cohens_h}
 \title{Calculating effect sizes}
 \usage{
-mean_diff(dabest_obj)
+mean_diff(dabest_obj, perm_count = 5000)
 
-median_diff(dabest_obj)
+median_diff(dabest_obj, perm_count = 5000)
 
-cohens_d(dabest_obj)
+cohens_d(dabest_obj, perm_count = 5000)
 
-hedges_g(dabest_obj)
+hedges_g(dabest_obj, perm_count = 5000)
 
-cliffs_delta(dabest_obj)
+cliffs_delta(dabest_obj, perm_count = 5000)
 
-cohens_h(dabest_obj)
+cohens_h(dabest_obj, perm_count = 5000)
 }
 \arguments{
-\item{dabest_obj}{A dabest_obj created by loading in dataset along with other
+\item{`dabest_obj`}{A dabest_obj created by loading in dataset along with other
 specified parameters with the \code{\link[=load]{load()}} function.}
+
+\item{`perm_count`}{The number of reshuffles of control and test labels to be performed for each p-value.}
 }
 \value{
 Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are the elements contained within:
@@ -38,6 +40,7 @@ Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are 
 \item \code{is_paired} Boolean value determining if it is a paired plot.
 \item \code{is_colour} Boolean value determining if there is a colour column for the plot.
 \item \code{paired} Paired ("sequential" or "baseline") as initially passed to \code{\link[=load]{load()}}.
+\item \code{resamples} The number of resamples to be used to generate the effect size bootstraps.
 \item \code{control_summary} Numeric value for plotting of control summary lines for float_contrast = \code{TRUE}.
 \item \code{test_summary} Numeric value for plotting of control summary lines for float_contrast = \code{TRUE}.
 \item \code{ylim} Vector containing the y limits for the raw plot.
@@ -49,9 +52,12 @@ Returns a \code{dabest_effectsize_obj} list with 22 elements. The following are 
 \item \code{minimeta} Boolean value as initially passed to \code{\link[=load]{load()}}.
 \item \code{delta} Boolean value as initially passed to \code{\link[=load]{load()}}.
 \item \code{proportional_data} List of calculations related to the plotting of proportion plots.
-\item \code{boot_result} list containing values related to the calculation of the effect sizes,
+\item \code{boot_result} List containing values related to the calculation of the effect sizes,
 bootstrapping and BCa correction.
-\item \code{permtest_pvals} list containing values related to the calculations of permutation
+\item \code{baseline_ec_boot_result} List containing values related to the calculation
+of the effect sizes, bootstrapping and BCa correction for the baseline error
+curve.
+\item \code{permtest_pvals} List containing values related to the calculations of permutation
 t tests and the corresponding p values, and p values for different types of effect sizes
 and different statistical tests.
 }

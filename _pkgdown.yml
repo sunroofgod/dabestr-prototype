@@ -20,9 +20,10 @@ articles:
   navbar:
   contents:
   - plot_aesthetics
-- title: Getting Started
-  navbar: Getting Started
+- title: Tutorials 
+  navbar: Tutorials
   contents:
+  - tutorial_basics
   - datasets
 
 reference:

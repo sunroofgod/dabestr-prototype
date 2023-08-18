@@ -16,30 +16,33 @@
 #' @returns 
 #' Returns a `dabest_effectsize_obj` list with 22 elements. The following are the elements contained within:
 
-#' * `raw_data` The tidy dataset passed to [load()] that was cleaned and altered for plotting.
-#' * `idx` The list of control-test groupings as initially passed to [load()].
-#' * `delta_x_labels` Vector containing labels for the x-axis of the delta plot.
-#' * `delta_y_labels` String label for the y-axis of the delta plot.
-#' * `Ns` List of labels for x-axis of the raw plot.
-#' * `raw_y_labels` Vector containing labels for the y-axis of the raw plot.
-#' * `is_paired` Boolean value determining if it is a paired plot.
-#' * `is_colour` Boolean value determining if there is a colour column for the plot.
-#' * `paired` Paired ("sequential" or "baseline") as initially passed to [load()].
-#' * `resamples` The number of resamples to be used to generate the effect size bootstraps.
-#' * `control_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
-#' * `test_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
-#' * `ylim` Vector containing the y limits for the raw plot.
-#' * `enquo_x` Quosure of x as initially passed to [load()].
-#' * `enquo_y` Quosure of y as initially passed to [load()].
-#' * `enquo_id_col` Quosure of id_col as initially passed to [load()].
-#' * `enquo_colour` Quosure of colour as initially passed to [load()].
-#' * `proportional` Boolean value as initially passed to [load()].
-#' * `minimeta` Boolean value as initially passed to [load()].
-#' * `delta` Boolean value as initially passed to [load()].
-#' * `proportional_data` List of calculations related to the plotting of proportion plots.
-#' * `boot_result` list containing values related to the calculation of the effect sizes, 
+#' - `raw_data` The tidy dataset passed to [load()] that was cleaned and altered for plotting.
+#' - `idx` The list of control-test groupings as initially passed to [load()].
+#' - `delta_x_labels` Vector containing labels for the x-axis of the delta plot.
+#' - `delta_y_labels` String label for the y-axis of the delta plot.
+#' - `Ns` List of labels for x-axis of the raw plot.
+#' - `raw_y_labels` Vector containing labels for the y-axis of the raw plot.
+#' - `is_paired` Boolean value determining if it is a paired plot.
+#' - `is_colour` Boolean value determining if there is a colour column for the plot.
+#' - `paired` Paired ("sequential" or "baseline") as initially passed to [load()].
+#' - `resamples` The number of resamples to be used to generate the effect size bootstraps.
+#' - `control_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
+#' - `test_summary` Numeric value for plotting of control summary lines for float_contrast = `TRUE`.
+#' - `ylim` Vector containing the y limits for the raw plot.
+#' - `enquo_x` Quosure of x as initially passed to [load()].
+#' - `enquo_y` Quosure of y as initially passed to [load()].
+#' - `enquo_id_col` Quosure of id_col as initially passed to [load()].
+#' - `enquo_colour` Quosure of colour as initially passed to [load()].
+#' - `proportional` Boolean value as initially passed to [load()].
+#' - `minimeta` Boolean value as initially passed to [load()].
+#' - `delta` Boolean value as initially passed to [load()].
+#' - `proportional_data` List of calculations related to the plotting of proportion plots.
+#' - `boot_result` List containing values related to the calculation of the effect sizes, 
 #' bootstrapping and BCa correction.
-#' * `permtest_pvals` list containing values related to the calculations of permutation 
+#' - `baseline_ec_boot_result` List containing values related to the calculation 
+#' of the effect sizes, bootstrapping and BCa correction for the baseline error
+#' curve.
+#' - `permtest_pvals` List containing values related to the calculations of permutation 
 #' t tests and the corresponding p values, and p values for different types of effect sizes 
 #' and different statistical tests.
 #'

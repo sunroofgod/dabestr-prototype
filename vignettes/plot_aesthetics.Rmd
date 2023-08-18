@@ -12,9 +12,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  warning = FALSE,
-  message = FALSE
+  comment = "#>"
 )
 ```
 
@@ -84,8 +82,8 @@ dabest_plot(
 )
 ```
 
-### Labels
-The following parameters are responsible for adjusting the labels of the text elements.
+### Content
+The following parameters are responsible for adjusting the content of the text elements.
 
 - `swarm_label`: Default "value" or "proportion of success" for proportion plots. Label for the y-axis of the swarm plot.
 - `contrast_label`: Default "effect size", based on the effect sizes as given in `effect_size()`. Label for the y-axis of the contrast plot.
@@ -134,7 +132,7 @@ cowplot::plot_grid(
 )
 ```
 
-### Limits
+### Axes
 The following parameters are responsible for adjusting the y-axis limits for the
 rawdata axes and contrast axes of the  plot. By adjusting the range, it gives 
 rise to the effect of zooming in or out of the plot.
@@ -194,9 +192,28 @@ dabest_plot(dabest_paired_props.mean_diff, flow = FALSE, raw_bar_width = 0.15)
 ```
 
 - `asymmetric_side` Default "right". Can be either "right" or "left". Controls which side the swarm points are shown.
+```{r}
+right <- dabest_plot(dabest_twogroup_obj.mean_diff, float_contrast = FALSE,
+                     swarm_label = "", contrast_label = "", 
+                     asymmetric_side = "right")
+left <- dabest_plot(dabest_twogroup_obj.mean_diff, float_contrast = FALSE,
+                    swarm_label = "", contrast_label = "", 
+                    asymmetric_side = "left")
+
+cowplot::plot_grid(
+  plotlist = list(right, left),
+  nrow = 1,
+  ncol = 2
+)
+```
+
 - `show_delta2` Default FALSE. Boolean value determining if the delta-delta plot is shown.
 - `show_mini_meta` Default FALSE. Boolean value determining if the weighted average plot is shown. 
 If False, the resulting graph would be identical to a multiple two-groups plot.
 - `show_zero_dot` Default TRUE. Boolean value determining if there is a dot on 
 the zero line of the effect size for the control-control group.
 - `show_baseline_ec` Default FALSE. Boolean value determining whether the baseline curve is shown.
+```{r}
+dabest_plot(dabest_multigroup_obj.mean_diff, float_contrast = FALSE,
+            show_baseline_ec = TRUE)
+```
