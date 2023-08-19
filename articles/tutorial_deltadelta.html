@@ -113,12 +113,7 @@ populations too.</p>
 done twice (<code>Rep1</code> and <code>Rep2</code>). We shall do a few
 analyses to visualise these differences in a simulated dataset.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dabestr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     load</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="create-dataset-for-demo">Create dataset for demo<a class="anchor" aria-label="anchor" href="#create-dataset-for-demo"></a>
 </h2>
@@ -235,11 +230,42 @@ input.</p>
 <p>The above function creates the following <code>dabest</code>
 object:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># print(unpaired_delta2)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
+<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
+<span><span class="co">#&gt; 1. M Placebo minus W Placebo</span></span>
+<span><span class="co">#&gt; 2. M Drug minus W Drug</span></span>
+<span><span class="co">#&gt; 3. character(0) minus character(0) (only for mean difference)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
 <p>We can quickly check out the effect sizes:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">unpaired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
-<span><span class="co"># print(unpaired_delta2.mean_diff)</span></span></code></pre></div>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
+<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:30 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; The unpaired mean difference between M Placebo and W Placebo is -0.168 [95%CI -0.469, 0.079].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("0.3502", "0.246"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; The unpaired mean difference between M Drug and W Drug is -0.481 [95%CI -1.193, 0.311].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("0.3502", "0.246"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
+<span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
+<span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>

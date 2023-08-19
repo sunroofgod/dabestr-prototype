@@ -93,12 +93,7 @@ and 1 (success). This means that the code is not suitable for analyzing
 proportion data that contains non-numeric values, such as strings like
 ‘yes’ and ‘no’.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dabestr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     load</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="create-dataset-for-demo">Create dataset for demo<a class="anchor" aria-label="anchor" href="#create-dataset-for-demo"></a>
 </h2>
@@ -155,7 +150,18 @@ proportion data that contains non-numeric values, such as strings like
 <code class="sourceCode R"><span><span class="va">two_groups_unpaired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Success</span>,</span>
 <span>                            idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>,</span>
 <span>                            proportional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co"># print(two_groups_unpaired)</span></span></code></pre></div>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
+<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:30 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
+<span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="effect-sizes">Effect sizes<a class="anchor" aria-label="anchor" href="#effect-sizes"></a>
@@ -170,11 +176,43 @@ object, is then passed into these <code><a href="../reference/effect_size.html">
 as a parameter.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">two_groups_unpaired.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">two_groups_unpaired</span><span class="op">)</span></span>
-<span><span class="co"># print(two_groups_unpaired.mean_diff)</span></span></code></pre></div>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
+<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:30 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; The unpaired mean difference between Test 1 and Control 1 is 0.35 [95%CI 0.15, 0.55].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 6e-04, calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
+<span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
+<span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
 <p>Let’s compute the Cohen’s h for our comparison.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">two_groups_unpaired.cohens_h</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">cohens_h</a></span><span class="op">(</span><span class="va">two_groups_unpaired</span><span class="op">)</span></span>
-<span><span class="co"># print(two_groups_unpaired.cohens_h)</span></span></code></pre></div>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired.cohens_h</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
+<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:30 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; The unpaired Cohen's h between Test 1 and Control 1 is 0.758 [95%CI 0.311, 1.217].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 6e-04, calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
+<span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
+<span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="producing-unpaired-proportional-plots">Producing Unpaired Proportional Plots<a class="anchor" aria-label="anchor" href="#producing-unpaired-proportional-plots"></a>
