@@ -120,10 +120,10 @@ cowplot::plot_grid(
 )
 ```
 
-You can also modify the width of bars as you expect by setting `bar_width` in the `dabest_plot()` function.
+You can also modify the width of bars as you expect by setting `raw_bar_width` in the `dabest_plot()` function.
 
 ```{r}
-dabest_plot(two_groups_unpaired.mean_diff, bar_width = 0.15)
+dabest_plot(two_groups_unpaired.mean_diff, raw_bar_width = 0.15)
 ```
 
 `swarm_label` and `contrast_label` can be used to set labels for the y-axis of the bar plot and the contrast plot.
@@ -242,7 +242,7 @@ dabest_plot(separate_control.mean_diff, swarm_y_text = 11, contrast_y_text = 11,
 Several exclusive parameters can be supplied to the `dabest_plot()` function to customize the paired proportional plot. By adding available `plot_kwargs`, you can customize the Paired Proportions plot. The following parameters are supported:
 
 - `sankey_alpha`: The transparency of each bar. Default is 0.5.
-- `bar_width`: The width of each bar. Default is 0.3.
+- `raw_bar_width`: The width of each bar. Default is 0.3.
 
 ```{r}
 dabest_plot(two_groups_baseline.mean_diff, sankey_alpha = 0.8)
