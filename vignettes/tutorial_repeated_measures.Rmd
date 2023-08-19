@@ -23,7 +23,7 @@ This is an improved version of paired data plotting in previous versions, which 
 
 To use these features, you can simply declare the argument `paired = "sequential"` or `paired = "baseline"` correspondingly while running `load()`. You must also pass a column in the dataset that indicates the identity of each observation, using the `id_col` keyword.
 
-```{r setup}
+```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
@@ -66,14 +66,16 @@ df <- df %>%
 two_groups_paired_sequential <- load(df, x = Group, y = Measurement,
                                      idx = c("Control 1", "Test 1"),
                                      paired = "sequential", id_col = ID)
-# print(two_groups_paired_sequential)
+
+print(two_groups_paired_sequential)
 ```
 
 ```{r}
 two_groups_paired_baseline <- load(df, x = Group, y = Measurement,
                                    idx = c("Control 1", "Test 1"),
                                    paired = "baseline", id_col = ID)
-# print(two_groups_paired_baseline)
+
+print(two_groups_paired_baseline)
 ```
 
 When only 2 paired data groups are involved, assigning either "baseline" or "sequential" to `paired` will give you the same numerical results. 
@@ -83,8 +85,11 @@ two_groups_paired_baseline.mean_diff <- mean_diff(two_groups_paired_baseline)
 ```
 
 ```{r}
-# print(two_groups_paired_sequential.mean_diff)
-# print(two_groups_paired_baseline.mean_diff)
+print(two_groups_paired_sequential.mean_diff)
+```
+
+```{r}
+print(two_groups_paired_baseline.mean_diff)
 ```
 
 For paired data, we use [slopegraphs](https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk) (another innovation from Edward Tufte) to connect paired observations. Both Gardner-Altman and Cumming plots support this.
@@ -145,7 +150,8 @@ sequential_repeated_measures.mean_diff <- load(df, x = Group, y = Measurement,
                                              "Test 2", "Test 3"),
                                      paired = "sequential", id_col = ID) %>%
   mean_diff()
-# print(sequential_repeated_measures.mean_diff)
+
+print(sequential_repeated_measures.mean_diff)
 ```
 
 ```{r}
@@ -159,7 +165,8 @@ baseline_repeated_measures.mean_diff <- load(df, x = Group, y = Measurement,
                                                      "Test 2", "Test 3"),
                                              paired = "baseline", id_col = ID) %>%
   mean_diff()
-# print(baseline_repeated_measures.mean_diff)
+
+print(baseline_repeated_measures.mean_diff)
 ```
 
 ```{r}

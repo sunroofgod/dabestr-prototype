@@ -18,7 +18,7 @@ This vignette documents how `dabestr` is able to generate proportion plots for b
 
 It’s important to note that the code we provide only supports numerical proportion data, where the values are limited to 0 (failure) and 1 (success). This means that the code is not suitable for analyzing proportion data that contains non-numeric values, such as strings like ‘yes’ and ‘no’.
 
-```{r setup}
+```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
@@ -66,7 +66,8 @@ When loading data, specify `proportional = TRUE`.
 two_groups_unpaired <- load(df, x = Group, y = Success,
                             idx = c("Control 1", "Test 1"),
                             proportional = TRUE)
-# print(two_groups_unpaired)
+
+print(two_groups_unpaired)
 ```
 
 ## Effect sizes
@@ -80,13 +81,15 @@ these `effect_size()` functions as a parameter.
 
 ```{r}
 two_groups_unpaired.mean_diff <- mean_diff(two_groups_unpaired)
-# print(two_groups_unpaired.mean_diff)
+
+print(two_groups_unpaired.mean_diff)
 ```
 
 Let’s compute the Cohen’s h for our comparison.
 ```{r}
 two_groups_unpaired.cohens_h <- cohens_h(two_groups_unpaired)
-# print(two_groups_unpaired.cohens_h)
+
+print(two_groups_unpaired.cohens_h)
 ```
 
 ## Producing Unpaired Proportional Plots

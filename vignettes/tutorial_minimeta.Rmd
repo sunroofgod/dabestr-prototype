@@ -31,7 +31,7 @@ DABEST can only compute weighted effect size for _mean difference only_, and not
 
 For more information on meta-analysis, please refer to Chapter 10 of the Cochrane handbook: https://training.cochrane.org/handbook/current/chapter-10
 
-```{r setup}
+```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
@@ -89,14 +89,15 @@ unpaired <- load(df, x = Group, y = Measurement,
 When this `dabest` object is printed, it should show that effect sizes will be calculated for each group, as well as the weighted delta. Note once again that weighted delta will only be calculated for mean difference.
 
 ```{r}
-# print(unpaired)
+print(unpaired)
 ```
 
 After applying the `mean_diff()` function to the `dabest` object, you can view the mean differences for each group as well as the weighted delta by printing the `dabest_effectsize_obj`.
 
 ```{r}
 unpaired.mean_diff <- mean_diff(unpaired)
-# print(unpaired.mean_diff)
+
+print(unpaired.mean_diff)
 ```
 
 You can view the details of each experiment by accessing `dabest_effectsize_obj$boot_results`, as follows. This also contains details of the weighted delta.

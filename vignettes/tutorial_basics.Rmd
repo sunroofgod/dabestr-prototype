@@ -21,7 +21,7 @@ The dataset is first processed into the dabestr format via `load()`. The effect 
 calculated via `effect_size()`. Lastly, the estimation plots are produced via
 `dabest_plot()`
 
-```{r setup}
+```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
@@ -78,15 +78,18 @@ two_groups_unpaired <- load(df, x = Group, y = Measurement,
 ```
 
 Printing this `dabestr` object gives you a gentle greeting, as well as the comparisons that can be computed.
-```{r, eval = FALSE}
+```{r}
 print(two_groups_unpaired)
 ```
 
 ### Changing statistical parameters
 You can change the width of the confidence interval that will be produced by manipulating the `ci` argument.
-```{r, eval = FALSE}
+```{r}
 two_groups_unpaired_ci90 = load(df, x = Group, y = Measurement,
                                 idx = c("Control 1", "Test 1"), ci=90)
+```
+
+```{r}
 print(two_groups_unpaired_ci90)
 ```
 
@@ -104,7 +107,8 @@ these `effect_size()` functions as a parameter.
 
 ```{r}
 two_groups_unpaired.mean_diff <- mean_diff(two_groups_unpaired)
-# print(two_groups_unpaired.mean_diff)
+
+print(two_groups_unpaired.mean_diff)
 ```
 
 For each comparison, the type of effect size is reported (here, it’s the “unpaired mean difference”). The confidence interval is reported as: _[confidenceIntervalWidth LowerBound, UpperBound]_
@@ -138,9 +142,22 @@ dabest_plot(two_groups_unpaired.mean_diff)
 
 Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function This will plot the bootstrap effect sizes below the raw data, and also displays the the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
 
-```{r}
+```{r, eval = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
             contrast_ylim = c(-0.3, 1.3))
+```
+
+```{r, echo = FALSE}
+pp_plot <- dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
+            contrast_ylim = c(-0.3, 1.3))
+
+cowplot::plot_grid(
+  plotlist = list(NULL, pp_plot, NULL),
+  nrow = 1,
+  ncol = 3,
+  rel_widths = c(2.5, 5, 2.5)
+)
+
 ```
 
 The `dabestr` package also implements a range of estimation plot designs aimed at depicting common experimental designs.
@@ -161,13 +178,20 @@ The **shared control plot** displays another common experimental paradigm, where
 
 This type of Cumming plot is automatically generated if the vector passed to `idx` has more than two data columns.
 ```{r}
-share_control <- load(df, x = Group, y = Measurement,
-                      idx = c("Control 1", "Test 1", "Test 2", "Test 3",
-                              "Test 4", "Test 5", "Test 6")
-                      )
-# print(shared_control)
-shared_control.mean_diff <- mean_diff(share_control)
-# print(shared_control.mean_diff)
+shared_control <- load(df, x = Group, y = Measurement,
+                       idx = c("Control 1", "Test 1", "Test 2", "Test 3",
+                               "Test 4", "Test 5", "Test 6"))
+
+print(shared_control)
+```
+
+```{r}
+shared_control.mean_diff <- mean_diff(shared_control)
+
+print(shared_control.mean_diff)
+```
+
+```{r}
 dabest_plot(shared_control.mean_diff)
 ```
 
@@ -178,9 +202,17 @@ multi_groups <- load(df, x = Group, y = Measurement,
                                 c("Control 2", "Test 2", "Test 3"),
                                 c("Control 3", "Test 4", "Test 5", "Test 6"))
                      )
-# print(multi_groups)
+
+print(multi_groups)
+```
+
+```{r}
 multi_groups.mean_diff <- mean_diff(multi_groups)
-# print(multi_groups.mean_diff)
+
+print(multi_groups.mean_diff)
+```
+
+```{r}
 dabest_plot(multi_groups.mean_diff)
 ```
 
