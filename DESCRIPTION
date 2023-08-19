@@ -24,7 +24,8 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation.
   The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
 License: Apache License (>= 2)
 Encoding: UTF-8
-URL: https://github.com/sunroofgod/dabestr-prototype
+URL: https://github.com/sunroofgod/dabestr-prototype,
+    https://sunroofgod.github.io/dabestr-prototype/
 Depends:
   R (>= 2.10)
 Imports: 
@@ -59,4 +60,3 @@ Suggests:
 Config/testthat/edition: 3
 LazyData: true
 VignetteBuilder: knitr
-
