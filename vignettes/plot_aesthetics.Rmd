@@ -34,7 +34,6 @@ dabest_plot(
 )
 ```
 
-
 ## Adjusting Text
 All text elements in the estimation plot can be adjusted. This includes the value,
 the size and even removal of the text elements completely.

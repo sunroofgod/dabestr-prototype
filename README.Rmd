@@ -38,11 +38,9 @@ git clone https://github.com/ACCLAB/dabestr
 
 ## Usage
 
-```{r, include = FALSE}
-devtools::load_all(".")
-```
-
 ```{r}
+library(dabestr)
+
 data(twogroup_data)
 
 dabest_obj.mean_diff <- dabestr::load(data = twogroup_data, 

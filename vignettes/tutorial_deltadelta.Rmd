@@ -36,7 +36,7 @@ Effectively, we have 4 groups of subjects for comparison.
 
 There are 2 `Treatment` conditions, `Placebo` (control group) and `Drug` (test group). There are 2 `Genotypes`: `W` (wild type population) and `M` (mutant population). In addition, each experiment was done twice (`Rep1` and `Rep2`). We shall do a few analyses to visualise these differences in a simulated dataset.
 
-```{r setup}
+```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
@@ -100,14 +100,15 @@ unpaired_delta2 <- load(df, x = Genotype, y = Measurement,
 The above function creates the following `dabest` object:
 
 ```{r}
-# print(unpaired_delta2)
+print(unpaired_delta2)
 ```
 
 We can quickly check out the effect sizes:
 
 ```{r}
 unpaired_delta2.mean_diff <- mean_diff(unpaired_delta2)
-# print(unpaired_delta2.mean_diff)
+
+print(unpaired_delta2.mean_diff)
 ```
 
 ```{r}

@@ -289,3 +289,56 @@ hedges_correction <- function(x1, x2) {
   return(out)
 }
 
+#' Print a `dabest_effectsize_obj` object
+#' 
+#' @noRd
+#'
+#' @param dabest_effectsize_obj a list object created by `effect_size()` functions
+#' @param ... S3 signature for generic plot function.
+#'
+#' @return A summary of the effect sizes and respective confidence intervals.
+#'
+#' @examples 
+#' # Loading in of the dataset
+#' data(twogroup_data)
+#' 
+#' # Preparing the data to be plotted
+#' dabest_obj <- load(twogroup_data, x = Group, y = Measurement,
+#'                    idx = c("Control1", "Group1"))
+#'                    
+#' dabest_obj.mean_diff <- mean_diff(dabest_obj)
+#' 
+#' # Display the results in a user-friendly format.
+#' print(dabest_obj.mean_diff)
+#' 
+#' @export
+print.dabest_effectsize <- function(dabest_effectsize_obj, ...) {
+  if (class(dabest_effectsize_obj) != "dabest_effectsize") {
+    cli::cli_abort(c("Only dabest_effectsize objects can be used.", 
+                     "x" = "Please enter a valid entry into the function."))
+  }
+  
+  print_greeting_header()
+  
+  paired <- dabest_effectsize_obj$paired
+  ci <- dabest_effectsize_obj$ci
+  
+  if (is.null(paired)) {
+    rm_status <- ""
+  } else if (paired =="sequential") {
+    rm_status <- "for the sequential design of repeated-measures experiment \n"
+  } else if (paired=="baseline") {
+    rm_status <- "for repeated measures against baseline \n"
+  }
+  
+  if (is.null(paired)) {
+    paired_status <- "E"
+  } else if (paired =="sequential") {
+    paired_status <- "Paired e"
+  } else if (paired =="baseline") {
+    paired_status <- "Paired e"
+  }
+  es <- dabest_effectsize_obj$effect_size_type
+  print_each_comparism_effectsize(dabest_effectsize_obj,es)
+  print_ending(dabest_effectsize_obj)
+}

@@ -38,7 +38,7 @@
 #' a 2 by 2 experimental design.
 #'
 #' @return 
-#' Returns a dabest_object list with 18 elements. The following are the elements contained within:
+#' Returns a `dabest_obj` list with 18 elements. The following are the elements contained within:
 #'
 #' - `raw_data` The tidy dataset passed to [load()] that was cleaned and altered for plotting.
 #' - `proportional_data` List of calculations related to the plotting of proportion plots.
@@ -333,3 +333,58 @@ load <- function(
   return(dabest_object)
 }
 
+#' Print a `dabest` object
+#' 
+#' @noRd
+#'
+#' @param dabest_obj a list 
+#' @param ... S3 signature for generic plot function.
+#'
+#' @return A summary of the experimental designs.
+#'
+#' @examples 
+#' # Loading in of the dataset
+#' data(twogroup_data)
+#' 
+#' # Creating a dabest object
+#' dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement,
+#'                    idx = c("Control1", "Group1"))
+#'                    
+#' # Display the results in a user-friendly format.
+#' print(dabest_obj)
+#' 
+#' @export
+print.dabest <- function(dabest_obj, ...) {
+  if (class(dabest_obj)[1] != "dabest") {
+    cli::cli_abort(c("Only dabest class can be used.", 
+                     "x" = "Please enter a valid entry into the function."))
+  }
+  
+  print_greeting_header()
+  
+  paired <- dabest_obj$paired
+  ci <- dabest_obj$ci
+  
+  if (is.null(paired)) {
+    rm_status <- ""
+  } else if (paired =="sequential") {
+    rm_status <- "for the sequential design of repeated-measures experiment \n"
+  } else if (paired=="baseline") {
+    rm_status <- "for repeated measures against baseline \n"
+  }
+  
+  if (is.null(paired)) {
+    paired_status <- "E"
+  } else if (paired =="sequential") {
+    paired_status <- "Paired e"
+  } else if (paired =="baseline") {
+    paired_status <- "Paired e"
+  }
+  line1 <- paste(paired_status,"ffect size(s) ",rm_status,sep="")
+  line2 <- paste("with ",ci,"% confidence intervals will be computed for:",sep="")
+  cat(line1)
+  cat(line2)
+  cat("\n")
+  print_each_comparism(dabest_obj)
+  print_ending(dabest_obj)
+}

@@ -69,7 +69,7 @@ distinguish the experiment and the factors (being used in the plotting labels).}
 a 2 by 2 experimental design.}
 }
 \value{
-Returns a dabest_object list with 18 elements. The following are the elements contained within:
+Returns a \code{dabest_obj} list with 18 elements. The following are the elements contained within:
 \itemize{
 \item \code{raw_data} The tidy dataset passed to \code{\link[=load]{load()}} that was cleaned and altered for plotting.
 \item \code{proportional_data} List of calculations related to the plotting of proportion plots.
