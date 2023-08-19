@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-devtools::load_all(".")
 ```
 
 When scientists perform replicates of the same experiment, the effect size of each replicate often varies, which complicates interpretation of the results. This vignette documents how `dabestr` is able to compute the meta-analyzed weighted effect size given multiple replicates of the same experiment. This can help resolve differences between replicates and simplify interpretation.
@@ -32,7 +31,7 @@ DABEST can only compute weighted effect size for _mean difference only_, and not
 
 For more information on meta-analysis, please refer to Chapter 10 of the Cochrane handbook: https://training.cochrane.org/handbook/current/chapter-10
 
-```{r eval = FALSE}
+```{r setup}
 library(dabestr)
 ```
 
