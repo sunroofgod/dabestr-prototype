@@ -26,6 +26,8 @@ articles:
   - tutorial_basics
   - tutorial_repeated_measures
   - tutorial_proportion_plots
+  - tutorial_minimeta
+  - tutorial_deltadelta
   - datasets
 
 reference:

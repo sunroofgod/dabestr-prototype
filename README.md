@@ -14,6 +14,7 @@ Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)]
 [![Free-to-view
 citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
+[![R-CMD-check](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 <!-- ## Overview -->
@@ -56,32 +57,6 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
                                       y = Measurement, 
                                       idx = c("Control1", "Group1")) %>%
   dabestr::mean_diff()
-#> DABESTR v0.0.0.9000
-#> ===================
-#> 
-#> Good afternoon!
-#> The current time is 17:12 PM on Tuesday August 15, 2023.
-#> 
-#> Effect size(s) with 95% confidence intervals will be computed for:
-#> 1. Group1 minus Control1
-#> 
-#> resamples will be used to generate the effect size bootstraps.
-#> 
-#> DABESTR v0.0.0.9000
-#> ===================
-#> 
-#> Good afternoon!
-#> The current time is 17:12 PM on Tuesday August 15, 2023.
-#> 
-#> The unpaired mean difference between Group1 and Control1 is 19.734 [95%CI 8.099, 31.045].
-#> The p-value of the two-sided permutation t-test is , calculated for legacy purposes only.
-#> 
-#> bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.
-#> Any p-value reported is the probability of observing the effect size (or greater),
-#> assuming the null hypothesis of zero difference is true.
-#> For each p-value, reshuffles of the control and test labels were performed.
-#> 
-#> To get the results of all valid statistical tests, use .mean_diff.statistical_tests
 
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```

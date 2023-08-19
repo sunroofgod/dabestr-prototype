@@ -92,7 +92,7 @@ draw_group_proportion_bar <- function(data, panel_scales, coord) {
   failure_bar <- grid::polygonGrob(x = coords$x,
                              y = coords$y,
                              gp = grid::gpar(col = first_row$colour,
-                                       fill = scales::alpha(first_row$fill, first_row$alpha)))
+                                             fill = scales::alpha(first_row$fill, first_row$alpha)))
 }
 
 GeomProportionBar <- ggplot2::ggproto("GeomProportionBar", ggplot2::Geom,
