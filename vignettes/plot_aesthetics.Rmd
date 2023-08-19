@@ -48,7 +48,8 @@ The following parameters are responsible for adjusting the size of the text elem
 - `contrast_y_text`: Default 15. Numeric value determining the font size of the y-axis of the contrast plot.
 
 ```{r, include = FALSE}
-devtools::load_all(".")
+library(dabestr)
+
 data(twogroup_data)
 data(multigroup_data)
 data(my.data.proportional)

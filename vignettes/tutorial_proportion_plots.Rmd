@@ -12,14 +12,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-devtools::load_all(".")
 ```
 
 This vignette documents how `dabestr` is able to generate proportion plots for binary data. 
 
 It’s important to note that the code we provide only supports numerical proportion data, where the values are limited to 0 (failure) and 1 (success). This means that the code is not suitable for analyzing proportion data that contains non-numeric values, such as strings like ‘yes’ and ‘no’.
 
-```{r eval = FALSE}
+```{r setup}
 library(dabestr)
 ```
 

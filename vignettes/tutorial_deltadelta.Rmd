@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-devtools::load_all(".")
 ```
 
 This vignette documents how `dabestr` is able to compute the calculation of delta-delta, an experimental function that allows the comparison between two bootstrapped effect sizes computed from two independent categorical variables.
@@ -37,7 +36,7 @@ Effectively, we have 4 groups of subjects for comparison.
 
 There are 2 `Treatment` conditions, `Placebo` (control group) and `Drug` (test group). There are 2 `Genotypes`: `W` (wild type population) and `M` (mutant population). In addition, each experiment was done twice (`Rep1` and `Rep2`). We shall do a few analyses to visualise these differences in a simulated dataset.
 
-```{r eval = FALSE}
+```{r setup}
 library(dabestr)
 ```
 

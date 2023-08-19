@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-devtools::load_all(".")
 ```
 
 This vignette documents the basic functionalities of dabestr. It illustrates the 
@@ -22,7 +21,7 @@ The dataset is first processed into the dabestr format via `load()`. The effect 
 calculated via `effect_size()`. Lastly, the estimation plots are produced via
 `dabest_plot()`
 
-```{r eval = FALSE}
+```{r setup}
 library(dabestr)
 ```
 

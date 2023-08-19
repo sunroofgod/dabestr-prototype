@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-devtools::load_all(".")
 ```
 
 This vignette documents how `dabestr` is able to generate estimation plots for experiments with repeated-measures designs. `dabestr` allows for the calculation and plotting of effect sizes for:
@@ -24,7 +23,7 @@ This is an improved version of paired data plotting in previous versions, which 
 
 To use these features, you can simply declare the argument `paired = "sequential"` or `paired = "baseline"` correspondingly while running `load()`. You must also pass a column in the dataset that indicates the identity of each observation, using the `id_col` keyword.
 
-```{r eval = FALSE}
+```{r setup}
 library(dabestr)
 ```
 
