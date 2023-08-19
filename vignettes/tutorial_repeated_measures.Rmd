@@ -62,6 +62,7 @@ df <- df %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 ```
 
+## Loading Data
 ```{r}
 two_groups_paired_sequential <- load(df, x = Group, y = Measurement,
                                      idx = c("Control 1", "Test 1"),
