@@ -8,9 +8,7 @@ float_contrast_theme <- ggplot2::theme(plot.margin = ggplot2::unit(c(0, 0, 0, 0)
                                        axis.title.x = ggplot2::element_blank(), 
                                        axis.ticks.x = ggplot2::element_blank(),
                                        axis.title.x.bottom = ggplot2::element_blank(),
-                                       legend.title = ggplot2::element_blank(),
-                                       axis.text = ggplot2::element_text(family = "sans"),
-                                       axis.title.y = ggplot2::element_text(family = "sans"))
+                                       legend.title = ggplot2::element_blank())
 
 # Theme for top-down graph
 non_float_contrast_theme <- ggplot2::theme(plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"),
@@ -18,15 +16,11 @@ non_float_contrast_theme <- ggplot2::theme(plot.margin = ggplot2::unit(c(0, 0, 0
                                            axis.title.x = ggplot2::element_blank(), 
                                            axis.ticks.x = ggplot2::element_blank(),
                                            axis.title.x.bottom = ggplot2::element_blank(),
-                                           legend.title = ggplot2::element_blank(),
-                                           axis.text = ggplot2::element_text(family = "sans"),
-                                           axis.title.y = ggplot2::element_text(family = "sans"))
+                                           legend.title = ggplot2::element_blank())
 
 # Theme for removal of all axes and labels
 remove_all_axes_theme <- ggplot2::theme(axis.line = ggplot2::element_blank(),
                                         axis.title = ggplot2::element_blank(),
                                         axis.ticks = ggplot2::element_blank(),
                                         legend.title = ggplot2::element_blank(),
-                                        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"),
-                                        axis.text = ggplot2::element_text(family = "sans"),
-                                        axis.title.y = ggplot2::element_text(family = "sans"))
+                                        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))
