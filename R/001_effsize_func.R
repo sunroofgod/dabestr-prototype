@@ -56,10 +56,10 @@
 #'
 #' @examples
 #' # Loading of the dataset
-#' data(twogroup_data)
+#' data(non_proportional_data)
 #' 
 #' # Preparing the data to be plotted
-#' dabest_obj <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
+#' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #' 
 #' @export 

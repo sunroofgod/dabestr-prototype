@@ -65,7 +65,7 @@
 #' @keywords internal
 #' @format A data frame with 40 rows and 5 variables:
 #'  \describe{
-#'       \item{Gender}{Gender of each observation}
+#'       \item{Genotype}{Genotype of each observation}
 #'       \item{ID}{Identity of each observation}
 #'       \item{Rep}{Rep of each observation}
 #'       \item{Treatment}{Which treatment method was used}
