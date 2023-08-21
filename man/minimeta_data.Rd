@@ -7,18 +7,17 @@
 \format{
 A data frame with 120 rows and 5 variables:
 \describe{
-\item{Dummy}{Dummy}
-\item{Gender}{Gender}
-\item{ID}{ID}
+\item{Gender}{Gender of each observation}
+\item{ID}{Identity of each observation}
 \item{Group}{Which control group or test it is}
-\item{Measurement}{Measurement}
+\item{Measurement}{Measurement value}
 }
 }
 \usage{
 minimeta_data
 }
 \description{
-Contains 3 control groups and 3 test groups.
+Contains 3 Control Samples and 3 Test Samples.
 }
 \examples{
 data(minimeta_data) # Lazy loading. Data becomes visible as soon as it is loaded
