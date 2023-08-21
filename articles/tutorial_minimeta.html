@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,9 @@
     <a class="dropdown-item" href="../articles/tutorial_deltadelta.html">Tutorial: Delta-Delta</a>
     <a class="dropdown-item" href="../articles/datasets.html">Sample Datasets</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -221,11 +224,11 @@ delta. Note once again that weighted delta will only be calculated for
 mean difference.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
 <span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:59 PM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -242,11 +245,11 @@ group as well as the weighted delta by printing the
 <code class="sourceCode R"><span><span class="va">unpaired.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">unpaired</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
 <span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 17:59 PM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The unpaired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.0018", "0.17"), calculated for legacy purposes only.</span></span>

@@ -43,6 +43,9 @@
     <loc>https://sunroofgod.github.io/dabestr-prototype/index.html</loc>
   </url>
   <url>
+    <loc>https://sunroofgod.github.io/dabestr-prototype/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://sunroofgod.github.io/dabestr-prototype/reference/dabest_plot.html</loc>
   </url>
   <url>
@@ -61,18 +64,15 @@
     <loc>https://sunroofgod.github.io/dabestr-prototype/reference/minimeta_data.html</loc>
   </url>
   <url>
-    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/multigroup_data.html</loc>
-  </url>
-  <url>
-    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/my.data.proportional.html</loc>
+    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/non_proportional_data.html</loc>
   </url>
   <url>
     <loc>https://sunroofgod.github.io/dabestr-prototype/reference/plot_kwargs.html</loc>
   </url>
   <url>
-    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/reexports.html</loc>
+    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/proportional_data.html</loc>
   </url>
   <url>
-    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/twogroup_data.html</loc>
+    <loc>https://sunroofgod.github.io/dabestr-prototype/reference/reexports.html</loc>
   </url>
 </urlset>

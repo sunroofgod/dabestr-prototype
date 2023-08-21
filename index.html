@@ -52,7 +52,7 @@
     
     <a class="navbar-brand me-2" href="index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,9 @@
     <a class="dropdown-item" href="articles/tutorial_deltadelta.html">Tutorial: Delta-Delta</a>
     <a class="dropdown-item" href="articles/datasets.html">Sample Datasets</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -110,6 +113,10 @@
 <li><p>It <strong>presents all datapoints</strong> as a swarmplot, which orders each point to display the underlying distribution.</p></li>
 <li><p>It presents the <strong>effect size</strong> as a <strong>bootstrap 95% confidence interval</strong> on a <strong>separate but aligned axes</strong>.</p></li>
 </ol>
+<div class="figure" style="text-align: center">
+<img src="reference/figures/2group_float_true.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_unpaired_proportion.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_unpaired_alpha=0.8.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_paired_proportion_sequential.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_minimeta.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_deltadelta_unpaired.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><p class="caption">
+</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -119,23 +126,18 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dabestr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     load</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sunroofgod/dabestr-prototype" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"non_proportional_data"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">twogroup_data</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu">dabestr</span><span class="fu">::</span><span class="fu"><a href="reference/load.html">load</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">twogroup_data</span>, </span>
+<span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu">dabestr</span><span class="fu">::</span><span class="fu"><a href="reference/load.html">load</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">non_proportional_data</span>, </span>
 <span>                                      x <span class="op">=</span> <span class="va">Group</span>, </span>
 <span>                                      y <span class="op">=</span> <span class="va">Measurement</span>, </span>
-<span>                                      idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control1"</span>, <span class="st">"Group1"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>                                      idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dabestr</span><span class="fu">::</span><span class="fu"><a href="reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">dabest_obj.mean_diff</span>, <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png"><!-- --></p>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
