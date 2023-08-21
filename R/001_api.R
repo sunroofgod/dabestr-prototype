@@ -67,11 +67,11 @@
 #' 
 #' @examples 
 #' # Loading in of the dataset
-#' data(twogroup_data)
+#' data(non_proportional_data)
 #' 
 #' # Creating a dabest object
-#' dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, 
-#' idx = c("Control1", "Group1"))
+#' dabest_obj <- load(data = non_proportional_data, x = Group, y = Measurement, 
+#' idx = c("Control1 ", "Test 1"))
 #' 
 #' @export load
 #'
