@@ -354,12 +354,13 @@ load <- function(
 #' print(dabest_obj)
 #' 
 #' @export
-print.dabest <- function(dabest_obj, ...) {
-  if (class(dabest_obj)[1] != "dabest") {
+print.dabest <- function(x, ...) {
+  if (class(x)[1] != "dabest") {
     cli::cli_abort(c("Only dabest class can be used.", 
                      "x" = "Please enter a valid entry into the function."))
   }
   
+  dabest_obj <- x
   print_greeting_header()
   
   paired <- dabest_obj$paired
