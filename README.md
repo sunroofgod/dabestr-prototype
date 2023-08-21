@@ -41,6 +41,14 @@ An estimation plot has two key features.
 2.  It presents the **effect size** as a **bootstrap 95% confidence
     interval** on a **separate but aligned axes**.
 
+<div class="figure" style="text-align: center">
+
+<img src="man/figures/2group_float_true.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_unpaired_proportion.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_unpaired_alpha=0.8.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_paired_proportion_sequential.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_minimeta.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_deltadelta_unpaired.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" />
+<p class="caption">
+</p>
+
+</div>
+
 ## Installation
 
 ``` bash
@@ -51,24 +59,21 @@ git clone https://github.com/ACCLAB/dabestr
 
 ``` r
 library(dabestr)
-#> 
-#> Attaching package: 'dabestr'
-#> The following object is masked from 'package:base':
-#> 
-#>     load
+```
 
-data(twogroup_data)
+``` r
+data("non_proportional_data")
 
-dabest_obj.mean_diff <- dabestr::load(data = twogroup_data, 
+dabest_obj.mean_diff <- dabestr::load(data = non_proportional_data, 
                                       x = Group, 
                                       y = Measurement, 
-                                      idx = c("Control1", "Group1")) %>%
+                                      idx = c("Control 1", "Test 1")) %>%
   dabestr::mean_diff()
 
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 ## Citation
 
