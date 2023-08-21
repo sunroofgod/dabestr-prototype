@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,11 +164,11 @@ list.</p>
 greeting, as well as the comparisons that can be computed.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -184,11 +184,11 @@ produced by manipulating the <code>ci</code> argument.</p>
 <span>                                idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>, ci<span class="op">=</span><span class="fl">90</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired_ci90</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 90% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -214,11 +214,11 @@ as a parameter.</p>
 <code class="sourceCode R"><span><span class="va">two_groups_unpaired.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">two_groups_unpaired</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The unpaired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 4e-04, calculated for legacy purposes only.</span></span>
@@ -344,11 +344,11 @@ passed to <code>idx</code> has more than two data columns.</p>
 <span>                               <span class="st">"Test 4"</span>, <span class="st">"Test 5"</span>, <span class="st">"Test 6"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">shared_control</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -363,11 +363,11 @@ passed to <code>idx</code> has more than two data columns.</p>
 <code class="sourceCode R"><span><span class="va">shared_control.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">shared_control</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">shared_control.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The unpaired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.1312", "0.97", "0.0328", "0.3298", "0.038"), calculated for legacy purposes only.</span></span>
@@ -406,11 +406,11 @@ elegantly present complex visualizations and statistics.</p>
 <span>                     <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_groups</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -425,11 +425,11 @@ elegantly present complex visualizations and statistics.</p>
 <code class="sourceCode R"><span><span class="va">multi_groups.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">multi_groups</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_groups.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.0.0.9000</span></span>
-<span><span class="co">#&gt; ===================</span></span>
+<span><span class="co">#&gt; DABESTR v1.0.0.0</span></span>
+<span><span class="co">#&gt; ================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good afternoon!</span></span>
-<span><span class="co">#&gt; The current time is 17:29 PM on Saturday August 19, 2023.</span></span>
+<span><span class="co">#&gt; Good morning!</span></span>
+<span><span class="co">#&gt; The current time is 05:03 AM on Monday August 21, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The unpaired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.0018", "0.0044", "0.2774", "0.1998", "0.921"), calculated for legacy purposes only.</span></span>
