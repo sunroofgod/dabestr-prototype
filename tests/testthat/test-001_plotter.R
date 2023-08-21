@@ -2,7 +2,7 @@ testthat::test_that("Plot two groups correctly", {
   np_dataset <- generate_non_proportional_dataset()
   
   #### 2GROUP ####
-  unpaired_mean_diff <- dabestr::load(np_dataset, x = Group, y = Measurement, idx = c("Control1", "Test1")) %>%
+  unpaired_mean_diff <- dabestr::load(np_dataset, x = Group, y = Measurement, idx = c("Control 1", "Test 1")) %>%
     dabestr::mean_diff()
   
   #### FLOAT TRUE ####
@@ -19,7 +19,7 @@ testthat::test_that("Plot two groups colour correctly", {
   
   #### 2GROUP COLOUR ####
   unpaired_mean_diff_colour <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                             idx = c("Control1", "Test1"),
+                                             idx = c("Control 1", "Test 1"),
                                              colour = Gender) %>%
     dabestr::mean_diff()
   
@@ -37,7 +37,7 @@ testthat::test_that("Plot multi groups correctly", {
 
   #### MULTIGROUP UNPAIRED ####
   multi_unpaired <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                  idx = list(c("Control1", "Test1"), c("Control2", "Test2", "Test3"))) %>%
+                                  idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3"))) %>%
     dabestr::mean_diff()
   
   multi_unpaired <- dabestr::dabest_plot(multi_unpaired, float_contrast = TRUE)
@@ -45,7 +45,7 @@ testthat::test_that("Plot multi groups correctly", {
   
   #### MULTIGROUP COLOUR UNPAIRED ####
   multi_unpaired_colour <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                         idx = list(c("Control1", "Test1"), c("Control2", "Test2", "Test3")),
+                                         idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
                                          colour = Gender) %>%
     dabestr::mean_diff()
   
@@ -54,7 +54,7 @@ testthat::test_that("Plot multi groups correctly", {
   
   #### MULTIGROUP SEQUENTIAL ####
   multi_sequential <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                    idx = list(c("Control1", "Test1"), c("Control2", "Test2", "Test3")),
+                                    idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
                                     paired = "sequential", id_col = ID) %>%
     dabestr::mean_diff()
   
@@ -63,7 +63,7 @@ testthat::test_that("Plot multi groups correctly", {
   
   #### MULTIGROUP BASELINE ####
   multi_baseline <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                  idx = list(c("Control1", "Test1"), c("Control2", "Test2", "Test3")),
+                                  idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
                                   paired = "baseline", id_col = ID) %>%
     dabestr::mean_diff()
   
@@ -72,7 +72,7 @@ testthat::test_that("Plot multi groups correctly", {
   
   #### MULTIGROUP BASELINE COLOUR ####
   multi_baseline_colour <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                                    idx = list(c("Control1", "Test1"), c("Control2", "Test2", "Test3")),
+                                    idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
                                     paired = "baseline", id_col = ID, colour = Gender) %>%
     dabestr::mean_diff()
   
@@ -85,7 +85,7 @@ testthat::test_that("Plot unpaired proportions correctly", {
   
   #### 2GROUP PROPORTION UNPAIRED ####
   unpaired_mean_diff <- dabestr::load(p_dataset, x = Group, y = Success, 
-                                  idx = c("Control1", "Test1"),
+                                  idx = c("Control 1", "Test 1"),
                                   proportional = TRUE) %>%
     dabestr::mean_diff()
   
@@ -99,7 +99,7 @@ testthat::test_that("Plot unpaired proportions correctly", {
   
   #### MULTIGROUP PROPORTION UNPAIRED ####
   multi_unpaired <- dabestr::load(p_dataset, x = Group, y = Success, 
-                                  idx = c("Control1", "Test1", "Test2"),
+                                  idx = c("Control 1", "Test 1", "Test 2"),
                                   proportional = TRUE) %>%
     dabestr::mean_diff()
   
@@ -112,7 +112,7 @@ testthat::test_that("Plot paired proportions correctly", {
   
   #### 2GROUP PROPORTION BASELINE ####
   paired_mean_diff <- dabestr::load(p_dataset, x = Group, y = Success, 
-                                    idx = c("Control1", "Test1"),
+                                    idx = c("Control 1", "Test 1"),
                                     proportional = TRUE, paired = "baseline",
                                     id_col = ID) %>%
     dabestr::mean_diff()
@@ -127,7 +127,7 @@ testthat::test_that("Plot paired proportions correctly", {
   
   #### MULTIGROUP PROPORTION SEQUENTIAL ####
   multi_sequential <- dabestr::load(p_dataset, x = Group, y = Success, 
-                                    idx = list(c("Control1", "Test1", "Test2", "Test3"), c("Control2", "Test4")),
+                                    idx = list(c("Control 1", "Test 1", "Test 2", "Test 3"), c("Control 2", "Test 4")),
                                     proportional = TRUE, paired = "sequential",
                                     id_col = ID) %>%
     dabestr::mean_diff()
@@ -137,7 +137,7 @@ testthat::test_that("Plot paired proportions correctly", {
   
   #### MULTIGROUP PROPORTION BASELINE ####
   multi_baseline <- dabestr::load(p_dataset, x = Group, y = Success, 
-                                    idx = list(c("Control1", "Test1", "Test2", "Test3"), c("Control2", "Test4")),
+                                    idx = list(c("Control 1", "Test 1", "Test 2", "Test 3"), c("Control 2", "Test 4")),
                                     proportional = TRUE, paired = "baseline",
                                     id_col = ID) %>%
     dabestr::mean_diff()
@@ -155,7 +155,7 @@ testthat::test_that("Plot minimeta correctly", {
 
   #### MINIMETA ####
   minimeta <- dabestr::load(np_dataset, x = Group, y = Measurement, 
-                            idx = list(c("Control1", "Test1"), c("Control2", "Test2"), c("Control3", "Test3")),
+                            idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2"), c("Control 3", "Test 3")),
                             minimeta = TRUE) %>%
     dabestr::mean_diff()
   

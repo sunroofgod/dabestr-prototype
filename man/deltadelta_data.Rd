@@ -5,21 +5,20 @@
 \alias{deltadelta_data}
 \title{Data to produce a delta2 Dabest plot}
 \format{
-A data frame with 80 rows and 6 variables:
+A data frame with 40 rows and 5 variables:
 \describe{
-\item{Dummy}{Dummy}
-\item{Genotype}{Genotype}
-\item{ID}{ID}
-\item{Rep}{Rep}
+\item{Gender}{Gender of each observation}
+\item{ID}{Identity of each observation}
+\item{Rep}{Rep of each observation}
 \item{Treatment}{Which treatment method was used}
-\item{Measurement}{Measurement}
+\item{Measurement}{Measurement value}
 }
 }
 \usage{
 deltadelta_data
 }
 \description{
-Contains 2 genotype groups and 2 treatment groups.
+Contains 2 Genotype groups and 2 Treatment groups.
 }
 \examples{
 data(deltadelta_data) # Lazy loading. Data becomes visible as soon as it is loaded

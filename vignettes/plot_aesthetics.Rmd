@@ -49,23 +49,23 @@ The following parameters are responsible for adjusting the size of the text elem
 ```{r, include = FALSE}
 library(dabestr)
 
-data(twogroup_data)
-data(multigroup_data)
-data(my.data.proportional)
-dabest_twogroup_obj.mean_diff <- load(twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1")) %>% 
+data(non_proportional_data)
+data(proportional_data)
+data(deltadelta_data)
+dabest_twogroup_obj.mean_diff <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1")) %>% 
   mean_diff()
 
-dabest_multigroup_obj.mean_diff <- load(multigroup_data, x = Group, y = Measurement, 
-                                        idx = list(c("Control1", "Group1", "Group2"), c("Control2", "Group3"))) %>% 
+dabest_multigroup_obj.mean_diff <- load(non_proportional_data, x = Group, y = Measurement, 
+                                        idx = list(c("Control 1", "Test 1", "Test 2"), c("Control 2", "Test 3"))) %>% 
   mean_diff()
 
-dabest_unpaired_props.mean_diff <- load(my.data.proportional, x = Group, y = Success, 
-                                        idx = list(c("Control1", "Test1")),
+dabest_unpaired_props.mean_diff <- load(proportional_data, x = Group, y = Success, 
+                                        idx = list(c("Control 1", "Test 1")),
                                         proportional = TRUE) %>% 
   mean_diff()
 
-dabest_paired_props.mean_diff <- load(my.data.proportional, x = Group, y = Success, 
-                                      idx = list(c("Control1", "Test1", "Test2", "Test3"), c("Control2", "Test4")),
+dabest_paired_props.mean_diff <- load(proportional_data, x = Group, y = Success, 
+                                      idx = list(c("Control 1", "Test 1", "Test 2", "Test 3"), c("Control 2", "Test 4")),
                                       proportional = TRUE, paired = "sequential",
                                       id_col = ID) %>% 
   mean_diff()

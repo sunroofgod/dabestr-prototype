@@ -251,7 +251,7 @@ Pvalues_statistics <- function(dabest_object,
         
         test_size <- length(test_measurement)
         
-        es <- ef_size_fn(ctrl_measurement, test_measurement, paired)
+        es <- ef_size_fn(ctrl_measurement, test_measurement, paired = is_paired)
         
         # do permutation tests accordingly
         PermutationTest_result <- PermutationTest(ctrl_measurement, 

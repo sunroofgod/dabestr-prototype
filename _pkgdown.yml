@@ -37,6 +37,8 @@ articles:
   - tutorial_minimeta
   - tutorial_deltadelta
   - datasets
+news:
+  cran_dates: false
 reference:
 - subtitle: Main API
   desc: "Functions responsible for producing an estimation plot. They have been  sequentially
