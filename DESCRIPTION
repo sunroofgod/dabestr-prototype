@@ -1,7 +1,7 @@
 Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 0.0.0.9000
+Version: 1.0.0.0
 Authors@R: c(
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
   person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("aut")),

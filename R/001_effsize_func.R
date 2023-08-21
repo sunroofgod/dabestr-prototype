@@ -10,9 +10,9 @@
 #' The following effect sizes `mean_diff`, `median_diff`, `cohens_d`, `hedges_g` and `cliffs_delta`
 #' are used for most plot types. 
 #' 
-#' @param `dabest_obj` A dabest_obj created by loading in dataset along with other 
+#' @param dabest_obj A dabest_obj created by loading in dataset along with other 
 #' specified parameters with the [load()] function.
-#' @param `perm_count` The number of reshuffles of control and test labels to be performed for each p-value.
+#' @param perm_count The number of reshuffles of control and test labels to be performed for each p-value.
 #' 
 #' @returns 
 #' Returns a `dabest_effectsize_obj` list with 22 elements. The following are the elements contained within:
@@ -312,12 +312,13 @@ hedges_correction <- function(x1, x2) {
 #' print(dabest_obj.mean_diff)
 #' 
 #' @export
-print.dabest_effectsize <- function(dabest_effectsize_obj, ...) {
-  if (class(dabest_effectsize_obj) != "dabest_effectsize") {
+print.dabest_effectsize <- function(x, ...) {
+  if (class(x) != "dabest_effectsize") {
     cli::cli_abort(c("Only dabest_effectsize objects can be used.", 
                      "x" = "Please enter a valid entry into the function."))
   }
   
+  dabest_effectsize_obj <- x
   print_greeting_header()
   
   paired <- dabest_effectsize_obj$paired
