@@ -1,76 +1,54 @@
-#' Data to produce the basic 2-group Dabest plot
-#'
-#' Contains 2 control groups and 4 test groups.
+#' Non-proportional data for Estimation plots.
+#' 
+#' Contains 3 Control Samples and 6 Test Samples.
 #' 
 #' @keywords internal
-#' @format A data frame with 240 rows and 5 variables:
+#' @format A data frame with 180 rows and 4 variables:
 #'  \describe{
-#'       \item{Dummy}{Dummy}
-#'       \item{Gender}{Gender}
-#'       \item{ID}{ID}
+#'       \item{Gender}{Gender of each observation}
+#'       \item{ID}{Identity of each observation}
 #'       \item{Group}{Which control group or test it is}
-#'       \item{Measurement}{Measurement}
+#'       \item{Measurement}{Measurement value}
 #'       }
 #' 
 #' @examples 
-#' data(twogroup_data) # Lazy loading. Data becomes visible as soon as it is loaded.
-"twogroup_data"
+#' data(non_proportional_data) # Lazy loading. Data becomes visible as soon as it is loaded
+"non_proportional_data"
 
 
 
 
-#' Data to proudce multi-group Dabest plot
+#' Numerical Binary data for Proportion Plots
 #' 
-#' Contains 3 control groups and 3 test groups.
+#' Contains 3 Control Samples and 7 Test Samples.
 #' 
 #' @keywords internal
-#' @format A data frame with 240 rows and 5 variables:
+#' @format A data frame with 400 rows and 4 variables:
 #'  \describe{
-#'       \item{Dummy}{Dummy}
-#'       \item{Gender}{Gender}
-#'       \item{ID}{ID}
+#'       \item{Gender}{Gender of each observation}
+#'       \item{ID}{Identity of each observation}
 #'       \item{Group}{Which control group or test it is}
-#'       \item{Measurement}{Measurement}
+#'       \item{Success}{1 (Success) or 0 (Failure)}
 #'       }
 #' 
 #' @examples 
-#' data(multigroup_data) # Lazy loading. Data becomes visible as soon as it is loaded
-"multigroup_data"
-
-
-
-
-#' Data to proudce proportional or sankey Dabest plot (Can also be used multi-sankey)
-#' 
-#' Contains 2 control groups and 4 test groups.
-#' 
-#' @keywords internal
-#' @format A data frame with 240 rows and 3 variables:
-#'  \describe{
-#'       \item{Group}{Which control group or test it is}
-#'       \item{Success}{1 or 0}
-#'       \item{ID}{ID}
-#'       }
-#' 
-#' @examples 
-#' data(my.data.proportional) # Lazy loading. Data becomes visible as soon as it is loaded
-"my.data.proportional"
+#' data(proportional_data) # Lazy loading. Data becomes visible as soon as it is loaded
+"proportional_data"
 
 
 
 
 #' Data to produce a mini-meta Dabest plot
 #' 
-#' Contains 3 control groups and 3 test groups.
+#' Contains 3 Control Samples and 3 Test Samples.
 #' 
 #' @keywords internal
 #' @format A data frame with 120 rows and 5 variables:
 #'  \describe{
-#'       \item{Dummy}{Dummy}
-#'       \item{Gender}{Gender}
-#'       \item{ID}{ID}
+#'       \item{Gender}{Gender of each observation}
+#'       \item{ID}{Identity of each observation}
 #'       \item{Group}{Which control group or test it is}
-#'       \item{Measurement}{Measurement}
+#'       \item{Measurement}{Measurement value}
 #'       }
 #' 
 #' @examples 
@@ -82,28 +60,18 @@
 
 #' Data to produce a delta2 Dabest plot
 #' 
-#' Contains 2 genotype groups and 2 treatment groups.
+#' Contains 2 Genotype groups and 2 Treatment groups.
 #' 
 #' @keywords internal
-#' @format A data frame with 80 rows and 6 variables:
+#' @format A data frame with 40 rows and 5 variables:
 #'  \describe{
-#'       \item{Dummy}{Dummy}
-#'       \item{Genotype}{Genotype}
-#'       \item{ID}{ID}
-#'       \item{Rep}{Rep}
+#'       \item{Gender}{Gender of each observation}
+#'       \item{ID}{Identity of each observation}
+#'       \item{Rep}{Rep of each observation}
 #'       \item{Treatment}{Which treatment method was used}
-#'       \item{Measurement}{Measurement}
+#'       \item{Measurement}{Measurement value}
 #'       }
 #' 
 #' @examples 
 #' data(deltadelta_data) # Lazy loading. Data becomes visible as soon as it is loaded
 "deltadelta_data"
-
-
-
-
-
-
-
-
-
