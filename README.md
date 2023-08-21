@@ -50,6 +50,13 @@ git clone https://github.com/ACCLAB/dabestr
 ## Usage
 
 ``` r
+library(dabestr)
+#> 
+#> Attaching package: 'dabestr'
+#> The following object is masked from 'package:base':
+#> 
+#>     load
+
 data(twogroup_data)
 
 dabest_obj.mean_diff <- dabestr::load(data = twogroup_data, 
@@ -61,7 +68,7 @@ dabest_obj.mean_diff <- dabestr::load(data = twogroup_data,
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
 
 ## Citation
 
