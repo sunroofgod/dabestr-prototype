@@ -74,6 +74,12 @@ bootstrap <- function(
     cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be used when {.field proportional} is TRUE.",
                      "x" = "Please change {.var effect_size_func}."))
   }
+
+  ## Check that if delta2 is true, only mean difference can be computed
+  if (isTRUE(delta2) && !(boot_labs %in% c("Paired\nmean difference","Mean difference")))  {
+    cli::cli_abort(c("Other effect sizes besides {.var Mean difference} cannot be used when {.field delta2} is TRUE.",
+                     "x" = "Please change {.var effect_size_func}."))
+  }
   
   ## Getting boot_results
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
