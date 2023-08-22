@@ -240,12 +240,3 @@ dabest_plot(separate_control.mean_diff, swarm_y_text = 11, contrast_y_text = 11,
 dabest_plot(separate_control.mean_diff, swarm_y_text = 11, contrast_y_text = 11, 
             flow = FALSE)
 ```
-
-Several exclusive parameters can be supplied to the `dabest_plot()` function to customize the paired proportional plot. By adding available `plot_kwargs`, you can customize the Paired Proportions plot. The following parameters are supported:
-
-- `sankey_alpha`: The transparency of each bar. Default is 0.5.
-- `raw_bar_width`: The width of each bar. Default is 0.3.
-
-```{r}
-dabest_plot(two_groups_baseline.mean_diff, sankey_alpha = 0.8)
-```
